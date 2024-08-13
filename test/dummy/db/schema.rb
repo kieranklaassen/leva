@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_13_173222) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_13_174509) do
   create_table "leva_dataset_records", force: :cascade do |t|
     t.integer "dataset_id", null: false
     t.string "recordable_type", null: false
@@ -57,6 +57,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_13_173222) do
     t.text "system_prompt"
     t.text "user_prompt"
     t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "text_contents", force: :cascade do |t|
+    t.text "text"
+    t.string "expected_label"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
