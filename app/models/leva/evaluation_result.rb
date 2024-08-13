@@ -25,5 +25,7 @@ module Leva
   class EvaluationResult < ApplicationRecord
     belongs_to :experiment
     belongs_to :dataset_record
+
+    delegate :record, to: :dataset_record, allow_nil: true
   end
 end
