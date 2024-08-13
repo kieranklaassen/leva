@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class SentimentEval < Leva::BaseEval
-  leva_dataset_record_class "YourRecordClass"
+  leva_dataset_record_class "TextContent"
 
-  # @param record [YourRecordClass] The record to evaluate
+  # @param record [TextContent] The record to evaluate
   # @return [Leva::Result] The result of the evaluation
   def run_each(record)
     # Implement your evaluation logic here
@@ -11,7 +11,7 @@ class SentimentEval < Leva::BaseEval
     score = calculate_score(prediction, record.expected_value)
 
     Leva::Result.new(
-      label: 'sentiment',
+      label: "sentiment",
       prediction: prediction,
       score: score
     )
@@ -19,7 +19,7 @@ class SentimentEval < Leva::BaseEval
 
   private
 
-  # @param record [YourRecordClass] The record to make a prediction for
+  # @param record [TextContent] The record to make a prediction for
   # @return [String] The prediction
   def your_prediction_method(record)
     # Implement your prediction logic here

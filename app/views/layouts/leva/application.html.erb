@@ -1,17 +1,36 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Leva</title>
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-
-  <%= yield :head %>
-
-  <%= stylesheet_link_tag    "leva/application", media: "all" %>
-</head>
-<body>
-
-<%= yield %>
-
-</body>
+<html lang="en" class="bg-gray-900">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leva - <%= yield(:title) || 'AI Evaluation Engine' %></title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        // ... any other Tailwind configuration
+      }
+    </script>
+  </head>
+  <body class="bg-gray-900 text-white">
+    <nav class="bg-gray-800 border-b border-gray-700">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex">
+            <%= link_to 'Leva', leva.root_path, class: 'flex-shrink-0 flex items-center text-2xl font-bold text-indigo-400' %>
+            <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <%= link_to 'Workbench', leva.workbench_index_path, class: "border-transparent #{request.path.start_with?(leva.workbench_index_path) ? 'border-indigo-500 text-white' : 'text-gray-400 hover:border-gray-700 hover:text-gray-300'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" %>
+              <%= link_to 'Datasets', leva.datasets_path, class: "border-transparent #{request.path.start_with?(leva.datasets_path) ? 'border-indigo-500 text-white' : 'text-gray-400 hover:border-gray-700 hover:text-gray-300'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" %>
+              <%= link_to 'Experiments', leva.experiments_path, class: "border-transparent #{request.path.start_with?(leva.experiments_path) ? 'border-indigo-500 text-white' : 'text-gray-400 hover:border-gray-700 hover:text-gray-300'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <main class="bg-gray-900">
+      <%= yield %>
+    </main>
+  </body>
 </html>

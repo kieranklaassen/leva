@@ -11,7 +11,7 @@ class <%= class_name %>Eval < Leva::BaseEval
     score = calculate_score(prediction, record.expected_value)
 
     Leva::Result.new(
-      label: '<%= file_name.underscore %>',
+      label: "<%= file_name.underscore %>",
       prediction: prediction,
       score: score
     )
