@@ -77,6 +77,9 @@ GEM
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
+    annotate (3.2.0)
+      activerecord (>= 3.2, < 8.0)
+      rake (>= 10.4, < 14.0)
     ast (2.4.2)
     base64 (0.2.0)
     bigdecimal (3.1.8)
@@ -233,6 +236,7 @@ PLATFORMS
   x86_64-darwin-22
 
 DEPENDENCIES
+  annotate
   leva!
   puma
   rubocop-rails-omakase

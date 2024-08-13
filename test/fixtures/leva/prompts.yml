@@ -1,0 +1,27 @@
+# == Schema Information
+#
+# Table name: leva_prompts
+#
+#  id            :integer          not null, primary key
+#  metadata      :text
+#  name          :string
+#  system_prompt :text
+#  user_prompt   :text
+#  version       :integer
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
+
+one:
+  name: MyString
+  version: 1
+  system_prompt: MyText
+  user_prompt: MyText
+  metadata: MyText
+
+two:
+  name: MyString
+  version: 1
+  system_prompt: MyText
+  user_prompt: MyText
+  metadata: MyText

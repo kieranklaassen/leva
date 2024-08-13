@@ -1,0 +1,32 @@
+# == Schema Information
+#
+# Table name: leva_experiments
+#
+#  id         :integer          not null, primary key
+#  metadata   :text
+#  name       :string
+#  status     :integer
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  dataset_id :integer          not null
+#  prompt_id  :integer          not null
+#
+# Indexes
+#
+#  index_leva_experiments_on_dataset_id  (dataset_id)
+#  index_leva_experiments_on_prompt_id   (prompt_id)
+#
+# Foreign Keys
+#
+#  dataset_id  (dataset_id => datasets.id)
+#  prompt_id   (prompt_id => prompts.id)
+#
+require "test_helper"
+
+module Leva
+  class ExperimentTest < ActiveSupport::TestCase
+    # test "the truth" do
+    #   assert true
+    # end
+  end
+end
