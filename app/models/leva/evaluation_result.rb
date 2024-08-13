@@ -18,8 +18,8 @@
 #
 # Foreign Keys
 #
-#  dataset_record_id  (dataset_record_id => dataset_records.id)
-#  experiment_id      (experiment_id => experiments.id)
+#  dataset_record_id  (dataset_record_id => leva_dataset_records.id)
+#  experiment_id      (experiment_id => leva_experiments.id)
 #
 module Leva
   class EvaluationResult < ApplicationRecord
