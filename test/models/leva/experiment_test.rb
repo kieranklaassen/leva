@@ -18,8 +18,8 @@
 #
 # Foreign Keys
 #
-#  dataset_id  (dataset_id => leva_datasets.id)
-#  prompt_id   (prompt_id => leva_prompts.id)
+#  dataset_id  (dataset_id => datasets.id)
+#  prompt_id   (prompt_id => prompts.id)
 #
 require "test_helper"
 
