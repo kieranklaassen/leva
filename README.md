@@ -20,7 +20,7 @@ $ bundle install
 
 ### 1. Setting up Datasets
 
-First, create a dataset and add any ActiveRecord records:
+First, create a dataset and add any ActiveRecord records you want to evaluate against:
 
 ```ruby
 dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset")
@@ -32,7 +32,7 @@ dataset.records << TextContent.create(text: "I's ok", expected_label: "Neutral")
 
 ### 2. Implementing Runs
 
-Create a run class to handle the execution of your model:
+Create a run class to handle the execution of your inference logic:
 
 ```bash
 $ rails generate leva:runner sentiment
@@ -50,7 +50,7 @@ end
 
 ### 3. Implementing Evals
 
-Create eval classes to evaluate the model's output:
+Create one or more eval classes to evaluate the model's output:
 
 ```bash
 $ rails generate leva:eval sentiment_accuracy
