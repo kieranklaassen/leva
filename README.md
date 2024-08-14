@@ -24,10 +24,9 @@ First, create a dataset and add any ActiveRecord records you want to evaluate ag
 
 ```ruby
 dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset")
-
-dataset.records << TextContent.create(text: "I love this product!", expected_label: "Positive")
-dataset.records << TextContent.create(text: "Terrible experience", expected_label: "Negative")
-dataset.records << TextContent.create(text: "I's ok", expected_label: "Neutral")
+dataset.add_record TextContent.create(text: "I love this product!", expected_label: "Positive")
+dataset.add_record TextContent.create(text: "Terrible experience", expected_label: "Negative")
+dataset.add_record TextContent.create(text: "I's ok", expected_label: "Neutral")
 ```
 
 ### 2. Implementing Runs
