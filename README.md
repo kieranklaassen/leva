@@ -13,7 +13,14 @@ gem 'leva'
 And then execute:
 
 ```bash
-$ bundle install
+bundle install
+```
+
+Add the migrations to your database:
+
+```bash
+rails leva:install:migrations
+rails db:migrate
 ```
 
 ## Usage

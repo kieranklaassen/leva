@@ -2,24 +2,24 @@
 #
 # Table name: leva_experiments
 #
-#  id         :integer          not null, primary key
-#  metadata   :text
-#  name       :string
-#  status     :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  dataset_id :integer          not null
-#  prompt_id  :integer
+#  id              :integer          not null, primary key
+#  metadata        :text
+#  name            :string
+#  status          :integer
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  leva_dataset_id :integer          not null
+#  leva_prompt_id  :integer
 #
 # Indexes
 #
-#  index_leva_experiments_on_dataset_id  (dataset_id)
-#  index_leva_experiments_on_prompt_id   (prompt_id)
+#  index_leva_experiments_on_leva_dataset_id  (leva_dataset_id)
+#  index_leva_experiments_on_leva_prompt_id   (leva_prompt_id)
 #
 # Foreign Keys
 #
-#  dataset_id  (dataset_id => leva_datasets.id)
-#  prompt_id   (prompt_id => leva_prompts.id)
+#  leva_dataset_id  (leva_dataset_id => leva_datasets.id)
+#  leva_prompt_id   (leva_prompt_id => leva_prompts.id)
 #
 require "test_helper"
 
