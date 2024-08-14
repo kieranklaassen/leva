@@ -35,7 +35,7 @@ dataset.records << TextContent.create(text: "I's ok", expected_label: "Neutral")
 Create a run class to handle the execution of your inference logic:
 
 ```bash
-$ rails generate leva:runner sentiment
+rails generate leva:runner sentiment
 ```
 
 ```ruby
@@ -53,7 +53,7 @@ end
 Create one or more eval classes to evaluate the model's output:
 
 ```bash
-$ rails generate leva:eval sentiment_accuracy
+rails generate leva:eval sentiment_accuracy
 ```
 
 ```ruby

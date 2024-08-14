@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class <%= class_name %>Eval < Leva::BaseEval
-  leva_dataset_record_class "YourRecordClass"
-
   # @param prediction [String] The prediction to evaluate
   # @param record [YourRecordClass] The record to evaluate
   # @return [Leva::Result] The result of the evaluation
@@ -11,7 +9,6 @@ class <%= class_name %>Eval < Leva::BaseEval
 
     Leva::Result.new(
       label: "<%= file_name.underscore %>",
-      prediction: prediction,
       score: score
     )
   end
