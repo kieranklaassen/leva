@@ -32,8 +32,8 @@ module Leva
       dataset.add_record TextContent.create(text: "I's ok", expected_label: "Neutral")
       @experiment = Leva::Experiment.create!(name: "Sentiment Analysis", dataset: dataset)
 
-      @run = TestSentimentRun.new
-      @evals = [TestSentimentAccuracyEval.new, TestSentimentF1Eval.new]
+      @run = SentimentRun.new
+      @evals = [SentimentAccuracyEval.new, SentimentF1Eval.new]
     end
 
     test "run evaluation with two evals and one runner" do
@@ -50,8 +50,8 @@ module Leva
       average_accuracy = accuracy_results.average(:score)
       average_f1 = f1_results.average(:score)
 
-      assert_in_delta 0.67, average_accuracy, 0.01, "Average accuracy should be about 0.67 (2 out of 3 correct)"
-      assert_in_delta 0.67, average_f1, 0.01, "Average F1 score should be about 0.67 (2 out of 3 correct)"
+      assert_equal 1.0, average_accuracy
+      assert average_f1 < 1.0
     end
   end
 end

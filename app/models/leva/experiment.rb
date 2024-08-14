@@ -24,6 +24,8 @@
 module Leva
   class Experiment < ApplicationRecord
     belongs_to :dataset
-    belongs_to :prompt
+    belongs_to :prompt, optional: true
+
+    has_many :evaluation_results, dependent: :destroy
   end
 end

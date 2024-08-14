@@ -36,7 +36,7 @@ module Leva
     def run(experiment)
       results = {}
       experiment.dataset.dataset_records.find_each do |dataset_record|
-        result = execute(dataset_record.record)
+        result = execute(dataset_record.recordable)
         results[dataset_record.id] = result
       end
       results
@@ -66,7 +66,7 @@ module Leva
     def evaluate_all(experiment, results)
       experiment.dataset.dataset_records.find_each do |dataset_record|
         prediction = results[dataset_record.id]
-        evaluation = evaluate(prediction, dataset_record.record)
+        evaluation = evaluate(prediction, dataset_record.recordable)
 
         Leva::EvaluationResult.create!(
           experiment: experiment,
