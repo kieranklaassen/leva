@@ -34,6 +34,9 @@ module Leva
     # @param experiment [Leva::Experiment] The experiment to run.
     # @return [Hash] A hash mapping dataset_record_ids to their execution results.
     def run(experiment)
+      @experiment = experiment
+      @prompt = experiment.prompt
+
       results = {}
       experiment.dataset.dataset_records.find_each do |dataset_record|
         result = execute(dataset_record.recordable)
