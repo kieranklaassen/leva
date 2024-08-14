@@ -9,7 +9,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  dataset_id :integer          not null
-#  prompt_id  :integer          not null
+#  prompt_id  :integer
 #
 # Indexes
 #

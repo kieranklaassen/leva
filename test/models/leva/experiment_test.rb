@@ -9,7 +9,7 @@
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #  dataset_id :integer          not null
-#  prompt_id  :integer          not null
+#  prompt_id  :integer
 #
 # Indexes
 #
@@ -25,8 +25,33 @@ require "test_helper"
 
 module Leva
   class ExperimentTest < ActiveSupport::TestCase
-    # test "the truth" do
-    #   assert true
-    # end
+    def setup
+      dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset")
+      dataset.add_record TextContent.create(text: "I love this product!", expected_label: "Positive")
+      dataset.add_record TextContent.create(text: "Terrible experience", expected_label: "Negative")
+      dataset.add_record TextContent.create(text: "I's ok", expected_label: "Neutral")
+      @experiment = Leva::Experiment.create!(name: "Sentiment Analysis", dataset: dataset)
+
+      @run = TestSentimentRun.new
+      @evals = [TestSentimentAccuracyEval.new, TestSentimentF1Eval.new]
+    end
+
+    test "run evaluation with two evals and one runner" do
+      Leva.run_evaluation(experiment: @experiment, run: @run, evals: @evals)
+
+      assert_equal 6, @experiment.evaluation_results.count, "Should have 6 evaluation results (1 run * 3 records * 2 evals)"
+
+      accuracy_results = @experiment.evaluation_results.where(label: 'sentiment_accuracy')
+      f1_results = @experiment.evaluation_results.where(label: 'sentiment_f1')
+
+      assert_equal 3, accuracy_results.count, "Should have 3 accuracy results"
+      assert_equal 3, f1_results.count, "Should have 3 F1 results"
+
+      average_accuracy = accuracy_results.average(:score)
+      average_f1 = f1_results.average(:score)
+
+      assert_in_delta 0.67, average_accuracy, 0.01, "Average accuracy should be about 0.67 (2 out of 3 correct)"
+      assert_in_delta 0.67, average_f1, 0.01, "Average F1 score should be about 0.67 (2 out of 3 correct)"
+    end
   end
 end
