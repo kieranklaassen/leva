@@ -1,6 +1,6 @@
 # Leva - Flexible Evaluation Framework for Language Models
 
-Leva is a Ruby on Rails framework for evaluating Language Models (LLMs) using ActiveRecord datasets. It provides a flexible structure for creating experiments, managing datasets, and implementing various evaluation logic.
+Leva is a Ruby on Rails framework for evaluating Language Models (LLMs) using ActiveRecord datasets on production models. It provides a flexible structure for creating experiments, managing datasets, and implementing various evaluation logic on production data with security in mind.
 
 ## Installation
 
@@ -23,117 +23,117 @@ $ bundle install
 First, create a dataset and add any ActiveRecord records:
 
 ```ruby
-dataset = Dataset.create(name: "Sentiment Analysis Dataset")
+dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset")
 
 dataset.records << TextContent.create(text: "I love this product!", expected_label: "Positive")
 dataset.records << TextContent.create(text: "Terrible experience", expected_label: "Negative")
 dataset.records << TextContent.create(text: "I's ok", expected_label: "Neutral")
 ```
 
-> In this case the TextContent model is the ActiveRecord model from your own application.
+### 2. Implementing Runs
 
-### 2. Implementing Evals
-
-Create evals by adding new files in `app/evals/`. Each eval implements both the evaluation logic and how to run it. Here are some examples:
+Create a run class to handle the execution of your model:
 
 ```bash
-$ rails generate leva:eval Sentiment
+$ rails generate leva:run sentiment
 ```
 
-#### Sentiment Evaluation (app/evals/sentiment_eval.rb)
-
 ```ruby
-class SentimentEval < Leva::BaseEval
-  leva_dataset_record_class "TextContent"
-
-  def run_each(record)
-    prediction = label_sentiment(record.text)
-    score = calculate_score(prediction, record.expected_label)
-
-    Leva::Result.new(
-      label: 'sentiment',
-      prediction: prediction,
-      score: score
-    )
-  end
-
-  private
-
-  def label_sentiment(text)
-    # Simple sentiment analysis logic, use LLM to label the sentiment yourself
-    text = text.downcase
-    if text.include?('love')
-      'Positive'
-    elsif text.include?('terrible')
-      'Negative'
-    else
-      'Neutral'
-    end
-  end
-
-  def calculate_score(prediction, expected)
-    prediction == expected ? 1.0 : 0.0
+class SentimentRun < Leva::BaseRun
+  def execute(text)
+    # Your model execution logic here
+    # This could involve calling an API, running a local model, etc.
+    # Return the model's output
   end
 end
 ```
 
-### 3. Running Experiments
+### 3. Implementing Evals
 
-You can run experiments with different evals:
+Create eval classes to evaluate the model's output:
 
-```ruby
-sentiment_experiment = Experiment.create!(name: "Sentiment Analysis", dataset: dataset)
-SentimentEval.run_experiment(sentiment_experiment)
+```bash
+$ rails generate leva:eval sentiment_accuracy
 ```
 
-You can also run an experiment with a prompt so you can use a LLM to evaluate the dataset:
+```ruby
+class SentimentAccuracyEval < Leva::BaseEval
+  def evaluate(prediction, expected)
+    score = prediction == expected ? 1.0 : 0.0
+    Leva::Result.new(label: 'sentiment_accuracy', score: score)
+  end
+end
+
+class SentimentF1Eval < Leva::BaseEval
+  def evaluate(prediction, expected)
+    # Calculate F1 score
+    # ...
+    Leva::Result.new(label: 'sentiment_f1', score: f1_score)
+  end
+end
+```
+
+### 4. Running Experiments
+
+You can run experiments with different runs and evals:
+
+```ruby
+experiment = Leva::Experiment.create!(name: "Sentiment Analysis", dataset: dataset)
+
+run = SentimentRun.new
+evals = [SentimentAccuracyEval.new, SentimentF1Eval.new]
+
+Leva.run_evaluation(experiment: experiment, run: run, evals: evals)
+```
+
+### 5. Using Prompts
+
+You can also use prompts with your runs:
 
 ```ruby
 prompt = Leva::Prompt.create!(
   name: "Sentiment Analysis",
   version: 1,
   system_prompt: "You are an expert at analyzing text and returning the sentiment.",
-  user_prompt: "Please analyze the following text and return the sentiment as Positive, Negative, or Neutral.  \n\n {{TEXT}}",
-  metadata: {
-    model: "gpt-4o",
-    temperature: 0.5
-  }
+  user_prompt: "Please analyze the following text and return the sentiment as Positive, Negative, or Neutral.\n\n{{TEXT}}",
+  metadata: { model: "gpt-4", temperature: 0.5 }
 )
 
-sentiment_experiment = Experiment.create!(
+experiment = Leva::Experiment.create!(
   name: "Sentiment Analysis with LLM",
   dataset: dataset,
   prompt: prompt
 )
 
-SentimentEval.run_experiment(sentiment_experiment)
+run = SentimentRun.new
+evals = [SentimentAccuracyEval.new, SentimentF1Eval.new]
+
+Leva.run_evaluation(experiment: experiment, run: run, evals: evals)
 ```
 
-### 4. Analyzing Results
+### 6. Analyzing Results
 
 After the experiments are complete, analyze the results:
 
 ```ruby
-
-results = experiment.evaluation_results
-average_score = results.average(:score)
-count = results.count
-
-puts "Experiment: #{experiment.name}"
-puts "Average Score: #{average_score}"
-puts "Number of Evaluations: #{count}"
+experiment.evaluation_results.group_by(&:label).each do |label, results|
+  average_score = results.average(&:score)
+  puts "#{label.capitalize} Average Score: #{average_score}"
+end
 ```
 
 ## Configuration
 
-If your evals require API keys or other configurations, ensure you set these up in your Rails credentials or environment variables.
+Ensure you set up any required API keys or other configurations in your Rails credentials or environment variables.
 
 ## Leva's Components
 
 ### Classes
 
-- `Leva::BaseEval`: The base class for all evals. Override the `run` method in your eval classes.
-- `Leva::Result`: The result of an evaluation.
+- `Leva`: Handles the process of running experiments.
+- `Leva::BaseRun`: Base class for run implementations.
+- `Leva::BaseEval`: Base class for eval implementations.
+- `Leva::Result`: Represents the result of an evaluation.
 
 ### Models
 
