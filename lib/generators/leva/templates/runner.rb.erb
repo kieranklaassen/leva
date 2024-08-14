@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+class <%= class_name %>Run < Leva::BaseRun
+  # @param record [YourRecordClass] The record to run
+  # @return [String] The result of the run
+  def execute(record)
+    # Your model execution logic here
+    # This could involve calling an API, running a local model, etc.
+    # Return the result of the run to be used to evaluate the model
+  end
+end

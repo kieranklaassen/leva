@@ -35,12 +35,12 @@ dataset.records << TextContent.create(text: "I's ok", expected_label: "Neutral")
 Create a run class to handle the execution of your model:
 
 ```bash
-$ rails generate leva:run sentiment
+$ rails generate leva:runner sentiment
 ```
 
 ```ruby
 class SentimentRun < Leva::BaseRun
-  def execute(text)
+  def execute(record)
     # Your model execution logic here
     # This could involve calling an API, running a local model, etc.
     # Return the model's output
