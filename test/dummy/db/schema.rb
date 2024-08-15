@@ -23,6 +23,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_13_174509) do
 
   create_table "leva_datasets", force: :cascade do |t|
     t.string "name"
+    t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -68,9 +69,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_13_174509) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "leva_dataset_records", "datasets"
-  add_foreign_key "leva_evaluation_results", "dataset_records"
-  add_foreign_key "leva_evaluation_results", "experiments"
-  add_foreign_key "leva_experiments", "datasets"
-  add_foreign_key "leva_experiments", "prompts"
+  add_foreign_key "leva_dataset_records", "leva_datasets", column: "dataset_id"
+  add_foreign_key "leva_evaluation_results", "leva_dataset_records", column: "dataset_record_id"
+  add_foreign_key "leva_evaluation_results", "leva_experiments", column: "experiment_id"
+  add_foreign_key "leva_experiments", "leva_datasets", column: "dataset_id"
+  add_foreign_key "leva_experiments", "leva_prompts", column: "prompt_id"
 end

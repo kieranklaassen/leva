@@ -13,6 +13,8 @@ module Leva
     # GET /datasets/1
     # @return [void]
     def show
+      @experiments = @dataset.experiments
+      @new_experiment = Experiment.new(dataset: @dataset)
     end
 
     # GET /datasets/new

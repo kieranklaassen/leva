@@ -16,7 +16,7 @@
 #
 # Foreign Keys
 #
-#  dataset_id  (dataset_id => datasets.id)
+#  dataset_id  (dataset_id => leva_datasets.id)
 #
 require "test_helper"
 

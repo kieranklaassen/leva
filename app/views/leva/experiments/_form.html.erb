@@ -1,0 +1,30 @@
+<%= form_with(model: experiment, local: true, class: "bg-gray-800 rounded-lg shadow-lg p-6") do |form| %>
+  <% if experiment.errors.any? %>
+    <div class="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded-lg mb-4" role="alert">
+      <strong class="font-bold">Error:</strong>
+      <ul class="list-disc list-inside">
+        <% experiment.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="mb-4">
+    <%= form.label :name, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+    <%= form.text_field :name, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+  </div>
+  <div class="mb-4">
+    <%= form.label :description, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+    <%= form.text_area :description, rows: 3, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+  </div>
+  <div class="mb-4">
+    <%= form.label :prompt_id, "Prompt", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+    <%= form.collection_select :prompt_id, Prompt.all, :id, :name,
+        { prompt: "Select a prompt" },
+        class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+  </div>
+  <%= form.hidden_field :dataset_id, value: experiment.dataset_id || params[:dataset_id] %>
+  <div class="flex items-center justify-end">
+    <%= form.submit experiment.new_record? ? "Create Experiment" : "Update Experiment", class: "btn btn-primary" %>
+  </div>
+<% end %>

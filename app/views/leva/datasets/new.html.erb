@@ -1,0 +1,28 @@
+<% content_for :title, 'New Dataset' %>
+<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
+  <h1 class="text-3xl font-bold text-indigo-400 mb-6">New Dataset</h1>
+  <%= form_with(model: @dataset, local: true, class: "bg-gray-800 rounded-lg shadow-lg p-6") do |form| %>
+    <% if @dataset.errors.any? %>
+      <div class="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded-lg mb-4" role="alert">
+        <strong class="font-bold">Error:</strong>
+        <ul class="list-disc list-inside">
+          <% @dataset.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <div class="mb-4">
+      <%= form.label :name, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.text_field :name, autofocus: true, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+    </div>
+    <div class="mb-6">
+      <%= form.label :description, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.text_area :description, rows: 4, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+    </div>
+    <div class="flex items-center justify-end space-x-4">
+      <%= link_to "Cancel", datasets_path, class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
+      <%= form.submit "Create Dataset", class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors duration-150 ease-in-out" %>
+    </div>
+  <% end %>
+</div>

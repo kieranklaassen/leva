@@ -35,7 +35,8 @@ module Leva
         ExperimentJob.perform_later(@experiment)
         redirect_to @experiment, notice: 'Experiment was successfully created.'
       else
-        render :new
+        @dataset = @experiment.dataset
+        render 'leva/datasets/show'
       end
     end
 
@@ -67,7 +68,7 @@ module Leva
     # Only allow a list of trusted parameters through.
     # @return [ActionController::Parameters]
     def experiment_params
-      params.require(:experiment).permit(:name, :description, :dataset_id)
+      params.require(:experiment).permit(:name, :description, :dataset_id, :prompt_id)
     end
   end
 end

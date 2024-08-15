@@ -1,24 +1,23 @@
 <% content_for :title, @experiment.name %>
-<div class="px-4 sm:px-6 lg:px-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-2xl font-semibold text-gray-900"><%= @experiment.name %></h1>
-      <p class="mt-2 text-sm text-gray-700">Status: <%= @experiment.status %></p>
-    </div>
+<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-indigo-400 mb-2"><%= @experiment.name %></h1>
+    <p class="text-gray-400"><%= @experiment.description %></p>
+    <p class="text-indigo-300 mt-2">Status: <%= @experiment.status.capitalize %></p>
+    <%= link_to 'Edit Experiment', edit_experiment_path(@experiment), class: 'btn btn-secondary mt-4' %>
   </div>
-  <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
-    <div class="px-4 py-5 sm:px-6">
-      <h3 class="text-lg leading-6 font-medium text-gray-900">Experiment Details</h3>
-    </div>
-    <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
-      <dl class="sm:divide-y sm:divide-gray-200">
-        <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">Dataset</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @experiment.dataset.name %></dd>
-        </div>
-        <!-- Add more experiment details here -->
-      </dl>
-    </div>
+  <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+    <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Experiment Details</h2>
+    <p class="text-gray-400">Dataset: <%= link_to @experiment.dataset.name, dataset_path(@experiment.dataset), class: 'text-indigo-400 hover:underline' %></p>
+    <p class="text-gray-400">Prompt: <%= @experiment.prompt ? @experiment.prompt.name : 'Not specified' %></p>
+    <!-- Add more experiment details as needed -->
   </div>
-  <!-- Add experiment results or other relevant information here -->
+  <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+    <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Evaluation Results</h2>
+    <% if @experiment.evaluation_results.any? %>
+      <!-- Display evaluation results here -->
+    <% else %>
+      <p class="text-gray-400">No evaluation results available yet.</p>
+    <% end %>
+  </div>
 </div>

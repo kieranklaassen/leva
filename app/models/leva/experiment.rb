@@ -18,8 +18,8 @@
 #
 # Foreign Keys
 #
-#  dataset_id  (dataset_id => datasets.id)
-#  prompt_id   (prompt_id => prompts.id)
+#  dataset_id  (dataset_id => leva_datasets.id)
+#  prompt_id   (prompt_id => leva_prompts.id)
 #
 module Leva
   class Experiment < ApplicationRecord
@@ -27,5 +27,10 @@ module Leva
     belongs_to :prompt, optional: true
 
     has_many :evaluation_results, dependent: :destroy
+
+    validates :name, presence: true
+    validates :dataset, presence: true
+
+    enum status: { pending: 0, running: 1, completed: 2, failed: 3 }
   end
 end
