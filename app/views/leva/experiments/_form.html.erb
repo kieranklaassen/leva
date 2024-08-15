@@ -11,20 +11,41 @@
   <% end %>
   <div class="mb-4">
     <%= form.label :name, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.text_field :name, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+    <%= form.text_field :name, autofocus: true, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
   </div>
   <div class="mb-4">
     <%= form.label :description, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.text_area :description, rows: 3, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+    <%= form.text_area :description, rows: 4, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
   </div>
-  <div class="mb-4">
-    <%= form.label :prompt_id, "Prompt", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.collection_select :prompt_id, Prompt.all, :id, :name,
-        { prompt: "Select a prompt" },
-        class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
-  </div>
-  <%= form.hidden_field :dataset_id, value: experiment.dataset_id || params[:dataset_id] %>
-  <div class="flex items-center justify-end">
-    <%= form.submit experiment.new_record? ? "Create Experiment" : "Update Experiment", class: "btn btn-primary" %>
+  <% if experiment.new_record? %>
+    <% if params[:dataset_id].blank? %>
+      <div class="mb-4">
+        <%= form.label :dataset_id, "Dataset", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+        <%= form.collection_select :dataset_id, Leva::Dataset.all, :id, :name,
+            { prompt: "Select a dataset" },
+            class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+      </div>
+    <% else %>
+      <%= form.hidden_field :dataset_id, value: params[:dataset_id] %>
+    <% end %>
+    <div class="mb-4">
+      <%= form.label :prompt_id, "Prompt", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.collection_select :prompt_id, Leva::Prompt.all, :id, :name,
+          { prompt: "Select a prompt" },
+          class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+    </div>
+  <% else %>
+    <%= form.hidden_field :dataset_id %>
+    <%= form.hidden_field :prompt_id %>
+  <% end %>
+  <div class="flex items-center justify-end space-x-4">
+    <% if experiment.persisted? %>
+      <%= link_to "Cancel", experiment_path(experiment), class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
+    <% elsif experiment.dataset_id.present? || params[:dataset_id].present? %>
+      <%= link_to "Cancel", dataset_path(experiment.dataset_id || params[:dataset_id]), class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
+    <% else %>
+      <%= link_to "Cancel", experiments_path, class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
+    <% end %>
+    <%= form.submit experiment.persisted? ? "Update Experiment" : "Create Experiment", class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors duration-150 ease-in-out" %>
   </div>
 <% end %>

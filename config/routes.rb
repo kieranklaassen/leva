@@ -2,7 +2,7 @@ Leva::Engine.routes.draw do
   root 'workbench#index'
 
   resources :datasets
-  resources :experiments
+  resources :experiments, except: [:destroy]
   resources :prompts
   resources :workbench, only: [:index, :new, :show] do
     post 'run', on: :collection

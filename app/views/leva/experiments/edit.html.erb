@@ -1,0 +1,5 @@
+<% content_for :title, "Edit #{@experiment.name}" %>
+<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
+  <h1 class="text-3xl font-bold text-indigo-400 mb-6">Edit Experiment</h1>
+  <%= render 'form', experiment: @experiment %>
+</div>

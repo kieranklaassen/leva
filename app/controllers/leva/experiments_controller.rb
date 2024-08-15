@@ -2,7 +2,7 @@
 
 module Leva
   class ExperimentsController < ApplicationController
-    before_action :set_experiment, only: [:show, :edit, :update, :destroy]
+    before_action :set_experiment, only: [:show, :edit, :update]
 
     # GET /experiments
     # @return [void]
@@ -18,12 +18,13 @@ module Leva
     # GET /experiments/new
     # @return [void]
     def new
-      @experiment = Experiment.new
+      @experiment = Experiment.new(dataset_id: params[:dataset_id])
     end
 
     # GET /experiments/1/edit
     # @return [void]
     def edit
+      # The @experiment is already set by the before_action
     end
 
     # POST /experiments
@@ -35,26 +36,18 @@ module Leva
         ExperimentJob.perform_later(@experiment)
         redirect_to @experiment, notice: 'Experiment was successfully created.'
       else
-        @dataset = @experiment.dataset
-        render 'leva/datasets/show'
+        render :new
       end
     end
 
     # PATCH/PUT /experiments/1
     # @return [void]
     def update
-      if @experiment.update(experiment_params)
+      if @experiment.update(experiment_update_params)
         redirect_to @experiment, notice: 'Experiment was successfully updated.'
       else
         render :edit
       end
-    end
-
-    # DELETE /experiments/1
-    # @return [void]
-    def destroy
-      @experiment.destroy
-      redirect_to experiments_url, notice: 'Experiment was successfully destroyed.'
     end
 
     private
@@ -69,6 +62,10 @@ module Leva
     # @return [ActionController::Parameters]
     def experiment_params
       params.require(:experiment).permit(:name, :description, :dataset_id, :prompt_id)
+    end
+
+    def experiment_update_params
+      params.require(:experiment).permit(:name, :description)
     end
   end
 end

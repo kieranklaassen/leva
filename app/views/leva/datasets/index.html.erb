@@ -11,16 +11,7 @@
   </div>
   <% if @datasets.any? %>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <% @datasets.each do |dataset| %>
-        <div class="bg-gray-800 rounded-lg shadow-lg p-6">
-          <h2 class="text-xl font-semibold mb-2 text-indigo-300"><%= dataset.name %></h2>
-          <p class="text-gray-400 mb-4"><%= dataset.description %></p>
-          <div class="flex space-x-2">
-            <%= link_to 'View', dataset_path(dataset), class: "btn btn-small btn-primary flex-1 text-center" %>
-            <%= link_to 'Edit', edit_dataset_path(dataset), class: "btn btn-small btn-secondary flex-1 text-center" %>
-          </div>
-        </div>
-      <% end %>
+      <%= render @datasets %>
     </div>
   <% else %>
     <div class="bg-gray-800 rounded-lg shadow-lg p-12 text-center">

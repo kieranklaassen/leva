@@ -2,14 +2,15 @@
 #
 # Table name: leva_experiments
 #
-#  id         :integer          not null, primary key
-#  metadata   :text
-#  name       :string
-#  status     :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  dataset_id :integer          not null
-#  prompt_id  :integer
+#  id          :integer          not null, primary key
+#  description :text
+#  metadata    :text
+#  name        :string
+#  status      :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  dataset_id  :integer          not null
+#  prompt_id   :integer
 #
 # Indexes
 #

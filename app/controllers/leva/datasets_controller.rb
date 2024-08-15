@@ -26,6 +26,7 @@ module Leva
     # GET /datasets/1/edit
     # @return [void]
     def edit
+      # The @dataset is already set by the before_action
     end
 
     # POST /datasets
@@ -53,8 +54,12 @@ module Leva
     # DELETE /datasets/1
     # @return [void]
     def destroy
-      @dataset.destroy
-      redirect_to datasets_url, notice: 'Dataset was successfully destroyed.'
+      if @dataset.dataset_records.any?
+        redirect_to @dataset, alert: 'Cannot delete dataset with existing records.'
+      else
+        @dataset.destroy
+        redirect_to datasets_url, notice: 'Dataset was successfully destroyed.'
+      end
     end
 
     private

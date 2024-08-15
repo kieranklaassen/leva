@@ -2,14 +2,15 @@
 #
 # Table name: leva_experiments
 #
-#  id         :integer          not null, primary key
-#  metadata   :text
-#  name       :string
-#  status     :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  dataset_id :integer          not null
-#  prompt_id  :integer
+#  id          :integer          not null, primary key
+#  description :text
+#  metadata    :text
+#  name        :string
+#  status      :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  dataset_id  :integer          not null
+#  prompt_id   :integer
 #
 # Indexes
 #
@@ -32,5 +33,13 @@ module Leva
     validates :dataset, presence: true
 
     enum status: { pending: 0, running: 1, completed: 2, failed: 3 }
+
+    before_validation :set_default_status
+
+    private
+
+    def set_default_status
+      self.status ||= :pending
+    end
   end
 end

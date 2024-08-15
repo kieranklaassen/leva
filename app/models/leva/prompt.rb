@@ -13,5 +13,10 @@
 #
 module Leva
   class Prompt < ApplicationRecord
+    has_many :experiments
+
+    validates :name, presence: true
+    validates :system_prompt, presence: true
+    validates :user_prompt, presence: true
   end
 end

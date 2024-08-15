@@ -42,6 +42,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_13_174509) do
 
   create_table "leva_experiments", force: :cascade do |t|
     t.string "name"
+    t.text "description"
     t.integer "dataset_id", null: false
     t.integer "prompt_id"
     t.integer "status"
