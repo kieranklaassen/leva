@@ -1,0 +1,21 @@
+<div class="w-64 h-full bg-gray-900 border-r border-gray-800 flex flex-col">
+  <div class="p-4">
+    <h2 class="text-xl font-bold mb-4 text-indigo-400">Prompts</h2>
+    <div class="space-y-2">
+      <% prompts.each do |prompt| %>
+        <%= link_to workbench_index_path(prompt_id: prompt.id), class: "block bg-gray-800 p-3 rounded-lg hover:bg-gray-700 transition duration-150 ease-in-out #{'bg-indigo-600' if prompt == selected_prompt}" do %>
+          <span class="text-sm font-medium"><%= prompt.name %></span>
+          <span class="text-xs text-indigo-300 ml-2">v<%= prompt.version %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+  <div class="mt-auto p-4">
+    <%= link_to new_workbench_path, class: "w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 p-3 rounded-lg transition duration-150 ease-in-out" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      <span>New Prompt</span>
+    <% end %>
+  </div>
+</div>

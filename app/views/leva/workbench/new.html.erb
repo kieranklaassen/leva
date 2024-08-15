@@ -1,38 +1,86 @@
-<% content_for :title, 'New Experiment' %>
-<div class="px-4 sm:px-6 lg:px-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-2xl font-semibold text-gray-900">New Experiment</h1>
-      <p class="mt-2 text-sm text-gray-700">Create a new experiment in your workbench.</p>
-    </div>
-  </div>
-  <div class="mt-8 max-w-xl">
-    <%= form_with(model: @experiment, url: experiments_path, local: true, class: "space-y-8 divide-y divide-gray-200") do |form| %>
-      <div class="space-y-8 divide-y divide-gray-200">
-        <div>
-          <div>
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Experiment Information</h3>
-            <p class="mt-1 text-sm text-gray-500">Provide details for your new experiment.</p>
-          </div>
-          <div class="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-            <div class="sm:col-span-4">
-              <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
-              <div class="mt-1">
-                <%= form.text_field :name, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
-              </div>
-            </div>
-            <div class="sm:col-span-2">
-              <%= form.label :dataset_id, class: "block text-sm font-medium text-gray-700" %>
-              <div class="mt-1">
-                <%= form.select :dataset_id, options_for_select(@datasets.map { |dataset| [dataset.name, dataset.id] }), class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="pt-5">
-        <%= form.submit class: "btn btn-primary btn-block" %>
+<% content_for :title, "New Prompt" %>
+<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
+  <h1 class="text-3xl font-bold text-indigo-400 mb-6">New Prompt</h1>
+  <%= form_with(model: @prompt, url: workbench_index_path, local: true, class: "bg-gray-800 rounded-lg shadow-lg p-6", data: { controller: "prompt-selector" }) do |form| %>
+    <% if @prompt.errors.any? %>
+      <div class="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded-lg mb-4">
+        <h2><%= pluralize(@prompt.errors.count, "error") %> prohibited this prompt from being saved:</h2>
+        <ul>
+          <% @prompt.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
       </div>
     <% end %>
-  </div>
+    <div class="mb-4">
+      <%= form.label :name, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.text_field :name, autofocus: true, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+    </div>
+    <div class="mb-4">
+      <%= form.label :version, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <div class="w-full bg-gray-700 text-white p-3 rounded-lg">1</div>
+      <%= form.hidden_field :version, value: 1 %>
+    </div>
+    <div class="mb-4">
+      <%= form.label :system_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.text_area :system_prompt, rows: 2, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+    </div>
+    <div class="mb-4">
+      <%= form.label :predefined_prompt, "Select Predefined Prompt", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.select :predefined_prompt,
+          options_for_select([['Custom Prompt', '']] + @predefined_prompts.map { |name, content| [name, content] }),
+          {},
+          class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none",
+          data: { action: "change->prompt-selector#toggleUserPrompt" }
+      %>
+    </div>
+    <div class="mb-4" data-prompt-selector-target="userPromptField">
+      <%= form.label :user_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.text_area :user_prompt, rows: 5, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+    </div>
+    <div class="mb-4 hidden" data-prompt-selector-target="promptPreview">
+      <h3 class="text-lg font-semibold mb-2 text-indigo-300">Prompt Preview</h3>
+      <div class="bg-gray-700 text-white p-3 rounded-lg" data-prompt-selector-target="previewContent"></div>
+    </div>
+    <div class="flex items-center justify-end space-x-4">
+      <%= link_to "Cancel", workbench_index_path, class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
+      <%= form.submit "Create Prompt", class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors duration-150 ease-in-out" %>
+    </div>
+  <% end %>
 </div>
+<script>
+  (() => {
+    const application = Stimulus.Application.start()
+
+    application.register("prompt-selector", class extends Stimulus.Controller {
+      static targets = ["userPromptField", "promptPreview", "previewContent"]
+
+      toggleUserPrompt(event) {
+        const selectedContent = event.target.value
+        if (selectedContent) {
+          this.userPromptFieldTarget.style.display = 'none'
+          this.promptPreviewTarget.classList.remove('hidden')
+          this.loadPredefinedPrompt(selectedContent)
+        } else {
+          this.userPromptFieldTarget.style.display = 'block'
+          this.promptPreviewTarget.classList.add('hidden')
+          this.clearUserPrompt()
+        }
+      }
+
+      loadPredefinedPrompt(content) {
+        const userPromptTextarea = this.userPromptFieldTarget.querySelector('textarea')
+        userPromptTextarea.value = content
+        this.previewContentTarget.innerHTML = marked.parse(content)
+      }
+
+      clearUserPrompt() {
+        const userPromptTextarea = this.userPromptFieldTarget.querySelector('textarea')
+        userPromptTextarea.value = ''
+        this.previewContentTarget.innerHTML = ''
+      }
+    })
+  })()
+</script>
+<!-- Include marked.js for Markdown parsing -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>

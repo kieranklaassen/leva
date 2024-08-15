@@ -1,0 +1,107 @@
+<div class="flex-1 overflow-y-auto p-6 space-y-6" data-controller="prompt-autosave" data-prompt-autosave-url-value="<%= workbench_path(@selected_prompt) %>">
+  <!-- System Prompt -->
+  <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
+    <h2 class="text-sm font-semibold mb-3 text-indigo-400">SYSTEM PROMPT</h2>
+    <textarea
+      class="w-full bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[100px] overflow-hidden resize-none"
+      name="prompt[system_prompt]"
+      data-prompt-autosave-target="input"
+      data-action="input->prompt-autosave#debouncedSave"
+    ><%= @selected_prompt.system_prompt %></textarea>
+  </div>
+  <!-- User Message -->
+  <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
+    <h2 class="text-sm font-semibold mb-3 text-indigo-400">USER</h2>
+    <textarea
+      class="w-full bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[200px] overflow-hidden resize-none"
+      name="prompt[user_prompt]"
+      data-prompt-autosave-target="input"
+      data-action="input->prompt-autosave#debouncedSave"
+    ><%= @selected_prompt.user_prompt %></textarea>
+  </div>
+  <div class="text-sm text-center" data-prompt-autosave-target="status"></div>
+</div>
+<script>
+  (() => {
+    const application = Stimulus.Application.start()
+
+    application.register("prompt-autosave", class extends Stimulus.Controller {
+      static targets = ["input", "status"]
+      static values = { url: String }
+
+      connect() {
+        this.debouncedSave = this.debounce(this.save.bind(this), 1000)
+        this.adjustTextareaHeight()
+        this.inputTargets.forEach(input => {
+          input.addEventListener('input', () => this.adjustTextareaHeight(input))
+        })
+      }
+
+      adjustTextareaHeight(textarea = null) {
+        const textareas = textarea ? [textarea] : this.inputTargets
+        textareas.forEach(ta => {
+          ta.style.height = 'auto'
+          ta.style.height = ta.scrollHeight + 'px'
+        })
+      }
+
+      debouncedSave() {
+        this.debouncedSave()
+      }
+
+      save() {
+        const data = new FormData()
+        this.inputTargets.forEach(input => {
+          data.append(input.name, input.value)
+        })
+
+        this.statusTarget.textContent = "Saving..."
+        this.statusTarget.classList.add("text-yellow-500")
+
+        fetch(this.urlValue, {
+          method: 'PATCH',
+          body: data,
+          headers: {
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            this.statusTarget.textContent = "Changes saved successfully"
+            this.statusTarget.classList.remove("text-yellow-500")
+            this.statusTarget.classList.add("text-green-500")
+          } else {
+            this.statusTarget.textContent = `Error: ${data.errors.join(", ")}`
+            this.statusTarget.classList.remove("text-yellow-500")
+            this.statusTarget.classList.add("text-red-500")
+          }
+          setTimeout(() => {
+            this.statusTarget.textContent = ""
+            this.statusTarget.classList.remove("text-green-500", "text-red-500")
+          }, 3000)
+        })
+        .catch(error => {
+          console.error('Error:', error)
+          this.statusTarget.textContent = "Error saving changes"
+          this.statusTarget.classList.remove("text-yellow-500")
+          this.statusTarget.classList.add("text-red-500")
+        })
+      }
+
+      debounce(func, wait) {
+        let timeout
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout)
+            func(...args)
+          }
+          clearTimeout(timeout)
+          timeout = setTimeout(later, wait)
+        }
+      }
+    })
+  })()
+</script>

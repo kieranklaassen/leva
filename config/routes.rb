@@ -4,9 +4,11 @@ Leva::Engine.routes.draw do
   resources :datasets
   resources :experiments, except: [:destroy]
   resources :prompts
-  resources :workbench, only: [:index, :new, :show] do
-    post 'run', on: :collection
-    post 'run_with_evaluation', on: :collection
-    post 'run_evaluator', on: :collection
+  resources :workbench, only: [:index, :new, :create, :edit, :update] do
+    collection do
+      post 'run'
+      post 'run_with_evaluation'
+      post 'run_evaluator'
+    end
   end
 end

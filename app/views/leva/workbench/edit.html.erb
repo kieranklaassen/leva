@@ -1,0 +1,24 @@
+<% content_for :title, "Edit Prompt: #{@prompt.name}" %>
+<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
+  <h1 class="text-3xl font-bold text-indigo-400 mb-6">Edit Prompt: <%= @prompt.name %></h1>
+  <%= form_with(model: @prompt, url: workbench_path(@prompt), method: :patch, local: false, class: "bg-gray-800 rounded-lg shadow-lg p-6", data: { controller: "prompt-form" }) do |form| %>
+    <div class="mb-4">
+      <%= form.label :name, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.text_field :name, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none", data: { action: "input->prompt-form#autoSave" } %>
+    </div>
+    <div class="mb-4">
+      <%= form.label :version, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.number_field :version, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none", data: { action: "input->prompt-form#autoSave" } %>
+    </div>
+    <div class="mb-4">
+      <%= form.label :system_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.text_area :system_prompt, rows: 5, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none", data: { action: "input->prompt-form#autoSave" } %>
+    </div>
+    <div class="mb-4">
+      <%= form.label :user_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+      <%= form.text_area :user_prompt, rows: 5, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none", data: { action: "input->prompt-form#autoSave" } %>
+    </div>
+    <div id="form-status" class="mb-4 text-center"></div>
+  <% end %>
+  <%= link_to "Back to Workbench", workbench_index_path, class: "btn btn-secondary" %>
+</div>

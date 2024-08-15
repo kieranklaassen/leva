@@ -1,0 +1,20 @@
+<div class="bg-gray-900 p-4 flex items-center justify-between border-b border-gray-800">
+  <div>
+    <span class="font-medium text-lg"><%= selected_prompt.name %></span>
+    <span class="text-sm text-indigo-300 ml-2">v<%= selected_prompt.version %></span>
+  </div>
+  <div class="flex items-center space-x-3">
+    <%= button_to run_workbench_index_path, method: :post, class: "flex items-center space-x-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+      </svg>
+      <span>Run</span>
+    <% end %>
+    <%= button_to run_with_evaluation_workbench_index_path, method: :post, class: "flex items-center space-x-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 transition duration-150 ease-in-out" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+      </svg>
+      <span>Run + Evaluate</span>
+    <% end %>
+  </div>
+</div>
