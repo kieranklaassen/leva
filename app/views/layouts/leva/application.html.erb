@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-gray-900">
+<html lang="en" class="bg-gray-950">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,23 +7,33 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stimulus@3.2.2/dist/stimulus.umd.min.js"></script>
   </head>
-  <body class="bg-gray-900 text-white">
-    <nav class="bg-gray-800 border-b border-gray-700">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex">
-            <%= link_to 'Leva', leva.root_path, class: 'flex-shrink-0 flex items-center text-2xl font-bold text-indigo-400' %>
-            <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <%= link_to 'Workbench', leva.workbench_index_path, class: "border-transparent #{request.path.start_with?(leva.workbench_index_path) ? 'border-indigo-500 text-white' : 'text-gray-400 hover:border-gray-700 hover:text-gray-300'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" %>
-              <%= link_to 'Datasets', leva.datasets_path, class: "border-transparent #{request.path.start_with?(leva.datasets_path) ? 'border-indigo-500 text-white' : 'text-gray-400 hover:border-gray-700 hover:text-gray-300'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" %>
-              <%= link_to 'Experiments', leva.experiments_path, class: "border-transparent #{request.path.start_with?(leva.experiments_path) ? 'border-indigo-500 text-white' : 'text-gray-400 hover:border-gray-700 hover:text-gray-300'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium" %>
-            </div>
+  <body class="bg-gray-950 text-white">
+    <nav class="bg-gray-900 border-b border-gray-800">
+      <div class="px-4">
+        <div class="flex h-16 items-center">
+          <%= link_to leva.root_path, class: 'flex items-center text-2xl font-bold text-indigo-400' do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <defs>
+                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#4F46E5" />
+                  <stop offset="100%" stop-color="#9333EA" />
+                </linearGradient>
+              </defs>
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            LLM Evals
+          <% end %>
+          <div class="ml-10 flex space-x-6">
+            <%= link_to 'Workbench', leva.workbench_index_path, class: "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out #{request.path.start_with?(leva.workbench_index_path) ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}" %>
+            <%= link_to 'Datasets', leva.datasets_path, class: "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out #{request.path.start_with?(leva.datasets_path) ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}" %>
+            <%= link_to 'Experiments', leva.experiments_path, class: "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out #{request.path.start_with?(leva.experiments_path) ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}" %>
           </div>
         </div>
       </div>
     </nav>
-    <main class="bg-gray-900">
+    <main class="bg-gray-950">
       <%= yield %>
     </main>
   </body>
