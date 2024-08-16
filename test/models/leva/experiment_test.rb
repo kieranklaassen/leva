@@ -30,7 +30,7 @@ module Leva
       dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset")
       dataset.add_record TextContent.create(text: "I love this product!", expected_label: "Positive")
       dataset.add_record TextContent.create(text: "Terrible experience", expected_label: "Negative")
-      dataset.add_record TextContent.create(text: "I's ok", expected_label: "Neutral")
+      dataset.add_record TextContent.create(text: "It's ok", expected_label: "Neutral")
       @experiment = Leva::Experiment.create!(name: "Sentiment Analysis", dataset: dataset)
 
       @run = SentimentRun.new
@@ -42,8 +42,8 @@ module Leva
 
       assert_equal 6, @experiment.evaluation_results.count, "Should have 6 evaluation results (1 run * 3 records * 2 evals)"
 
-      accuracy_results = @experiment.evaluation_results.where(label: 'sentiment_accuracy')
-      f1_results = @experiment.evaluation_results.where(label: 'sentiment_f1')
+      accuracy_results = @experiment.evaluation_results.where(evaluator_class: 'SentimentAccuracyEval')
+      f1_results = @experiment.evaluation_results.where(evaluator_class: 'SentimentF1Eval')
 
       assert_equal 3, accuracy_results.count, "Should have 3 accuracy results"
       assert_equal 3, f1_results.count, "Should have 3 F1 results"

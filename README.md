@@ -80,17 +80,17 @@ rails generate leva:eval sentiment_accuracy
 
 ```ruby
 class SentimentAccuracyEval < Leva::BaseEval
-  def evaluate(prediction, expected)
-    score = prediction == expected ? 1.0 : 0.0
-    Leva::Result.new(label: 'sentiment_accuracy', score: score)
+  def evaluate(prediction, record)
+    score = prediction == record.expected_label ? 1.0 : 0.0
+    score
   end
 end
 
 class SentimentF1Eval < Leva::BaseEval
-  def evaluate(prediction, expected)
+  def evaluate(prediction, record)
     # Calculate F1 score
     # ...
-    Leva::Result.new(label: 'sentiment_f1', score: f1_score)
+    f1_score
   end
 end
 ```
@@ -138,9 +138,9 @@ Leva.run_evaluation(experiment: experiment, run: run, evals: evals)
 After the experiments are complete, analyze the results:
 
 ```ruby
-experiment.evaluation_results.group_by(&:label).each do |label, results|
+experiment.evaluation_results.group_by(&:evaluator_class).each do |evaluator_class, results|
   average_score = results.average(&:score)
-  puts "#{label.capitalize} Average Score: #{average_score}"
+  puts "#{evaluator_class.capitalize} Average Score: #{average_score}"
 end
 ```
 
@@ -155,13 +155,13 @@ Ensure you set up any required API keys or other configurations in your Rails cr
 - `Leva`: Handles the process of running experiments.
 - `Leva::BaseRun`: Base class for run implementations.
 - `Leva::BaseEval`: Base class for eval implementations.
-- `Leva::Result`: Represents the result of an evaluation.
 
 ### Models
 
 - `Leva::Dataset`: Represents a collection of data to be evaluated.
 - `Leva::DatasetRecord`: Represents individual records within a dataset.
 - `Leva::Experiment`: Represents a single run of an evaluation on a dataset.
+- `Leva::RunnerResult`: Stores the results of each run execution.
 - `Leva::EvaluationResult`: Stores the results of each evaluation.
 - `Leva::Prompt`: Represents a prompt for an LLM.
 

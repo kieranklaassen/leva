@@ -9,9 +9,14 @@ module Leva
   # @param evals [Array<Leva::BaseEval>] The evaluation implementations to use.
   # @return [void]
   def self.run_evaluation(experiment:, run:, evals:)
-    results = run.run(experiment)
-    evals.each do |eval|
-      eval.evaluate_all(experiment, results)
+    experiment.dataset.dataset_records.find_each do |dataset_record|
+      # Run the runner for this dataset record
+      runner_result = run.execute_and_store(experiment, dataset_record)
+
+      # Evaluate the runner result with each evaluator
+      evals.each do |eval|
+        eval.evaluate_and_store(experiment, runner_result)
+      end
     end
   end
 
@@ -29,20 +34,18 @@ module Leva
       raise NotImplementedError, "#{self.class} must implement #execute"
     end
 
-    # Runs the model on all records in an experiment.
+    # Executes the run on a given dataset record and stores the result.
     #
-    # @param experiment [Leva::Experiment] The experiment to run.
-    # @return [Hash] A hash mapping dataset_record_ids to their execution results.
-    def run(experiment)
-      @experiment = experiment
-      @prompt = experiment.prompt
-
-      results = {}
-      experiment.dataset.dataset_records.find_each do |dataset_record|
-        result = execute(dataset_record.recordable)
-        results[dataset_record.id] = result
-      end
-      results
+    # @param experiment [Leva::Experiment] The experiment being run.
+    # @param dataset_record [Leva::DatasetRecord] The dataset record to run the model on.
+    # @return [Leva::RunnerResult] The stored runner result.
+    def execute_and_store(experiment, dataset_record)
+      result = execute(dataset_record.recordable)
+      RunnerResult.create!(
+        experiment: experiment,
+        dataset_record: dataset_record,
+        prediction: result
+      )
     end
   end
 
@@ -55,43 +58,27 @@ module Leva
     #
     # @param prediction [Object] The model's prediction.
     # @param record [Object] The expected result.
-    # @return [Leva::Result] The evaluation result.
+    # @return [Float] The evaluation score.
     # @raise [NotImplementedError] if the method is not implemented in a subclass.
     def evaluate(prediction, record)
       raise NotImplementedError, "#{self.class} must implement #evaluate"
     end
 
-    # Evaluates all results for an experiment.
+    # Evaluates a single runner result and stores the evaluation.
     #
-    # @param experiment [Leva::Experiment] The experiment to evaluate.
-    # @param results [Hash] A hash mapping dataset_record_ids to their execution results.
-    # @return [void]
-    def evaluate_all(experiment, results)
-      experiment.dataset.dataset_records.find_each do |dataset_record|
-        prediction = results[dataset_record.id]
-        evaluation = evaluate(prediction, dataset_record.recordable)
+    # @param experiment [Leva::Experiment] The experiment being evaluated.
+    # @param runner_result [Leva::RunnerResult] The runner result to evaluate.
+    # @return [Leva::EvaluationResult] The stored evaluation result.
+    def evaluate_and_store(experiment, runner_result)
+      score = evaluate(runner_result.prediction, runner_result.dataset_record.recordable)
 
-        Leva::EvaluationResult.create!(
-          experiment: experiment,
-          dataset_record: dataset_record,
-          prediction: prediction,
-          score: evaluation.score,
-          label: evaluation.label
-        )
-      end
-    end
-  end
-
-  # Represents the result of an evaluation
-  class Result
-    attr_reader :label, :prediction, :score
-
-    # Initialize a new Result
-    # @param label [String] The label for the result
-    # @param score [Float] The score of the evaluation (0.0 to 1.0)
-    def initialize(label:, score:)
-      @label = label
-      @score = score
+      EvaluationResult.create!(
+        experiment: experiment,
+        dataset_record: runner_result.dataset_record,
+        runner_result: runner_result,
+        score: score,
+        evaluator_class: self.class.name
+      )
     end
   end
 end

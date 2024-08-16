@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_13_174509) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_16_201433) do
   create_table "leva_dataset_records", force: :cascade do |t|
     t.integer "dataset_id", null: false
     t.string "recordable_type", null: false
@@ -31,13 +31,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_13_174509) do
   create_table "leva_evaluation_results", force: :cascade do |t|
     t.integer "experiment_id", null: false
     t.integer "dataset_record_id", null: false
-    t.string "prediction"
     t.float "score"
-    t.string "label"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "runner_result_id", null: false
+    t.string "evaluator_class", null: false
     t.index ["dataset_record_id"], name: "index_leva_evaluation_results_on_dataset_record_id"
     t.index ["experiment_id"], name: "index_leva_evaluation_results_on_experiment_id"
+    t.index ["runner_result_id"], name: "index_leva_evaluation_results_on_runner_result_id"
   end
 
   create_table "leva_experiments", force: :cascade do |t|
@@ -63,6 +64,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_13_174509) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "leva_runner_results", force: :cascade do |t|
+    t.integer "experiment_id", null: false
+    t.integer "dataset_record_id", null: false
+    t.text "prediction"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["dataset_record_id"], name: "index_leva_runner_results_on_dataset_record_id"
+    t.index ["experiment_id"], name: "index_leva_runner_results_on_experiment_id"
+  end
+
   create_table "text_contents", force: :cascade do |t|
     t.text "text"
     t.string "expected_label"
@@ -73,6 +84,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_13_174509) do
   add_foreign_key "leva_dataset_records", "leva_datasets", column: "dataset_id"
   add_foreign_key "leva_evaluation_results", "leva_dataset_records", column: "dataset_record_id"
   add_foreign_key "leva_evaluation_results", "leva_experiments", column: "experiment_id"
+  add_foreign_key "leva_evaluation_results", "leva_runner_results", column: "runner_result_id"
   add_foreign_key "leva_experiments", "leva_datasets", column: "dataset_id"
   add_foreign_key "leva_experiments", "leva_prompts", column: "prompt_id"
+  add_foreign_key "leva_runner_results", "leva_dataset_records", column: "dataset_record_id"
+  add_foreign_key "leva_runner_results", "leva_experiments", column: "experiment_id"
 end

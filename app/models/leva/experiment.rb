@@ -26,13 +26,13 @@ module Leva
   class Experiment < ApplicationRecord
     belongs_to :dataset
     belongs_to :prompt, optional: true
-
-    has_many :evaluation_results, dependent: :destroy
+    has_many :runner_results, dependent: :destroy
+    has_many :evaluation_results, through: :runner_results
 
     validates :name, presence: true
     validates :dataset, presence: true
 
-    enum status: { pending: 0, running: 1, completed: 2, failed: 3 }
+    enum :status, { pending: 0, running: 1, completed: 2, failed: 3 }
 
     before_validation :set_default_status
 

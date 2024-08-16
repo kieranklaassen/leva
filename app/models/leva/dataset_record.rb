@@ -23,6 +23,9 @@ module Leva
     belongs_to :dataset
     belongs_to :recordable, polymorphic: true
 
+    has_many :runner_results, dependent: :destroy
+    has_many :evaluation_results, dependent: :destroy, through: :runner_results
+
     # @return [Hash] A hash of attributes to be displayed in the dataset records index
     def index_attributes
       if recordable.respond_to?(:index_attributes)

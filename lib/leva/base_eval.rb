@@ -40,13 +40,13 @@ module Leva
 
     # Run the evaluation for a single record
     # @param record [ActiveRecord::Base] The record to evaluate
-    # @return [Leva::Result] The result of the evaluation
+    # @return [Float] The score of the evaluation
     def run_each(record)
       raise NotImplementedError, "Subclasses must implement the 'run_each' method"
     end
 
     # Save the result of an evaluation
-    # @param result [Leva::Result] The result of the evaluation
+    # @param result [Float] The score of the evaluation
     def save_result(result)
       Leva::EvaluationResult.create!(
         experiment: @experiment,
@@ -55,21 +55,6 @@ module Leva
         score: result.score,
         label: result.label
       )
-    end
-  end
-
-  # Represents the result of an evaluation
-  class Result
-    attr_reader :label, :prediction, :score
-
-    # Initialize a new Result
-    # @param label [String] The label for the result
-    # @param prediction [String] The prediction made by the evaluation
-    # @param score [Float] The score of the evaluation (0.0 to 1.0)
-    def initialize(label:, prediction:, score:)
-      @label = label
-      @prediction = prediction
-      @score = score
     end
   end
 end
