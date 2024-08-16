@@ -40,12 +40,35 @@
       <% end %>
     </div>
     <% if @dataset.dataset_records.any? %>
-      <div class="bg-gray-800 rounded-lg shadow-lg p-6">
-        <ul class="list-disc list-inside">
-          <% @dataset.dataset_records.each do |record| %>
-            <li class="text-gray-400"><%= record.recordable.to_s %></li>
-          <% end %>
-        </ul>
+      <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead class="bg-gray-700">
+            <tr>
+              <% @dataset.dataset_records.first.display_attributes.keys.each do |key| %>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                  <%= key.to_s.humanize %>
+                </th>
+              <% end %>
+              <th scope="col" class="relative px-6 py-3">
+                <span class="sr-only">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-gray-800 divide-y divide-gray-700">
+            <% @dataset.dataset_records.each do |record| %>
+              <tr class="hover:bg-gray-700 transition-colors duration-200">
+                <% record.display_attributes.values.each do |value| %>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                    <%= value %>
+                  </td>
+                <% end %>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <%= link_to 'View', '#', class: 'text-indigo-400 hover:text-indigo-300 transition-colors duration-200' %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
     <% else %>
       <div class="bg-gray-800 rounded-lg shadow-lg p-12 text-center">

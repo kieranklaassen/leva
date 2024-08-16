@@ -33,8 +33,24 @@ First, create a dataset and add any ActiveRecord records you want to evaluate ag
 dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset")
 dataset.add_record TextContent.create(text: "I love this product!", expected_label: "Positive")
 dataset.add_record TextContent.create(text: "Terrible experience", expected_label: "Negative")
-dataset.add_record TextContent.create(text: "I's ok", expected_label: "Neutral")
+dataset.add_record TextContent.create(text: "It's ok", expected_label: "Neutral")
 ```
+
+To customize how your records are displayed in the dataset view, implement a `dataset_attributes` method in your model:
+
+```ruby
+class TextContent < ApplicationRecord
+  def dataset_attributes
+    {
+      text: text,
+      expected_label: expected_label,
+      created_at: created_at.strftime('%Y-%m-%d %H:%M:%S')
+    }
+  end
+end
+```
+
+If `dataset_attributes` is not implemented, Leva will fall back to displaying only the `name` attribute (or `to_s` if `name` is not available).
 
 ### 2. Implementing Runs
 

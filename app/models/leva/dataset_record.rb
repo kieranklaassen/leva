@@ -22,5 +22,16 @@ module Leva
   class DatasetRecord < ApplicationRecord
     belongs_to :dataset
     belongs_to :recordable, polymorphic: true
+
+    # @return [Hash] A hash of attributes to be displayed in the dataset partial
+    def display_attributes
+      if recordable.respond_to?(:dataset_attributes)
+        recordable.dataset_attributes
+      elsif recordable.respond_to?(:name)
+        { name: recordable.name }
+      else
+        { to_s: recordable.to_s }
+      end
+    end
   end
 end
