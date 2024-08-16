@@ -23,12 +23,23 @@ module Leva
     belongs_to :dataset
     belongs_to :recordable, polymorphic: true
 
-    # @return [Hash] A hash of attributes to be displayed in the dataset partial
-    def display_attributes
-      if recordable.respond_to?(:dataset_attributes)
-        recordable.dataset_attributes
+    # @return [Hash] A hash of attributes to be displayed in the dataset records index
+    def index_attributes
+      if recordable.respond_to?(:index_attributes)
+        recordable.index_attributes
       elsif recordable.respond_to?(:name)
         { name: recordable.name }
+      else
+        { to_s: recordable.to_s }
+      end
+    end
+
+    # @return [Hash] A hash of attributes to be displayed in the dataset record show view
+    def show_attributes
+      if recordable.respond_to?(:show_attributes)
+        recordable.show_attributes
+      elsif recordable.respond_to?(:dataset_attributes)
+        recordable.dataset_attributes
       else
         { to_s: recordable.to_s }
       end
