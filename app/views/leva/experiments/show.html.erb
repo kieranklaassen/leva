@@ -13,7 +13,7 @@
       </div>
     </div>
     <p class="text-gray-400"><%= @experiment.description %></p>
-    <p class="text-indigo-300 mt-2">Status: <%= @experiment.status.capitalize %></p>
+    <p class="text-indigo-300 mt-2">Status: <%= @experiment.status&.capitalize || 'N/A' %></p>
   </div>
   <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
     <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Experiment Details</h2>
