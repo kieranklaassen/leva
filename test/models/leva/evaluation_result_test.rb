@@ -8,7 +8,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  dataset_record_id :integer          not null
-#  experiment_id     :integer          not null
+#  experiment_id     :integer
 #  runner_result_id  :integer          not null
 #
 # Indexes

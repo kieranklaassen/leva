@@ -1,5 +1,6 @@
 class SentimentF1Eval < Leva::BaseEval
   def evaluate(prediction, record)
+    sleep 3
     # Simplified F1 score calculation for demonstration
     expected = record.expected_label
     if prediction == expected

@@ -13,7 +13,7 @@ module Leva
     experiment.dataset.dataset_records.find_each do |dataset_record|
       # Run the runner for this dataset record
       runner_result = run.execute_and_store(experiment, dataset_record)
-
+b
       # Evaluate the runner result with each evaluator
       evals.each do |eval|
         eval.evaluate_and_store(experiment, runner_result)
@@ -37,7 +37,7 @@ module Leva
 
     # Executes the run on a given dataset record and stores the result.
     #
-    # @param experiment [Leva::Experiment] The experiment being run.
+    # @param experiment [Leva::Experiment, nil] The experiment being run, if any.
     # @param dataset_record [Leva::DatasetRecord] The dataset record to run the model on.
     # @return [Leva::RunnerResult] The stored runner result.
     def execute_and_store(experiment, dataset_record)
@@ -67,7 +67,7 @@ module Leva
 
     # Evaluates a single runner result and stores the evaluation.
     #
-    # @param experiment [Leva::Experiment] The experiment being evaluated.
+    # @param experiment [Leva::Experiment, nil] The experiment being evaluated, if any.
     # @param runner_result [Leva::RunnerResult] The runner result to evaluate.
     # @return [Leva::EvaluationResult] The stored evaluation result.
     def evaluate_and_store(experiment, runner_result)

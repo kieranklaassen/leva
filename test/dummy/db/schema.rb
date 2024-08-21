@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_16_201433) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_163900) do
   create_table "leva_dataset_records", force: :cascade do |t|
     t.integer "dataset_id", null: false
     t.string "recordable_type", null: false
@@ -29,7 +29,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_16_201433) do
   end
 
   create_table "leva_evaluation_results", force: :cascade do |t|
-    t.integer "experiment_id", null: false
+    t.integer "experiment_id"
     t.integer "dataset_record_id", null: false
     t.float "score"
     t.datetime "created_at", null: false
@@ -65,7 +65,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_16_201433) do
   end
 
   create_table "leva_runner_results", force: :cascade do |t|
-    t.integer "experiment_id", null: false
+    t.integer "experiment_id"
     t.integer "dataset_record_id", null: false
     t.text "prediction"
     t.datetime "created_at", null: false

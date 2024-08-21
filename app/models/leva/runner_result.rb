@@ -7,7 +7,7 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  dataset_record_id :integer          not null
-#  experiment_id     :integer          not null
+#  experiment_id     :integer
 #
 # Indexes
 #
@@ -21,7 +21,7 @@
 #
 module Leva
   class RunnerResult < ApplicationRecord
-    belongs_to :experiment
+    belongs_to :experiment, optional: true
     belongs_to :dataset_record
     has_many :evaluation_results, dependent: :destroy
 

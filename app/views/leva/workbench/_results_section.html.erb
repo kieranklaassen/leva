@@ -37,10 +37,8 @@
   <!-- Run Result -->
   <div class="bg-gray-800 p-4 rounded-lg mb-5 shadow-md">
     <h3 class="text-sm font-semibold mb-2 text-indigo-300">Run Result</h3>
-    <% if flash[:result] %>
-      <p class="text-sm text-gray-300"><%= flash[:result] %></p>
-    <% elsif flash[:notice] %>
-      <p class="text-sm text-gray-300"><%= flash[:notice] %></p>
+    <% if @dataset_record && (runner_result = @dataset_record.runner_results.last) %>
+      <p class="text-sm text-gray-300"><%= runner_result.prediction %></p>
     <% else %>
       <div class="text-center py-8">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,7 +61,7 @@
     </div>
     <% @evaluators.each do |evaluator_class| %>
       <div class="bg-gray-800 p-4 rounded-lg shadow-md">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between mb-2">
           <span class="text-sm font-medium"><%= evaluator_class.name.demodulize %></span>
           <div class="flex items-center space-x-2">
             <%= button_to run_evaluator_workbench_index_path, method: :post, params: { evaluator: evaluator_class.name, runner: params[:runner], prompt_id: @prompt.id, dataset_record_id: @dataset_record&.id }, class: "p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition duration-150 ease-in-out" do %>
@@ -73,6 +71,11 @@
             <% end %>
           </div>
         </div>
+        <% if @dataset_record && (runner_result = @dataset_record.runner_results.last) && (evaluation_result = runner_result.evaluation_results.find_by(evaluator_class: evaluator_class.name)) %>
+          <div class="text-sm text-gray-300">
+            Score: <%= evaluation_result.score %>
+          </div>
+        <% end %>
       </div>
     <% end %>
   </div>

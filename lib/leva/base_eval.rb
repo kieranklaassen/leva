@@ -25,11 +25,7 @@ module Leva
       @experiment.update(status: :running)
 
       @experiment.dataset.records.each do |record|
-        @record = record
-        unless @record.class_name == self.class.dataset_record_class_name
-          raise ArgumentError, "Record class #{@record.class_name} does not match expected class #{self.class.dataset_record_class_name}"
-        end
-        ExperimentJob.perform_later(self, @record)
+        run_evaluation(record)
       end
 
       @experiment.update(status: :completed)
@@ -41,19 +37,31 @@ module Leva
     # Run the evaluation for a single record
     # @param record [ActiveRecord::Base] The record to evaluate
     # @return [Float] The score of the evaluation
-    def run_each(record)
-      raise NotImplementedError, "Subclasses must implement the 'run_each' method"
+    def run_evaluation(record)
+      unless record.class.name == self.class.dataset_record_class_name
+        raise ArgumentError, "Record class #{record.class.name} does not match expected class #{self.class.dataset_record_class_name}"
+      end
+
+      result = evaluate(record)
+      save_result(record, result)
+    end
+
+    # Evaluate the record
+    # @param record [ActiveRecord::Base] The record to evaluate
+    # @return [Float] The score of the evaluation
+    def evaluate(record)
+      raise NotImplementedError, "Subclasses must implement the 'evaluate' method"
     end
 
     # Save the result of an evaluation
+    # @param record [ActiveRecord::Base] The record evaluated
     # @param result [Float] The score of the evaluation
-    def save_result(result)
+    def save_result(record, result)
       Leva::EvaluationResult.create!(
         experiment: @experiment,
-        dataset_record: Leva::DatasetRecord.find_by(recordable: @record, dataset: @experiment.dataset),
-        prediction: result.prediction,
-        score: result.score,
-        label: result.label
+        dataset_record: Leva::DatasetRecord.find_by(recordable: record, dataset: @experiment.dataset),
+        score: result,
+        evaluator_class: self.class.name
       )
     end
   end
