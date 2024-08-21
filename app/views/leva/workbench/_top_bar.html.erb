@@ -7,18 +7,4 @@
       <span class="font-medium text-lg text-gray-400">No prompt selected</span>
     <% end %>
   </div>
-  <div class="flex items-center space-x-3">
-    <%= button_to run_workbench_index_path, method: :post, class: "btn btn-primary flex items-center space-x-2", disabled: selected_prompt.blank? do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-      </svg>
-      <span>Run</span>
-    <% end %>
-    <%= button_to run_with_evaluation_workbench_index_path, method: :post, class: "btn btn-primary flex items-center space-x-2", disabled: selected_prompt.blank? do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-      </svg>
-      <span>Run + Evaluate</span>
-    <% end %>
-  </div>
 </div>
