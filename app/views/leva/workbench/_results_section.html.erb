@@ -71,10 +71,17 @@
             <% end %>
           </div>
         </div>
-        <% if @dataset_record && (runner_result = @dataset_record.runner_results.last) && (evaluation_result = runner_result.evaluation_results.find_by(evaluator_class: evaluator_class.name)) %>
-          <div class="text-sm text-gray-300">
-            Score: <%= evaluation_result.score %>
-          </div>
+        <% if @dataset_record && (runner_result = @dataset_record.runner_results.last) %>
+          <% evaluation_result = Leva::EvaluationResult.for_evaluator(evaluator_class).where(runner_result: runner_result).last %>
+          <% if evaluation_result %>
+            <div class="text-sm text-gray-300">
+              Score: <%= evaluation_result.score %>
+            </div>
+          <% else %>
+            <div class="text-sm text-gray-500">
+              No evaluation result yet.
+            </div>
+          <% end %>
         <% end %>
       </div>
     <% end %>

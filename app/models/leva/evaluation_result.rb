@@ -33,5 +33,7 @@ module Leva
     validates :evaluator_class, presence: true
 
     delegate :record, to: :dataset_record, allow_nil: true
+
+    scope :for_evaluator, ->(evaluator_class) { where(evaluator_class: evaluator_class.name) }
   end
 end
