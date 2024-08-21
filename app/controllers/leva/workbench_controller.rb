@@ -5,6 +5,7 @@ module Leva
     before_action :set_prompt, only: [:index, :edit, :update]
     before_action :load_evaluators, only: [:index]
     before_action :load_predefined_prompts, only: [:new, :create]
+    before_action :set_dataset_record, only: [:index]
 
     # GET /workbench
     # @return [void]
@@ -83,6 +84,10 @@ module Leva
         content = File.read(file)
         [name, content]
       end
+    end
+
+    def set_dataset_record
+      @dataset_record = DatasetRecord.find(params[:dataset_record_id]) if params[:dataset_record_id]
     end
   end
 end

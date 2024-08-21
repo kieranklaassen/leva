@@ -47,5 +47,18 @@ module Leva
         { to_s: recordable.to_s }
       end
     end
+
+    # @return [String] A string representation of the record for display purposes
+    def display_name
+      if recordable.respond_to?(:name)
+        recordable.name
+      elsif recordable.respond_to?(:title)
+        recordable.title
+      elsif recordable.is_a?(TextContent)
+        "TextContent: #{recordable.text.truncate(30)}"
+      else
+        "#{recordable_type} ##{recordable_id}"
+      end
+    end
   end
 end

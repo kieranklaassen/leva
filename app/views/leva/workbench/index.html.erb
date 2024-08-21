@@ -9,7 +9,7 @@
     <!-- Scrollable Content -->
     <div class="flex-1 flex overflow-hidden">
       <%= render 'prompt_content', selected_prompt: @selected_prompt %>
-      <%= render 'results_section', evaluators: @evaluators %>
+      <%= render 'results_section', evaluators: @evaluators, dataset_record: @dataset_record %>
     </div>
   </div>
 </div>

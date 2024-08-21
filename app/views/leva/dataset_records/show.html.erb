@@ -3,15 +3,22 @@
   <div class="mb-8">
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold text-indigo-400 mb-2"><%= @dataset.name %> - Record Details</h1>
-      <%= link_to dataset_dataset_records_path(@dataset), class: 'btn btn-secondary flex items-center' do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-        </svg>
-        Back to Records
-      <% end %>
+      <div class="flex space-x-4">
+        <%= link_to dataset_dataset_records_path(@dataset), class: 'btn btn-secondary flex items-center' do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Back to Records
+        <% end %>
+        <%= link_to workbench_index_path(dataset_record_id: @record.id), class: 'btn btn-primary flex items-center' do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+          </svg>
+          Use in Workbench
+        <% end %>
+      </div>
     </div>
   </div>
-
   <div class="bg-gray-800 rounded-lg shadow-lg p-6">
     <% @record.show_attributes.each do |key, value| %>
       <div class="mb-4">
