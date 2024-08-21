@@ -56,7 +56,8 @@ module Leva
         experiment: experiment,
         dataset_record: dataset_record,
         prompt: prompt,
-        prediction: result
+        prediction: result,
+        actual_result: dataset_record.actual_result
       )
     end
   end

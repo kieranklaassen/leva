@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_21_183153) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_191713) do
   create_table "leva_dataset_records", force: :cascade do |t|
     t.integer "dataset_id", null: false
     t.string "recordable_type", null: false
     t.integer "recordable_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "actual_result"
     t.index ["dataset_id"], name: "index_leva_dataset_records_on_dataset_id"
     t.index ["recordable_type", "recordable_id"], name: "index_leva_dataset_records_on_recordable"
   end
@@ -74,6 +75,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_183153) do
     t.datetime "updated_at", null: false
     t.integer "prompt_version"
     t.integer "prompt_id", null: false
+    t.text "actual_result"
     t.index ["dataset_record_id"], name: "index_leva_runner_results_on_dataset_record_id"
     t.index ["experiment_id"], name: "index_leva_runner_results_on_experiment_id"
     t.index ["prompt_id"], name: "index_leva_runner_results_on_prompt_id"

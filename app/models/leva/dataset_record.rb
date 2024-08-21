@@ -8,6 +8,7 @@
 #  updated_at      :datetime         not null
 #  dataset_id      :integer          not null
 #  recordable_id   :integer          not null
+#  actual_result   :text
 #
 # Indexes
 #
@@ -25,6 +26,8 @@ module Leva
 
     has_many :runner_results, dependent: :destroy
     has_many :evaluation_results, dependent: :destroy, through: :runner_results
+
+    validates :actual_result, presence: true
 
     # @return [Hash] A hash of attributes to be displayed in the dataset records index
     def index_attributes

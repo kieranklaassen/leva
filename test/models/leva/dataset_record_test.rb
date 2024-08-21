@@ -3,6 +3,7 @@
 # Table name: leva_dataset_records
 #
 #  id              :integer          not null, primary key
+#  actual_result   :text
 #  recordable_type :string           not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null

@@ -1,0 +1,59 @@
+<% content_for :title, "Runner Result Details" %>
+<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-indigo-400 mb-2">Runner Result Details</h1>
+    <%= link_to "Back to Experiment", experiment_path(@experiment), class: "text-indigo-400 hover:underline" %>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+      <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Details</h2>
+      <p class="text-gray-400">
+        <strong class="text-indigo-300">Dataset Record:</strong>
+        <%= link_to @runner_result.dataset_record.display_name, dataset_dataset_record_path(@runner_result.dataset_record.dataset, @runner_result.dataset_record), class: "text-indigo-400 hover:underline" %>
+      </p>
+      <p class="text-gray-400">
+        <strong class="text-indigo-300">Prompt:</strong>
+        <%= link_to "#{@runner_result.prompt.name} (v#{@runner_result.prompt_version})", prompt_path(@runner_result.prompt), class: "text-indigo-400 hover:underline" %>
+      </p>
+      <p class="text-gray-400"><strong class="text-indigo-300">Created At:</strong> <%= @runner_result.created_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
+      <%= link_to 'Run in Workbench', workbench_index_path(prompt_id: @runner_result.prompt_id, dataset_record_id: @runner_result.dataset_record_id, runner: @experiment.runner_class), class: 'mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors duration-200' %>
+    </div>
+    <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+      <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Evaluation Results</h2>
+      <% if @runner_result.evaluation_results.any? %>
+        <div class="space-y-4">
+          <% @runner_result.evaluation_results.each do |eval_result| %>
+            <div class="bg-gray-700 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-indigo-200 mb-2"><%= eval_result.evaluator_class %></h3>
+              <% score = eval_result.score %>
+              <% color_class = case score
+                 when 0...0.2 then 'text-red-500'
+                 when 0.2...0.4 then 'text-orange-500'
+                 when 0.4...0.6 then 'text-yellow-500'
+                 when 0.6...0.8 then 'text-lime-500'
+                 when 0.8...1.0 then 'text-green-400'
+                 else 'text-green-300'
+                 end %>
+              <p class="text-xl font-bold <%= color_class %>"><%= sprintf('%.2f', score) %></p>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-gray-400">No evaluation results available.</p>
+      <% end %>
+    </div>
+  </div>
+  <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+    <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Prediction and Actual Result</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-xl font-semibold text-indigo-200 mb-2">Prediction</h3>
+        <pre class="bg-gray-700 p-4 rounded-lg mt-2 text-sm text-gray-300 whitespace-pre-wrap"><%= @runner_result.prediction %></pre>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold text-indigo-200 mb-2">Actual Result</h3>
+        <pre class="bg-gray-700 p-4 rounded-lg mt-2 text-sm text-gray-300 whitespace-pre-wrap"><%= @runner_result.actual_result %></pre>
+      </div>
+    </div>
+  </div>
+</div>

@@ -75,8 +75,17 @@
         <% if @dataset_record %>
           <% evaluation_result = @dataset_record.evaluation_results.for_evaluator(evaluator_class).last %>
           <% if evaluation_result %>
-            <div class="text-sm text-gray-300">
-              Score: <%= evaluation_result.score %>
+            <% score = evaluation_result.score %>
+            <% color_class = case score
+               when 0...0.2 then 'text-red-500'
+               when 0.2...0.4 then 'text-orange-500'
+               when 0.4...0.6 then 'text-yellow-500'
+               when 0.6...0.8 then 'text-lime-500'
+               when 0.8...1.0 then 'text-green-400'
+               else 'text-green-300'
+               end %>
+            <div class="text-sm <%= color_class %> font-semibold">
+              Score: <%= sprintf('%.2f', score) %>
             </div>
           <% else %>
             <div class="text-sm text-gray-500">
