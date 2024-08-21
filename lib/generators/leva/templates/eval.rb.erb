@@ -3,10 +3,10 @@
 class <%= class_name %>Eval < Leva::BaseEval
   # @param prediction [String] The prediction to evaluate
   # @param record [YourRecordClass] The record to evaluate
-  # @return [Float] The score of the evaluation
+  # @return [Array<(Float, Object)>] An array containing the evaluation score and the actual result.
   def evaluate(prediction, record)
     # Implement your evaluation logic here
 
-    1.0
+    [1.0, record.actual_result]
   end
 end

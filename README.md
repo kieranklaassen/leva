@@ -82,7 +82,7 @@ rails generate leva:eval sentiment_accuracy
 class SentimentAccuracyEval < Leva::BaseEval
   def evaluate(prediction, record)
     score = prediction == record.expected_label ? 1.0 : 0.0
-    score
+    [score, record.expected_label]
   end
 end
 
@@ -90,7 +90,7 @@ class SentimentF1Eval < Leva::BaseEval
   def evaluate(prediction, record)
     # Calculate F1 score
     # ...
-    f1_score
+    [f1_score, record.f1_score]
   end
 end
 ```

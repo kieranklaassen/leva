@@ -6,5 +6,6 @@ class SentimentAccuracyEval < Leva::BaseEval
   # @return [Float] The score of the evaluation
   def evaluate(prediction, text_content)
     prediction == text_content.expected_label ? 1.0 : 0.0
+    [1.0, text_content.expected_label]
   end
 end

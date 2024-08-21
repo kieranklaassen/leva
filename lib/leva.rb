@@ -57,7 +57,6 @@ module Leva
         dataset_record: dataset_record,
         prompt: prompt,
         prediction: result,
-        actual_result: dataset_record.actual_result
       )
     end
   end
@@ -71,7 +70,7 @@ module Leva
     #
     # @param prediction [Object] The model's prediction.
     # @param record [Object] The expected result.
-    # @return [Float] The evaluation score.
+    # @return [Array<(Float, Object)>] An array containing the evaluation score and the actual result.
     # @raise [NotImplementedError] if the method is not implemented in a subclass.
     def evaluate(prediction, record)
       raise NotImplementedError, "#{self.class} must implement #evaluate"
@@ -83,7 +82,11 @@ module Leva
     # @param runner_result [Leva::RunnerResult] The runner result to evaluate.
     # @return [Leva::EvaluationResult] The stored evaluation result.
     def evaluate_and_store(experiment, runner_result)
-      score = evaluate(runner_result.prediction, runner_result.dataset_record.recordable)
+      score, actual_result = evaluate(runner_result.prediction, runner_result.dataset_record.recordable)
+
+      if runner_result.actual_result.blank?
+        runner_result.update!(actual_result: actual_result)
+      end
 
       EvaluationResult.create!(
         experiment: experiment,

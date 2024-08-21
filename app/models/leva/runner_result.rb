@@ -32,7 +32,6 @@ module Leva
     has_many :evaluation_results, dependent: :destroy
 
     validates :prediction, presence: true
-    validates :actual_result, presence: true
     validates :prompt, presence: true
   end
 end
