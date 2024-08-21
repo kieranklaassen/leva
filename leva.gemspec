@@ -19,4 +19,5 @@ Gem::Specification.new do |spec|
   end
 
   spec.add_dependency "rails", ">= 7.2.0"
+  spec.add_dependency "liquid", "~> 5.5.0"
 end

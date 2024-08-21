@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     leva (0.1.5)
+      liquid (~> 5.5.0)
       rails (>= 7.2.0)
 
 GEM
@@ -100,6 +101,7 @@ GEM
       reline (>= 0.4.2)
     json (2.7.2)
     language_server-protocol (3.17.0.3)
+    liquid (5.5.1)
     logger (1.6.0)
     loofah (2.22.0)
       crass (~> 1.0.2)

@@ -1,5 +1,6 @@
 require "leva/version"
 require "leva/engine"
+require "liquid"
 
 module Leva
   # Runs an evaluation experiment with the given run and evals.

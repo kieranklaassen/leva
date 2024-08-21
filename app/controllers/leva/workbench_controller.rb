@@ -2,10 +2,11 @@
 
 module Leva
   class WorkbenchController < ApplicationController
-    before_action :set_prompt, only: [:index, :edit, :update]
+    before_action :set_prompt, only: [:index, :edit, :update, :run]
     before_action :load_evaluators, only: [:index]
+    before_action :load_runners, only: [:index, :run]
     before_action :load_predefined_prompts, only: [:new, :create]
-    before_action :set_dataset_record, only: [:index]
+    before_action :set_dataset_record, only: [:index, :run]
 
     # GET /workbench
     # @return [void]
@@ -48,8 +49,22 @@ module Leva
     end
 
     def run
-      # Implement the logic for running the prompt
-      redirect_to workbench_index_path, notice: 'Prompt run successfully'
+      return redirect_to workbench_index_path, alert: 'Please select a record and a runner' unless @dataset_record && run_params[:runner]
+
+      runner_class = run_params[:runner].constantize
+      return redirect_to workbench_index_path, alert: 'Invalid runner selected' unless runner_class < Leva::BaseRun
+
+      runner = runner_class.new
+
+      record = @dataset_record.recordable
+      prompt_template = Liquid::Template.parse(@prompt.user_prompt)
+      context = record.to_llm_context.stringify_keys
+      parsed_prompt = prompt_template.render(context)
+
+      result = runner.execute(record)
+
+      flash[:result] = result
+      redirect_to workbench_index_path(prompt_id: @prompt.id, dataset_record_id: @dataset_record.id, runner: run_params[:runner]), notice: 'Run completed successfully'
     end
 
     def run_with_evaluation
@@ -88,6 +103,16 @@ module Leva
 
     def set_dataset_record
       @dataset_record = DatasetRecord.find(params[:dataset_record_id]) if params[:dataset_record_id]
+    end
+
+    def load_runners
+      @runners = Dir[Rails.root.join('app', 'runners', '*.rb')].map do |file|
+        File.basename(file, '.rb').camelize.constantize
+      end.select { |klass| klass < Leva::BaseRun }
+    end
+
+    def run_params
+      params.permit(:runner)
     end
   end
 end

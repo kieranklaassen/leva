@@ -26,4 +26,11 @@ class TextContent < ApplicationRecord
       updated_at: updated_at.strftime('%Y-%m-%d %H:%M:%S')
     }
   end
+
+  def to_llm_context
+    {
+      text: text,
+      expected_label: expected_label
+    }
+  end
 end
