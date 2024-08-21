@@ -4,16 +4,34 @@
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold text-indigo-400 mb-2"><%= @experiment.name %></h1>
       <div class="flex items-center space-x-4">
-        <%= link_to edit_experiment_path(@experiment), class: 'btn btn-secondary flex items-center' do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-          </svg>
-          Edit Experiment
+        <% if @experiment.status != 'completed' %>
+          <%= link_to edit_experiment_path(@experiment), class: 'btn btn-secondary flex items-center' do %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+            Edit Experiment
+          <% end %>
         <% end %>
       </div>
     </div>
     <p class="text-gray-400"><%= @experiment.description %></p>
     <p class="text-indigo-300 mt-2">Status: <%= @experiment.status&.capitalize || 'N/A' %></p>
+  </div>
+  <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+    <h2 class="text-3xl font-semibold text-indigo-300 mb-6">Evaluation Summary</h2>
+    <% if @experiment.evaluation_results.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @experiment.evaluation_results.group_by(&:evaluator_class).each do |evaluator_class, results| %>
+          <div class="bg-gray-700 rounded-lg p-6">
+            <h3 class="text-xl font-semibold text-indigo-200 mb-4"><%= evaluator_class %></h3>
+            <p class="text-2xl font-bold text-indigo-400 mb-2"><%= (results.sum(&:score) / results.size.to_f).round(2) %></p>
+            <p class="text-gray-300">Number of Evaluations: <%= results.size %></p>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-400 text-xl">No evaluation results available yet.</p>
+    <% end %>
   </div>
   <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
     <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Experiment Details</h2>
@@ -22,19 +40,69 @@
     <!-- Add more experiment details as needed -->
   </div>
   <div class="bg-gray-800 rounded-lg shadow-lg p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-semibold text-indigo-300">Evaluation Results</h2>
-      <%= link_to '#', class: "btn btn-primary flex items-center" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-        </svg>
-        Run Evaluation
-      <% end %>
-    </div>
-    <% if @experiment.evaluation_results.any? %>
-      <!-- Display evaluation results here -->
+    <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Runner Results</h2>
+    <% if @experiment.runner_results.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-700">
+          <thead>
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Dataset Record</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Prompt</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Prediction</th>
+              <% @experiment.evaluation_results.group_by(&:evaluator_class).keys.each do |evaluator_class| %>
+                <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider"><%= evaluator_class %></th>
+              <% end %>
+              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Created At</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-gray-700 divide-y divide-gray-600">
+            <% @experiment.runner_results.each do |runner_result| %>
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300"><%= runner_result.dataset_record.display_name %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300"><%= runner_result.prompt.name %> (v<%= runner_result.prompt_version %>)</td>
+                <td class="px-6 py-4 text-sm text-gray-300"><%= truncate(runner_result.prediction, length: 50) %></td>
+                <% @experiment.evaluation_results.group_by(&:evaluator_class).keys.each do |evaluator_class| %>
+                  <% eval_result = runner_result.evaluation_results.find_by(evaluator_class: evaluator_class) %>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <% if eval_result %>
+                      <% score = eval_result.score %>
+                      <% color_class = case score
+                         when 0...0.2 then 'text-red-500'
+                         when 0.2...0.4 then 'text-orange-500'
+                         when 0.4...0.6 then 'text-yellow-500'
+                         when 0.6...0.8 then 'text-lime-500'
+                         when 0.8...1.0 then 'text-green-400'
+                         else 'text-green-300'
+                         end %>
+                      <span class="<%= color_class %> font-semibold"><%= sprintf('%.2f', score) %></span>
+                    <% else %>
+                      <span class="text-gray-400">N/A</span>
+                    <% end %>
+                  </td>
+                <% end %>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300"><%= runner_result.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <%= link_to 'Experiment', workbench_index_path(prompt_id: runner_result.prompt_id, dataset_record_id: runner_result.dataset_record_id, runner: @experiment.runner_class), class: 'text-indigo-400 hover:underline' %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-4 text-sm text-gray-400">
+        <p>Score color legend:</p>
+        <ul class="list-disc list-inside">
+          <li><span class="text-red-500 font-semibold">0.00 - 0.19</span>: Very Poor</li>
+          <li><span class="text-orange-500 font-semibold">0.20 - 0.39</span>: Poor</li>
+          <li><span class="text-yellow-500 font-semibold">0.40 - 0.59</span>: Fair</li>
+          <li><span class="text-lime-500 font-semibold">0.60 - 0.79</span>: Good</li>
+          <li><span class="text-green-400 font-semibold">0.80 - 0.99</span>: Very Good</li>
+          <li><span class="text-green-300 font-semibold">1.00+</span>: Excellent</li>
+        </ul>
+      </div>
     <% else %>
-      <p class="text-gray-400">No evaluation results available yet.</p>
+      <p class="text-gray-400">No runner results available yet.</p>
     <% end %>
   </div>
 </div>

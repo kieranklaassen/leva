@@ -3,6 +3,7 @@
 module Leva
   class ExperimentsController < ApplicationController
     before_action :set_experiment, only: [:show, :edit, :update]
+    before_action :check_editable, only: [:edit, :update]
 
     # GET /experiments
     # @return [void]
@@ -13,6 +14,7 @@ module Leva
     # GET /experiments/1
     # @return [void]
     def show
+      @experiment = Experiment.includes(runner_results: :evaluation_results).find(params[:id])
     end
 
     # GET /experiments/new
@@ -66,6 +68,10 @@ module Leva
 
     def experiment_update_params
       params.require(:experiment).permit(:name, :description)
+    end
+
+    def check_editable
+      redirect_to @experiment, alert: 'Completed experiments cannot be edited.' if @experiment.completed?
     end
   end
 end

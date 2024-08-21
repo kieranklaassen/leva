@@ -11,62 +11,14 @@
   <% end %>
   <div class="mb-4">
     <%= form.label :name, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.text_field :name, autofocus: true, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+    <%= form.text_field :name, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
   </div>
   <div class="mb-4">
     <%= form.label :description, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
     <%= form.text_area :description, rows: 4, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
   </div>
-  <% if experiment.new_record? %>
-    <% if params[:dataset_id].blank? %>
-      <div class="mb-4">
-        <%= form.label :dataset_id, "Dataset", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-        <%= form.collection_select :dataset_id, Leva::Dataset.all, :id, :name,
-            { prompt: "Select a dataset" },
-            class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
-      </div>
-    <% else %>
-      <%= form.hidden_field :dataset_id, value: params[:dataset_id] %>
-    <% end %>
-    <div class="mb-4">
-      <%= form.label :prompt_id, "Prompt", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-      <%= form.collection_select :prompt_id, Leva::Prompt.all, :id, :name,
-          { prompt: "Select a prompt" },
-          class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
-    </div>
-  <% else %>
-    <%= form.hidden_field :dataset_id %>
-    <%= form.hidden_field :prompt_id %>
-  <% end %>
-  <div class="mb-4">
-    <%= form.label :runner_class, "Runner", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.select :runner_class,
-        Dir[Rails.root.join('app', 'runners', '*.rb')].map { |f| File.basename(f, '.rb').camelize.constantize }
-           .select { |klass| klass < Leva::BaseRun }
-           .map { |klass| [klass.name.demodulize, klass.name] },
-        { prompt: "Select a runner" },
-        class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
-  </div>
-  <div class="mb-4">
-    <%= form.label :evaluator_classes, "Evaluators", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.collection_check_boxes :evaluator_classes,
-        Dir[Rails.root.join('app', 'evals', '*.rb')].map { |f| File.basename(f, '.rb').camelize.constantize }
-           .select { |klass| klass < Leva::BaseEval },
-        :name, :name.to_proc do |b| %>
-      <div class="flex items-center mb-2">
-        <%= b.check_box class: "mr-2 bg-gray-700 text-indigo-500 focus:ring-indigo-500" %>
-        <%= b.label class: "text-gray-300" %>
-      </div>
-    <% end %>
-  </div>
   <div class="flex items-center justify-end space-x-4">
-    <% if experiment.persisted? %>
-      <%= link_to "Cancel", experiment_path(experiment), class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
-    <% elsif experiment.dataset_id.present? || params[:dataset_id].present? %>
-      <%= link_to "Cancel", dataset_path(experiment.dataset_id || params[:dataset_id]), class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
-    <% else %>
-      <%= link_to "Cancel", experiments_path, class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
-    <% end %>
-    <%= form.submit experiment.persisted? ? "Update Experiment" : "Create Experiment", class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors duration-150 ease-in-out" %>
+    <%= link_to "Cancel", experiment_path(experiment), class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
+    <%= form.submit "Update Experiment", class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors duration-150 ease-in-out" %>
   </div>
 <% end %>
