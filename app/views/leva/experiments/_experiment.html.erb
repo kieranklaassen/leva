@@ -1,8 +1,42 @@
-<div class="bg-gray-800 rounded-lg shadow-lg p-6">
-  <h3 class="text-xl font-semibold mb-2 text-indigo-200"><%= experiment.name %></h3>
-  <p class="text-gray-400 mb-2">Status: <%= experiment.status&.capitalize || 'N/A' %></p>
-  <div class="flex space-x-2">
-    <%= link_to 'View Results', experiment_path(experiment), class: "btn btn-small btn-primary flex-1 text-center" %>
-    <%= link_to 'Edit', edit_experiment_path(experiment), class: "btn btn-small btn-secondary flex-1 text-center" %>
-  </div>
-</div>
+<tr class="hover:bg-gray-700 transition-colors duration-200">
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+    <%= experiment.name %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm">
+    <% status_color = case experiment.status
+       when 'pending' then 'bg-yellow-100 text-yellow-800'
+       when 'running' then 'bg-blue-100 text-blue-800'
+       when 'completed' then 'bg-green-100 text-green-800'
+       when 'failed' then 'bg-red-100 text-red-800'
+       else 'bg-gray-100 text-gray-800'
+       end %>
+    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_color %>">
+      <%= experiment.status&.capitalize || 'N/A' %>
+    </span>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+    <%= experiment.runner_results.count %>
+  </td>
+  <% Leva::EvaluationResult.distinct.pluck(:evaluator_class).each do |evaluator_class| %>
+    <td class="px-6 py-4 whitespace-nowrap text-sm">
+      <% results = experiment.evaluation_results.where(evaluator_class: evaluator_class) %>
+      <% if results.any? %>
+        <% avg_score = (results.sum(&:score) / results.size.to_f).round(2) %>
+        <% color_class = case avg_score
+           when 0...0.2 then 'text-red-500'
+           when 0.2...0.4 then 'text-orange-500'
+           when 0.4...0.6 then 'text-yellow-500'
+           when 0.6...0.8 then 'text-lime-500'
+           when 0.8...1.0 then 'text-green-400'
+           else 'text-green-300'
+           end %>
+        <span class="<%= color_class %> font-semibold"><%= sprintf('%.2f', avg_score) %></span>
+      <% else %>
+        <span class="text-gray-400">N/A</span>
+      <% end %>
+    </td>
+  <% end %>
+  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+    <%= link_to 'View Results', experiment_path(experiment), class: "text-indigo-400 hover:text-indigo-300 transition-colors duration-200" %>
+  </td>
+</tr>

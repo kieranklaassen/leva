@@ -10,8 +10,33 @@
     <% end %>
   </div>
   <% if @experiments.any? %>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <%= render @experiments %>
+    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-700">
+        <thead class="bg-gray-700">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+              Name
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+              Status
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+              Total Results
+            </th>
+            <% Leva::EvaluationResult.distinct.pluck(:evaluator_class).each do |evaluator_class| %>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <%= evaluator_class %>
+              </th>
+            <% end %>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-gray-800 divide-y divide-gray-700">
+          <%= render @experiments %>
+        </tbody>
+      </table>
     </div>
   <% else %>
     <div class="bg-gray-800 rounded-lg shadow-lg p-12 text-center">

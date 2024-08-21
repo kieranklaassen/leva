@@ -24,7 +24,16 @@
         <% @experiment.evaluation_results.group_by(&:evaluator_class).each do |evaluator_class, results| %>
           <div class="bg-gray-700 rounded-lg p-6">
             <h3 class="text-xl font-semibold text-indigo-200 mb-4"><%= evaluator_class %></h3>
-            <p class="text-2xl font-bold text-indigo-400 mb-2"><%= (results.sum(&:score) / results.size.to_f).round(2) %></p>
+            <% avg_score = (results.sum(&:score) / results.size.to_f).round(2) %>
+            <% color_class = case avg_score
+               when 0...0.2 then 'text-red-500'
+               when 0.2...0.4 then 'text-orange-500'
+               when 0.4...0.6 then 'text-yellow-500'
+               when 0.6...0.8 then 'text-lime-500'
+               when 0.8...1.0 then 'text-green-400'
+               else 'text-green-300'
+               end %>
+            <p class="text-2xl font-bold <%= color_class %> mb-2"><%= sprintf('%.2f', avg_score) %></p>
             <p class="text-gray-300">Number of Evaluations: <%= results.size %></p>
           </div>
         <% end %>
