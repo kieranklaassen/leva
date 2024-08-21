@@ -34,7 +34,7 @@ module Leva
 
       if @experiment.save
         ExperimentJob.perform_later(@experiment)
-        redirect_to @experiment, notice: 'Experiment was successfully created.'
+        redirect_to @experiment, notice: 'Experiment was successfully created and is now running.'
       else
         render :new
       end
@@ -61,7 +61,7 @@ module Leva
     # Only allow a list of trusted parameters through.
     # @return [ActionController::Parameters]
     def experiment_params
-      params.require(:experiment).permit(:name, :description, :dataset_id, :prompt_id)
+      params.require(:experiment).permit(:name, :description, :dataset_id, :prompt_id, :runner_class, evaluator_classes: [])
     end
 
     def experiment_update_params

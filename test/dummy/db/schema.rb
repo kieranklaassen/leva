@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_21_181934) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_183153) do
   create_table "leva_dataset_records", force: :cascade do |t|
     t.integer "dataset_id", null: false
     t.string "recordable_type", null: false
@@ -50,6 +50,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_181934) do
     t.text "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "runner_class"
+    t.text "evaluator_classes"
     t.index ["dataset_id"], name: "index_leva_experiments_on_dataset_id"
     t.index ["prompt_id"], name: "index_leva_experiments_on_prompt_id"
   end

@@ -10,6 +10,8 @@ module Leva
   # @param evals [Array<Leva::BaseEval>] The evaluation implementations to use.
   # @return [void]
   def self.run_evaluation(experiment:, run:, evals:)
+    experiment.update(status: :running)
+
     experiment.dataset.dataset_records.find_each do |dataset_record|
       runner_result = run.execute_and_store(experiment, dataset_record, experiment.prompt)
 
@@ -17,6 +19,11 @@ module Leva
         eval.evaluate_and_store(experiment, runner_result)
       end
     end
+
+    experiment.update(status: :completed)
+  rescue StandardError => e
+    experiment.update(status: :failed)
+    Rails.logger.error "Error in experiment #{experiment.name}: #{e.message}"
   end
 
   # Base class for all run implementations in Leva.
@@ -40,6 +47,10 @@ module Leva
     # @param prompt [Leva::Prompt] The prompt to store the version of.
     # @return [Leva::RunnerResult] The stored runner result.
     def execute_and_store(experiment, dataset_record, prompt)
+      # Expose these to the subclass execution
+      @experiment = experiment
+      @prompt = prompt
+
       result = execute(dataset_record.recordable)
       RunnerResult.create!(
         experiment: experiment,

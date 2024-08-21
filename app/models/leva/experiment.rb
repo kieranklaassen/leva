@@ -2,15 +2,17 @@
 #
 # Table name: leva_experiments
 #
-#  id          :integer          not null, primary key
-#  description :text
-#  metadata    :text
-#  name        :string
-#  status      :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  dataset_id  :integer          not null
-#  prompt_id   :integer
+#  id                :integer          not null, primary key
+#  description       :text
+#  evaluator_classes :text
+#  metadata          :text
+#  name              :string
+#  runner_class      :string
+#  status            :integer
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  dataset_id        :integer          not null
+#  prompt_id         :integer
 #
 # Indexes
 #
@@ -31,15 +33,11 @@ module Leva
 
     validates :name, presence: true
     validates :dataset, presence: true
+    validates :runner_class, presence: true
+    validates :evaluator_classes, presence: true
 
-    enum :status, { pending: 0, running: 1, completed: 2, failed: 3 }
+    enum :status, { pending: 0, running: 1, completed: 2, failed: 3 }, default: :pending
 
-    before_validation :set_default_status
-
-    private
-
-    def set_default_status
-      self.status ||= :pending
-    end
+    serialize :evaluator_classes, coder: JSON, type: Array
   end
 end

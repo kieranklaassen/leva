@@ -38,6 +38,27 @@
     <%= form.hidden_field :dataset_id %>
     <%= form.hidden_field :prompt_id %>
   <% end %>
+  <div class="mb-4">
+    <%= form.label :runner_class, "Runner", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+    <%= form.select :runner_class,
+        Dir[Rails.root.join('app', 'runners', '*.rb')].map { |f| File.basename(f, '.rb').camelize.constantize }
+           .select { |klass| klass < Leva::BaseRun }
+           .map { |klass| [klass.name.demodulize, klass.name] },
+        { prompt: "Select a runner" },
+        class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+  </div>
+  <div class="mb-4">
+    <%= form.label :evaluator_classes, "Evaluators", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+    <%= form.collection_check_boxes :evaluator_classes,
+        Dir[Rails.root.join('app', 'evals', '*.rb')].map { |f| File.basename(f, '.rb').camelize.constantize }
+           .select { |klass| klass < Leva::BaseEval },
+        :name, :name.to_proc do |b| %>
+      <div class="flex items-center mb-2">
+        <%= b.check_box class: "mr-2 bg-gray-700 text-indigo-500 focus:ring-indigo-500" %>
+        <%= b.label class: "text-gray-300" %>
+      </div>
+    <% end %>
+  </div>
   <div class="flex items-center justify-end space-x-4">
     <% if experiment.persisted? %>
       <%= link_to "Cancel", experiment_path(experiment), class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
