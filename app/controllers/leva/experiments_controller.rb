@@ -2,8 +2,11 @@
 
 module Leva
   class ExperimentsController < ApplicationController
+    include ApplicationHelper
+
     before_action :set_experiment, only: [:show, :edit, :update]
     before_action :check_editable, only: [:edit, :update]
+    before_action :load_runners_and_evaluators, only: [:new, :edit, :create, :update]
 
     # GET /experiments
     # @return [void]
@@ -45,7 +48,7 @@ module Leva
     # PATCH/PUT /experiments/1
     # @return [void]
     def update
-      if @experiment.update(experiment_update_params)
+      if @experiment.update(experiment_params)
         redirect_to @experiment, notice: 'Experiment was successfully updated.'
       else
         render :edit
@@ -66,8 +69,9 @@ module Leva
       params.require(:experiment).permit(:name, :description, :dataset_id, :prompt_id, :runner_class, evaluator_classes: [])
     end
 
-    def experiment_update_params
-      params.require(:experiment).permit(:name, :description)
+    def load_runners_and_evaluators
+      @runners = load_runners
+      @evaluators = load_evaluators
     end
 
     def check_editable
