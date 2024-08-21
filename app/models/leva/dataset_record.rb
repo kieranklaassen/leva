@@ -57,8 +57,6 @@ module Leva
         recordable.name
       elsif recordable.respond_to?(:title)
         recordable.title
-      elsif recordable.is_a?(TextContent)
-        "TextContent: #{recordable.text.truncate(30)}"
       else
         "#{recordable_type} ##{recordable_id}"
       end
