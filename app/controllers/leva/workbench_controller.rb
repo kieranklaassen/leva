@@ -54,7 +54,7 @@ module Leva
       return redirect_to workbench_index_path, alert: 'Invalid runner selected' unless runner_class < Leva::BaseRun
 
       runner = runner_class.new
-      runner_result = runner.execute_and_store(nil, @dataset_record)
+      runner_result = runner.execute_and_store(nil, @dataset_record, @prompt)
 
       redirect_to workbench_index_path(prompt_id: @prompt.id, dataset_record_id: @dataset_record.id, runner: run_params[:runner]), notice: 'Run completed successfully'
     end
@@ -66,7 +66,7 @@ module Leva
       return redirect_to workbench_index_path, alert: 'Invalid runner selected' unless runner_class < Leva::BaseRun
 
       runner = runner_class.new
-      runner_result = runner.execute_and_store(nil, @dataset_record)
+      runner_result = runner.execute_and_store(nil, @dataset_record, @prompt)
 
       @evaluators.each do |evaluator_class|
         evaluator = evaluator_class.new
@@ -86,7 +86,7 @@ module Leva
       return redirect_to workbench_index_path, alert: 'Invalid evaluator selected' unless evaluator_class < Leva::BaseEval
 
       runner = runner_class.new
-      runner_result = runner.execute_and_store(nil, @dataset_record)
+      runner_result = runner.execute_and_store(nil, @dataset_record, @prompt)
 
       evaluator = evaluator_class.new
       evaluator.evaluate_and_store(nil, runner_result)

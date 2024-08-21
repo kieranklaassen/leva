@@ -11,10 +11,8 @@ module Leva
   # @return [void]
   def self.run_evaluation(experiment:, run:, evals:)
     experiment.dataset.dataset_records.find_each do |dataset_record|
-      # Run the runner for this dataset record
-      runner_result = run.execute_and_store(experiment, dataset_record)
-b
-      # Evaluate the runner result with each evaluator
+      runner_result = run.execute_and_store(experiment, dataset_record, experiment.prompt)
+
       evals.each do |eval|
         eval.evaluate_and_store(experiment, runner_result)
       end
@@ -39,12 +37,14 @@ b
     #
     # @param experiment [Leva::Experiment, nil] The experiment being run, if any.
     # @param dataset_record [Leva::DatasetRecord] The dataset record to run the model on.
+    # @param prompt [Leva::Prompt] The prompt to store the version of.
     # @return [Leva::RunnerResult] The stored runner result.
-    def execute_and_store(experiment, dataset_record)
+    def execute_and_store(experiment, dataset_record, prompt)
       result = execute(dataset_record.recordable)
       RunnerResult.create!(
         experiment: experiment,
         dataset_record: dataset_record,
+        prompt: prompt,
         prediction: result
       )
     end

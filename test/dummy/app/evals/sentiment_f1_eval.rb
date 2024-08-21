@@ -5,6 +5,7 @@ class SentimentF1Eval < Leva::BaseEval
   # @param text_content [TextContent] The record to evaluate
   # @return [Float] The score of the evaluation
   def evaluate(prediction, text_content)
+    sleep 3
     rand
   end
 end

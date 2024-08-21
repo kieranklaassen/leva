@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_21_163900) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_181934) do
   create_table "leva_dataset_records", force: :cascade do |t|
     t.integer "dataset_id", null: false
     t.string "recordable_type", null: false
@@ -70,8 +70,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_163900) do
     t.text "prediction"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "prompt_version"
+    t.integer "prompt_id", null: false
     t.index ["dataset_record_id"], name: "index_leva_runner_results_on_dataset_record_id"
     t.index ["experiment_id"], name: "index_leva_runner_results_on_experiment_id"
+    t.index ["prompt_id"], name: "index_leva_runner_results_on_prompt_id"
   end
 
   create_table "text_contents", force: :cascade do |t|
@@ -89,4 +92,5 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_163900) do
   add_foreign_key "leva_experiments", "leva_prompts", column: "prompt_id"
   add_foreign_key "leva_runner_results", "leva_dataset_records", column: "dataset_record_id"
   add_foreign_key "leva_runner_results", "leva_experiments", column: "experiment_id"
+  add_foreign_key "leva_runner_results", "leva_prompts", column: "prompt_id"
 end
