@@ -2,9 +2,9 @@
 
 module Leva
   class WorkbenchController < ApplicationController
+    include ApplicationHelper
+
     before_action :set_prompt, only: [:index, :edit, :update, :run, :run_with_evaluation, :run_evaluator]
-    before_action :load_evaluators, only: [:index, :run, :run_with_evaluation, :run_evaluator]
-    before_action :load_runners, only: [:index, :run, :run_with_evaluation, :run_evaluator]
     before_action :set_dataset_record, only: [:index, :run, :run_with_evaluation, :run_evaluator]
 
     # GET /workbench
@@ -12,12 +12,15 @@ module Leva
     def index
       @prompts = Prompt.all
       @selected_prompt = @prompt || Prompt.first
+      @evaluators = load_evaluators
+      @runners = load_runners
     end
 
     # GET /workbench/new
     # @return [void]
     def new
       @prompt = Prompt.new
+      @predefined_prompts = load_predefined_prompts
     end
 
     # POST /workbench
@@ -68,7 +71,7 @@ module Leva
       runner = runner_class.new
       runner_result = runner.execute_and_store(nil, @dataset_record, @prompt)
 
-      @evaluators.each do |evaluator_class|
+      load_evaluators.each do |evaluator_class|
         evaluator = evaluator_class.new
         evaluator.evaluate_and_store(nil, runner_result)
       end
@@ -104,28 +107,8 @@ module Leva
       params.require(:prompt).permit(:name, :system_prompt, :user_prompt, :version)
     end
 
-    def load_evaluators
-      @evaluators = Dir[Rails.root.join('app', 'evals', '*.rb')].map do |file|
-        File.basename(file, '.rb').camelize.constantize
-      end.select { |klass| klass < Leva::BaseEval }
-    end
-
-    def load_predefined_prompts
-      @predefined_prompts = Dir.glob(Rails.root.join('app', 'prompts', '*.md')).map do |file|
-        name = File.basename(file, '.md').titleize
-        content = File.read(file)
-        [name, content]
-      end
-    end
-
     def set_dataset_record
       @dataset_record = DatasetRecord.find(params[:dataset_record_id]) if params[:dataset_record_id]
-    end
-
-    def load_runners
-      @runners = Dir[Rails.root.join('app', 'runners', '*.rb')].map do |file|
-        File.basename(file, '.rb').camelize.constantize
-      end.select { |klass| klass < Leva::BaseRun }
     end
 
     def run_params

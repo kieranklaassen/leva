@@ -7,10 +7,6 @@
       <%= form.text_field :name, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none", data: { action: "input->prompt-form#autoSave" } %>
     </div>
     <div class="mb-4">
-      <%= form.label :version, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-      <%= form.number_field :version, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none", data: { action: "input->prompt-form#autoSave" } %>
-    </div>
-    <div class="mb-4">
       <%= form.label :system_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
       <%= form.text_area :system_prompt, rows: 5, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none", data: { action: "input->prompt-form#autoSave" } %>
     </div>

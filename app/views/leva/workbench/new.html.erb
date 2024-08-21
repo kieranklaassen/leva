@@ -17,11 +17,6 @@
       <%= form.text_field :name, autofocus: true, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
     </div>
     <div class="mb-4">
-      <%= form.label :version, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-      <div class="w-full bg-gray-700 text-white p-3 rounded-lg">1</div>
-      <%= form.hidden_field :version, value: 1 %>
-    </div>
-    <div class="mb-4">
       <%= form.label :system_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
       <%= form.text_area :system_prompt, rows: 2, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
     </div>
