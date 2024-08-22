@@ -9,6 +9,8 @@
 #  updated_at     :datetime         not null
 #
 class TextContent < ApplicationRecord
+  include Leva::Recordable
+
   # @return [Hash] A hash of attributes to be displayed in the dataset records index
   def index_attributes
     {

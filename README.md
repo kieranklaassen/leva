@@ -27,19 +27,12 @@ rails db:migrate
 
 ### 1. Setting up Datasets
 
-First, create a dataset and add any ActiveRecord records you want to evaluate against:
-
-```ruby
-dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset")
-dataset.add_record TextContent.create(text: "I love this product!", expected_label: "Positive")
-dataset.add_record TextContent.create(text: "Terrible experience", expected_label: "Negative")
-dataset.add_record TextContent.create(text: "It's ok", expected_label: "Neutral")
-```
-
-To customize how your records are displayed in the dataset view, implement a `dataset_attributes` method in your model:
+First, create a dataset and add any ActiveRecord records you want to evaluate against. To make your models compatible with Leva, include the `Leva::Recordable` concern in your model:
 
 ```ruby
 class TextContent < ApplicationRecord
+  include Leva::Recordable
+
   def dataset_attributes
     {
       text: text,
@@ -50,7 +43,7 @@ class TextContent < ApplicationRecord
 end
 ```
 
-If `dataset_attributes` is not implemented, Leva will fall back to displaying only the `name` attribute (or `to_s` if `name` is not available).
+dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset") dataset.add_record TextContent.create(text: "I love this product!", expected_label: "Positive") dataset.add_record TextContent.create(text: "Terrible experience", expected_label: "Negative") dataset.add_record TextContent.create(text: "It's ok", expected_label: "Neutral")
 
 ### 2. Implementing Runs
 
