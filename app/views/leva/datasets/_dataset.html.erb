@@ -1,8 +1,18 @@
-<div class="bg-gray-800 rounded-lg shadow-lg p-6">
-  <h2 class="text-xl font-semibold mb-2 text-indigo-300"><%= dataset.name %></h2>
-  <p class="text-gray-400 mb-4"><%= dataset.description %></p>
-  <div class="flex space-x-2">
-    <%= link_to 'View', dataset_path(dataset), class: "btn btn-small btn-primary flex-1 text-center" %>
-    <%= link_to 'Edit', edit_dataset_path(dataset), class: "btn btn-small btn-secondary flex-1 text-center" %>
-  </div>
-</div>
+<tr class="hover:bg-gray-700 transition-colors duration-200">
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+    <%= dataset.name %>
+  </td>
+  <td class="px-6 py-4 text-sm text-gray-300">
+    <%= truncate(dataset.description, length: 100) %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+    <%= dataset.dataset_records.count %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+    <%= dataset.experiments.count %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+    <%= link_to 'View', dataset_path(dataset), class: 'text-indigo-400 hover:text-indigo-300 transition-colors duration-200 mr-3' %>
+    <%= link_to 'Edit', edit_dataset_path(dataset), class: 'text-indigo-400 hover:text-indigo-300 transition-colors duration-200' %>
+  </td>
+</tr>
