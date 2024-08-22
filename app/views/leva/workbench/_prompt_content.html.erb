@@ -20,6 +20,17 @@
         data-action="input->prompt-autosave#debouncedSave"
       ><%= @selected_prompt.user_prompt %></textarea>
     </div>
+    <!-- Available Liquid Tags -->
+    <% if @dataset_record && @dataset_record.recordable.respond_to?(:to_llm_context) %>
+      <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
+        <h2 class="text-sm font-semibold mb-3 text-indigo-400">AVAILABLE LIQUID TAGS</h2>
+        <div class="bg-gray-800 p-3 rounded-lg text-sm">
+          <% @dataset_record.recordable.to_llm_context.keys.each do |key| %>
+            <code class="text-green-400 mr-2">{{ <%= key %> }}</code>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
     <div class="text-sm text-center" data-prompt-autosave-target="status"></div>
   </div>
   <script>
