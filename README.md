@@ -144,6 +144,100 @@ experiment.evaluation_results.group_by(&:evaluator_class).each do |evaluator_cla
 end
 ```
 
+### 7. Adding a Concern for Polymorphic Relation
+
+To add a concern for the polymorphic relation in `app/models/leva/dataset_record.rb`, follow these steps:
+
+1. Create a new concern file `app/models/concerns/recordable_concern.rb` with the following content:
+
+```ruby
+module RecordableConcern
+  extend ActiveSupport::Concern
+
+  included do
+    # Define any necessary associations or validations here
+  end
+
+  # @return [Hash] A hash of attributes to be displayed in the dataset records index
+  def index_attributes
+    {
+      text: text.truncate(50),
+      expected_label: expected_label
+    }
+  end
+
+  # @return [Hash] A hash of attributes to be displayed in the dataset record show view
+  def show_attributes
+    {
+      text: text,
+      expected_label: expected_label,
+      created_at: created_at.strftime('%Y-%m-%d %H:%M:%S'),
+      updated_at: updated_at.strftime('%Y-%m-%d %H:%M:%S')
+    }
+  end
+
+  # @return [String] A string representation of the record for display purposes
+  def display_name
+    if respond_to?(:name)
+      name
+    elsif respond_to?(:title)
+      title
+    else
+      "#{self.class.name} ##{id}"
+    end
+  end
+end
+```
+
+2. Include the `RecordableConcern` in `app/models/leva/dataset_record.rb`:
+
+```ruby
+module Leva
+  class DatasetRecord < ApplicationRecord
+    include RecordableConcern
+
+    belongs_to :dataset
+    belongs_to :recordable, polymorphic: true
+
+    has_many :runner_results, dependent: :destroy
+    has_many :evaluation_results, dependent: :destroy, through: :runner_results
+
+    # @return [Hash] A hash of attributes to be displayed in the dataset records index
+    def index_attributes
+      if recordable.respond_to?(:index_attributes)
+        recordable.index_attributes
+      elsif recordable.respond_to?(:name)
+        { name: recordable.name }
+      else
+        { to_s: recordable.to_s }
+      end
+    end
+
+    # @return [Hash] A hash of attributes to be displayed in the dataset record show view
+    def show_attributes
+      if recordable.respond_to?(:show_attributes)
+        recordable.show_attributes
+      elsif recordable.respond_to?(:dataset_attributes)
+        recordable.dataset_attributes
+      else
+        { to_s: recordable.to_s }
+      end
+    end
+
+    # @return [String] A string representation of the record for display purposes
+    def display_name
+      if recordable.respond_to?(:name)
+        recordable.name
+      elsif recordable.respond_to?(:title)
+        recordable.title
+      else
+        "#{recordable_type} ##{recordable_id}"
+      end
+    end
+  end
+end
+```
+
 ## Configuration
 
 Ensure you set up any required API keys or other configurations in your Rails credentials or environment variables.

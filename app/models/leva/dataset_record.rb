@@ -20,6 +20,8 @@
 #
 module Leva
   class DatasetRecord < ApplicationRecord
+    include RecordableConcern
+
     belongs_to :dataset
     belongs_to :recordable, polymorphic: true
 
