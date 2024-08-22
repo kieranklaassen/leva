@@ -66,13 +66,13 @@ module Leva
   # @abstract Subclass and override {#evaluate} to implement
   #   custom evaluation logic.
   class BaseEval
-    # Evaluates the model's prediction against the expected result.
+    # Evaluates the model's prediction against the ground truth.
     #
     # @param prediction [Object] The model's prediction.
-    # @param record [Object] The expected result.
-    # @return [Array<(Float, Object)>] An array containing the evaluation score and the actual result.
+    # @param recordable [Object] The recordable object containing the ground truth.
+    # @return [Float] The evaluation score.
     # @raise [NotImplementedError] if the method is not implemented in a subclass.
-    def evaluate(prediction, record)
+    def evaluate(prediction, recordable)
       raise NotImplementedError, "#{self.class} must implement #evaluate"
     end
 
@@ -82,11 +82,7 @@ module Leva
     # @param runner_result [Leva::RunnerResult] The runner result to evaluate.
     # @return [Leva::EvaluationResult] The stored evaluation result.
     def evaluate_and_store(experiment, runner_result)
-      score, actual_result = evaluate(runner_result.prediction, runner_result.dataset_record.recordable)
-
-      if runner_result.actual_result.blank?
-        runner_result.update!(actual_result: actual_result)
-      end
+      score = evaluate(runner_result.prediction, runner_result.dataset_record.recordable)
 
       EvaluationResult.create!(
         experiment: experiment,

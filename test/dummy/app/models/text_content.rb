@@ -11,6 +11,11 @@
 class TextContent < ApplicationRecord
   include Leva::Recordable
 
+  # @return [String] The ground truth label for the record
+  def ground_truth
+    expected_label
+  end
+
   # @return [Hash] A hash of attributes to be displayed in the dataset records index
   def index_attributes
     {

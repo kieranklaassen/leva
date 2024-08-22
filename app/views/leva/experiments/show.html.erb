@@ -58,7 +58,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Dataset Record</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Prompt</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Prediction</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Actual Result</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider">Ground Truth</th>
               <% @experiment.evaluation_results.group_by(&:evaluator_class).keys.each do |evaluator_class| %>
                 <th class="px-6 py-3 text-left text-xs font-medium text-indigo-300 uppercase tracking-wider"><%= evaluator_class %></th>
               <% end %>
@@ -72,7 +72,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300"><%= runner_result.dataset_record.display_name %></td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300"><%= runner_result.prompt.name %> (v<%= runner_result.prompt_version %>)</td>
                 <td class="px-6 py-4 text-sm text-gray-300"><%= truncate(runner_result.prediction, length: 30) %></td>
-                <td class="px-6 py-4 text-sm text-gray-300"><%= truncate(runner_result.actual_result, length: 30) %></td>
+                <td class="px-6 py-4 text-sm text-gray-300"><%= truncate(runner_result.ground_truth, length: 30) %></td>
                 <% @experiment.evaluation_results.group_by(&:evaluator_class).keys.each do |evaluator_class| %>
                   <% eval_result = runner_result.evaluation_results.find_by(evaluator_class: evaluator_class) %>
                   <td class="px-6 py-4 whitespace-nowrap text-sm">

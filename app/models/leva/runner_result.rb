@@ -3,7 +3,6 @@
 # Table name: leva_runner_results
 #
 #  id                :integer          not null, primary key
-#  actual_result     :text
 #  prediction        :text
 #  prompt_version    :integer
 #  created_at        :datetime         not null
@@ -33,5 +32,7 @@ module Leva
 
     validates :prediction, presence: true
     validates :prompt, presence: true
+
+    delegate :ground_truth, to: :dataset_record
   end
 end

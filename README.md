@@ -29,11 +29,35 @@ rails db:migrate
 
 First, create a dataset and add any ActiveRecord records you want to evaluate against. To make your models compatible with Leva, include the `Leva::Recordable` concern in your model:
 
-```ruby
+````ruby
 class TextContent < ApplicationRecord
   include Leva::Recordable
 
-  def dataset_attributes
+  # @return [String] The ground truth label for the record
+  def ground_truth
+    expected_label
+  end
+
+  # @return [Hash] A hash of attributes to be displayed in the dataset records index
+  def index_attributes
+    {
+      text: text,
+      expected_label: expected_label,
+      created_at: created_at.strftime('%Y-%m-%d %H:%M:%S')
+    }
+  end
+
+  # @return [Hash] A hash of attributes to be displayed in the dataset record show view
+  def show_attributes
+    {
+      text: text,
+      expected_label: expected_label,
+      created_at: created_at.strftime('%Y-%m-%d %H:%M:%S')
+    }
+  end
+
+  # @return [Hash] A hash of attributes to be displayed in the dataset record show view
+  def to_llm_context
     {
       text: text,
       expected_label: expected_label,
@@ -41,7 +65,6 @@ class TextContent < ApplicationRecord
     }
   end
 end
-```
 
 dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset") dataset.add_record TextContent.create(text: "I love this product!", expected_label: "Positive") dataset.add_record TextContent.create(text: "Terrible experience", expected_label: "Negative") dataset.add_record TextContent.create(text: "It's ok", expected_label: "Neutral")
 
@@ -51,7 +74,7 @@ Create a run class to handle the execution of your inference logic:
 
 ```bash
 rails generate leva:runner sentiment
-```
+````
 
 ```ruby
 class SentimentRun < Leva::BaseRun
