@@ -108,7 +108,7 @@ module Leva
     end
 
     def set_dataset_record
-      @dataset_record = DatasetRecord.find(params[:dataset_record_id]) if params[:dataset_record_id]
+      @dataset_record = DatasetRecord.find_by(id: params[:dataset_record_id]) if params[:dataset_record_id].present?
     end
 
     def run_params
