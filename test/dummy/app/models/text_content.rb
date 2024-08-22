@@ -9,7 +9,8 @@
 #  updated_at     :datetime         not null
 #
 class TextContent < ApplicationRecord
-  # @return [Hash] A hash of attributes to be displayed in the dataset records index
+  include RecordableConcern
+
   def index_attributes
     {
       text: text.truncate(50),
@@ -17,7 +18,6 @@ class TextContent < ApplicationRecord
     }
   end
 
-  # @return [Hash] A hash of attributes to be displayed in the dataset record show view
   def show_attributes
     {
       text: text,
@@ -25,6 +25,16 @@ class TextContent < ApplicationRecord
       created_at: created_at.strftime('%Y-%m-%d %H:%M:%S'),
       updated_at: updated_at.strftime('%Y-%m-%d %H:%M:%S')
     }
+  end
+
+  def display_name
+    if respond_to?(:name)
+      name
+    elsif respond_to?(:title)
+      title
+    else
+      "#{self.class.name} ##{id}"
+    end
   end
 
   def to_llm_context
