@@ -82,6 +82,10 @@ module Leva
     # @param runner_result [Leva::RunnerResult] The runner result to evaluate.
     # @return [Leva::EvaluationResult] The stored evaluation result.
     def evaluate_and_store(experiment, runner_result)
+      @experiment = experiment
+      @runner_result = runner_result
+
+      # TODO: return parsed predfiction maybe?
       score = evaluate(runner_result.prediction, runner_result.dataset_record.recordable)
 
       EvaluationResult.create!(
