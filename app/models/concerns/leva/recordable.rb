@@ -24,8 +24,14 @@ module Leva
       raise NotImplementedError, "#{self.class} must implement #show_attributes"
     end
 
+    # @return [Hash] A hash of attributes to be liquified for LLM context
     def to_llm_context
       raise NotImplementedError, "#{self.class} must implement #to_llm_context"
+    end
+
+    # @return [Regexp] A regex pattern to extract the contents of a LLM response
+    def extract_regex_pattern
+      false
     end
   end
 end

@@ -34,5 +34,17 @@ module Leva
     validates :prompt, presence: true
 
     delegate :ground_truth, to: :dataset_record
+
+    # @return [Array<String>] The parsed prediction
+    def parsed_predictions
+      @parsed_predictions ||= begin
+        if dataset_record.recordable.extract_regex_pattern
+          match_data = prediction.match(dataset_record.recordable.extract_regex_pattern)
+          match_data ? match_data.captures : prediction
+        else
+          prediction
+        end
+      end
+    end
   end
 end

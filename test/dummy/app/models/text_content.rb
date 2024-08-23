@@ -40,4 +40,9 @@ class TextContent < ApplicationRecord
       expected_label: expected_label
     }
   end
+
+  # @return [Regexp] A regex pattern to extract the contents of a <sentiment> XML tag
+  def extract_regex_pattern
+    /<sentiment>(.*?)<\/sentiment>/
+  end
 end
