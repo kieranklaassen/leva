@@ -52,7 +52,7 @@
         <div>
           <h4 class="text-xs font-semibold text-indigo-200 my-2 gap-2">Parsed Predictions:  <%= runner_result.dataset_record.recordable.extract_regex_pattern.to_s %></h4>
           <% runner_result.parsed_predictions.each do |prediction| %>
-            <pre class="text-sm text-gray-300 whitespace-pre-wrap bg-gray-700 p-2 rounded"><%= prediction %></pre>
+            <pre class="text-sm text-gray-300 whitespace-pre-wrap bg-gray-700 p-2 rounded mb-2"><%= prediction %></pre>
           <% end %>
         </div>
       <% end %>
