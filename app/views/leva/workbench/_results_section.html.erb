@@ -42,11 +42,11 @@
     <% if @dataset_record && (runner_result = @dataset_record.runner_results.last) %>
       <div class="mb-3">
         <h4 class="text-xs font-semibold text-indigo-200 mb-1">Ground Truth:</h4>
-        <p class="text-sm text-gray-300"><%= @dataset_record.ground_truth %></p>
+        <pre class="text-sm text-gray-300 whitespace-pre-wrap bg-gray-700 p-2 rounded"><%= @dataset_record.ground_truth %></pre>
       </div>
       <div>
         <h4 class="text-xs font-semibold text-indigo-200 mb-1">Prediction:</h4>
-        <p class="text-sm text-gray-300"><%= runner_result.prediction %></p>
+        <pre class="text-sm text-gray-300 whitespace-pre-wrap bg-gray-700 p-2 rounded"><%= runner_result.prediction %></pre>
       </div>
       <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
         <p>Prompt version: <%= runner_result.prompt.version %></p>
