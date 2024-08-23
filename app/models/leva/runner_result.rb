@@ -37,11 +37,18 @@ module Leva
 
     # @return [Array<String>] The parsed draft responses
     def parsed_predictions
-    @parsed_predictions ||= if extract_regex_pattern
-      prediction.scan(extract_regex_pattern).map { |_, content| content.strip }
-    else
-      [prediction]
+      @parsed_predictions ||=
+        if extract_regex_pattern
+          prediction.scan(extract_regex_pattern).map { |_, content| content.strip }
+        else
+          [prediction]
+        end
     end
-  end
+
+    private
+
+    def extract_regex_pattern
+      dataset_record.recordable.extract_regex_pattern
+    end
   end
 end
