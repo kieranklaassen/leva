@@ -35,16 +35,13 @@ module Leva
 
     delegate :ground_truth, to: :dataset_record
 
-    # @return [Array<String>] The parsed prediction
+    # @return [Array<String>] The parsed draft responses
     def parsed_predictions
-      @parsed_predictions ||= begin
-        if dataset_record.recordable.extract_regex_pattern
-          match_data = prediction.match(dataset_record.recordable.extract_regex_pattern)
-          match_data ? match_data.captures : prediction
-        else
-          prediction
-        end
-      end
+    @parsed_predictions ||= if extract_regex_pattern
+      prediction.scan(extract_regex_pattern).map { |_, content| content.strip }
+    else
+      [prediction]
     end
+  end
   end
 end
