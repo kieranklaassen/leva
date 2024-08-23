@@ -11,7 +11,7 @@ Leva::Engine.routes.draw do
   resources :workbench, only: [:index, :new, :create, :edit, :update] do
     collection do
       post 'run'
-      post 'run_with_evaluation'
+      post 'run_all_evals'
       post 'run_evaluator'
     end
   end

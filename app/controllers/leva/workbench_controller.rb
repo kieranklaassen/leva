@@ -4,8 +4,9 @@ module Leva
   class WorkbenchController < ApplicationController
     include ApplicationHelper
 
-    before_action :set_prompt, only: [:index, :edit, :update, :run, :run_with_evaluation, :run_evaluator]
-    before_action :set_dataset_record, only: [:index, :run, :run_with_evaluation, :run_evaluator]
+    before_action :set_prompt, only: [:index, :edit, :update, :run, :run_all_evals, :run_evaluator]
+    before_action :set_dataset_record, only: [:index, :run, :run_all_evals, :run_evaluator]
+    before_action :set_runner_result, only: [:index, :run_all_evals, :run_evaluator]
 
     # GET /workbench
     # @return [void]
@@ -62,39 +63,27 @@ module Leva
       redirect_to workbench_index_path(prompt_id: @prompt.id, dataset_record_id: @dataset_record.id, runner: run_params[:runner]), notice: 'Run completed successfully'
     end
 
-    def run_with_evaluation
-      return redirect_to workbench_index_path, alert: 'Please select a record and a runner' unless @dataset_record && run_params[:runner]
-
-      runner_class = run_params[:runner].constantize
-      return redirect_to workbench_index_path, alert: 'Invalid runner selected' unless runner_class < Leva::BaseRun
-
-      runner = runner_class.new
-      runner_result = runner.execute_and_store(nil, @dataset_record, @prompt)
+    def run_all_evals
+      return redirect_to workbench_index_path, alert: 'No runner result available' unless @runner_result
 
       load_evaluators.each do |evaluator_class|
         evaluator = evaluator_class.new
-        evaluator.evaluate_and_store(nil, runner_result)
+        evaluator.evaluate_and_store(nil, @runner_result)
       end
 
-      redirect_to workbench_index_path(prompt_id: @prompt.id, dataset_record_id: @dataset_record.id, runner: run_params[:runner]), notice: 'Run and evaluation completed successfully'
+      redirect_to workbench_index_path(prompt_id: @prompt.id, dataset_record_id: @dataset_record.id, runner: params[:runner]), notice: 'All evaluations completed successfully'
     end
 
     def run_evaluator
-      return redirect_to workbench_index_path, alert: 'Please select a record and a runner' unless @dataset_record && run_params[:runner]
-
-      runner_class = run_params[:runner].constantize
-      return redirect_to workbench_index_path, alert: 'Invalid runner selected' unless runner_class < Leva::BaseRun
+      return redirect_to workbench_index_path, alert: 'No runner result available' unless @runner_result
 
       evaluator_class = params[:evaluator].constantize
       return redirect_to workbench_index_path, alert: 'Invalid evaluator selected' unless evaluator_class < Leva::BaseEval
 
-      runner = runner_class.new
-      runner_result = runner.execute_and_store(nil, @dataset_record, @prompt)
-
       evaluator = evaluator_class.new
-      evaluator.evaluate_and_store(nil, runner_result)
+      evaluator.evaluate_and_store(nil, @runner_result)
 
-      redirect_to workbench_index_path(prompt_id: @prompt.id, dataset_record_id: @dataset_record.id, runner: run_params[:runner]), notice: 'Evaluator run successfully'
+      redirect_to workbench_index_path(prompt_id: @prompt.id, dataset_record_id: @dataset_record.id, runner: params[:runner]), notice: 'Evaluator run successfully'
     end
 
     private
@@ -113,6 +102,10 @@ module Leva
 
     def run_params
       params.permit(:runner, :prompt_id, :dataset_record_id)
+    end
+
+    def set_runner_result
+      @runner_result = @dataset_record.runner_results.last if @dataset_record
     end
   end
 end
