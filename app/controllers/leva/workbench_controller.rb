@@ -15,6 +15,8 @@ module Leva
       @selected_prompt = @prompt || Prompt.first
       @evaluators = load_evaluators
       @runners = load_runners
+      @selected_runner = params[:runner] || @runners.first&.name
+      @selected_dataset_record = params[:dataset_record_id] || DatasetRecord.first&.id
     end
 
     # GET /workbench/new
@@ -97,7 +99,7 @@ module Leva
     end
 
     def set_dataset_record
-      @dataset_record = DatasetRecord.find_by(id: params[:dataset_record_id]) if params[:dataset_record_id].present?
+      @dataset_record = DatasetRecord.find_by(id: params[:dataset_record_id]) || DatasetRecord.first
     end
 
     def run_params

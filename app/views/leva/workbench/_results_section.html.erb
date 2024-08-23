@@ -4,12 +4,12 @@
     <h3 class="text-sm font-semibold mb-2 text-indigo-300">Select Runner</h3>
     <%= form_tag workbench_index_path, method: :get, class: "flex items-center" do %>
       <%= select_tag :runner,
-                     options_from_collection_for_select(@runners, :name, :name, params[:runner]),
+                     options_from_collection_for_select(@runners, :name, :name, @selected_runner),
                      include_blank: "Select a runner",
                      onchange: "this.form.submit()",
                      class: "w-full bg-gray-800 text-white border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
       <%= hidden_field_tag :prompt_id, @prompt&.id %>
-      <%= hidden_field_tag :dataset_record_id, @dataset_record&.id %>
+      <%= hidden_field_tag :dataset_record_id, @selected_dataset_record %>
     <% end %>
   </div>
   <!-- Dataset Record Dropdown -->
@@ -17,17 +17,17 @@
     <%= form_tag workbench_index_path, method: :get, class: "flex flex-col" do %>
       <%= label_tag :dataset_record_id, "Select Test Record", class: "text-sm font-semibold mb-2 text-indigo-300" %>
       <%= select_tag :dataset_record_id,
-                     options_from_collection_for_select(Leva::DatasetRecord.all, :id, :display_name, @dataset_record&.id),
+                     options_from_collection_for_select(Leva::DatasetRecord.all, :id, :display_name, @selected_dataset_record),
                      include_blank: "Select a record",
                      onchange: "this.form.submit()",
                      class: "w-full bg-gray-800 text-white border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
       <%= hidden_field_tag :prompt_id, @prompt&.id %>
-      <%= hidden_field_tag :runner, params[:runner] %>
+      <%= hidden_field_tag :runner, @selected_runner %>
     <% end %>
   </div>
   <!-- Run Button -->
   <div class="mb-5">
-    <%= button_to run_workbench_index_path, method: :post, params: { runner: params[:runner], prompt_id: @prompt&.id, dataset_record_id: @dataset_record&.id }, class: "w-full btn btn-primary bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center justify-center transition duration-300 ease-in-out h-12", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
+    <%= button_to run_workbench_index_path, method: :post, params: { runner: @selected_runner, prompt_id: @prompt&.id, dataset_record_id: @selected_dataset_record }, class: "w-full btn btn-primary bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center justify-center transition duration-300 ease-in-out h-12", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
       <span data-button-loader-target="buttonText" class="flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
@@ -65,7 +65,7 @@
   <div class="space-y-4">
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-semibold text-indigo-400">Evaluators</h3>
-      <%= button_to run_all_evals_workbench_index_path, method: :post, params: { runner: params[:runner], prompt_id: @prompt&.id, dataset_record_id: @dataset_record&.id }, class: "btn btn-primary bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center justify-center transition duration-300 ease-in-out h-10", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
+      <%= button_to run_all_evals_workbench_index_path, method: :post, params: { runner: @selected_runner, prompt_id: @prompt&.id, dataset_record_id: @selected_dataset_record }, class: "btn btn-primary bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center justify-center transition duration-300 ease-in-out h-10", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
         <span data-button-loader-target="buttonText" class="flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd" />
@@ -79,7 +79,7 @@
         <div class="bg-gray-800 p-4 rounded-lg shadow-md">
           <div class="flex items-center justify-between mb-2">
             <span class="text-sm font-medium"><%= evaluator_class.name.demodulize %></span>
-            <%= button_to run_evaluator_workbench_index_path, method: :post, params: { evaluator: evaluator_class.name, runner: params[:runner], prompt_id: @prompt&.id, dataset_record_id: @dataset_record&.id }, class: "p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition duration-150 ease-in-out", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
+            <%= button_to run_evaluator_workbench_index_path, method: :post, params: { evaluator: evaluator_class.name, runner: @selected_runner, prompt_id: @prompt&.id, dataset_record_id: @selected_dataset_record }, class: "p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition duration-150 ease-in-out", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
               <span data-button-loader-target="buttonText">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
