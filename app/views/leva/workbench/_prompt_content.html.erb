@@ -1,34 +1,83 @@
 <% if @selected_prompt %>
-  <div class="flex-1 overflow-y-auto p-6 space-y-6" data-controller="prompt-autosave" data-prompt-autosave-url-value="<%= workbench_path(@selected_prompt) %>">
+  <div class="flex-1 overflow-y-auto p-6 space-y-6" data-controller="prompt-autosave collapsible clipboard" data-prompt-autosave-url-value="<%= workbench_path(@selected_prompt) %>">
     <!-- System Prompt -->
     <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
-      <h2 class="text-sm font-semibold mb-3 text-indigo-400">SYSTEM PROMPT</h2>
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-sm font-semibold text-indigo-400">SYSTEM PROMPT</h2>
+        <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="systemPrompt">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          </svg>
+          Copy
+        </button>
+      </div>
       <textarea
         class="w-full bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[100px] overflow-hidden resize-none"
         name="prompt[system_prompt]"
         data-prompt-autosave-target="input"
+        id="systemPrompt"
         data-action="input->prompt-autosave#debouncedSave"
       ><%= @selected_prompt.system_prompt %></textarea>
     </div>
-    <!-- User Message -->
+    <!-- User Message (Prompt Template) -->
     <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
-      <h2 class="text-sm font-semibold mb-3 text-indigo-400">USER</h2>
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-sm font-semibold text-indigo-400">USER (PROMPT TEMPLATE)</h2>
+        <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="userPrompt">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+          </svg>
+          Copy
+        </button>
+      </div>
       <textarea
         class="w-full bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[200px] overflow-hidden resize-none"
         name="prompt[user_prompt]"
         data-prompt-autosave-target="input"
+        id="userPrompt"
         data-action="input->prompt-autosave#debouncedSave"
       ><%= @selected_prompt.user_prompt %></textarea>
     </div>
     <!-- Available Liquid Tags -->
     <% if @dataset_record && @dataset_record.recordable.respond_to?(:to_llm_context) %>
-      <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
-        <h2 class="text-sm font-semibold mb-3 text-indigo-400">AVAILABLE LIQUID TAGS</h2>
-        <div class="bg-gray-800 p-3 rounded-lg text-sm">
-          <% @dataset_record.recordable.to_llm_context.keys.each do |key| %>
-            <code class="text-green-400 mr-2">{{ <%= key %> }}</code>
+      <div class="bg-gray-900 p-5 rounded-lg shadow-lg" data-controller="collapsible">
+        <h2 class="text-sm font-semibold mb-3 text-indigo-400 cursor-pointer flex items-center" data-action="click->collapsible#toggle">
+          AVAILABLE LIQUID TAGS
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </h2>
+        <div class="bg-gray-800 p-3 rounded-lg text-sm hidden" data-collapsible-target="content">
+          <% @dataset_record.recordable.to_llm_context.each do |key, value| %>
+            <details class="mb-2">
+              <summary class="text-green-400 cursor-pointer flex items-center justify-between">
+                <span>{{ <%= key %> }}</span>
+                <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="liquidTag<%= key %>">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                  Copy
+                </button>
+              </summary>
+              <pre class="text-xs text-gray-300 mt-1 whitespace-pre-wrap" id="liquidTag<%= key %>"><%= value.to_s %></pre>
+            </details>
           <% end %>
         </div>
+      </div>
+    <% end %>
+    <!-- Full Prompt Preview -->
+    <% if @dataset_record %>
+      <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-sm font-semibold text-indigo-400">FULL PROMPT PREVIEW</h2>
+          <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="fullPrompt">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+            Copy
+          </button>
+        </div>
+        <pre class="w-full bg-gray-800 text-white p-3 rounded-lg text-sm whitespace-pre-wrap" id="fullPrompt"><%= Liquid::Template.parse(@selected_prompt.user_prompt).render(@dataset_record.recordable.to_llm_context.stringify_keys) %></pre>
       </div>
     <% end %>
     <div class="text-sm text-center" data-prompt-autosave-target="status"></div>
@@ -113,6 +162,43 @@
             clearTimeout(timeout)
             timeout = setTimeout(later, wait)
           }
+        }
+      })
+
+      application.register("collapsible", class extends Stimulus.Controller {
+        static targets = ["content"]
+
+        toggle() {
+          this.contentTarget.classList.toggle("hidden")
+        }
+      })
+
+      application.register("clipboard", class extends Stimulus.Controller {
+        static targets = ["content"]
+
+        copy(event) {
+          const sourceId = event.currentTarget.dataset.clipboardSource
+          const sourceElement = document.getElementById(sourceId)
+          const content = sourceElement.value || sourceElement.textContent
+          navigator.clipboard.writeText(content).then(() => {
+            this.showFeedback(event.currentTarget, "Copied!")
+          }, (err) => {
+            console.error('Could not copy text: ', err)
+            this.showFeedback(event.currentTarget, "Failed to copy", true)
+          })
+        }
+
+        showFeedback(button, message, isError = false) {
+          const originalText = button.textContent
+          button.textContent = message
+          button.classList.add(isError ? "text-red-500" : "text-green-500")
+          button.disabled = true
+
+          setTimeout(() => {
+            button.textContent = originalText
+            button.classList.remove("text-green-500", "text-red-500")
+            button.disabled = false
+          }, 2000)
         }
       })
     })()
