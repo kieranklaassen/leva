@@ -100,8 +100,7 @@ module Leva
       @experiment = experiment
       @runner_result = runner_result
 
-      # TODO: return parsed predfiction maybe?
-      score = evaluate(runner_result.prediction, runner_result.dataset_record.recordable)
+      score = evaluate(runner_result, runner_result.dataset_record.recordable)
 
       EvaluationResult.create!(
         experiment: experiment,

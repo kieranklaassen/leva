@@ -63,8 +63,8 @@ module Leva
       # Delete existing runner results and evaluation results
       @experiment.runner_results.destroy_all
 
-      # Reset experiment status to running
-      @experiment.update(status: :running)
+      # Reset experiment status to pending
+      @experiment.update(status: :pending)
 
       # Queue the job again
       ExperimentJob.perform_later(@experiment)
