@@ -38,7 +38,7 @@ module Leva
       @experiment = Experiment.new(experiment_params)
 
       if @experiment.save
-        ExperimentJob.perform_later(@experiment)
+        ExperimentJob.perform_later(@experiment) unless @experiment.completed?
         redirect_to @experiment, notice: 'Experiment was successfully created and is now running.'
       else
         render :new
@@ -53,6 +53,23 @@ module Leva
       else
         render :edit
       end
+    end
+
+    # POST /experiments/1/rerun
+    # @return [void]
+    def rerun
+      @experiment = Experiment.find(params[:id])
+
+      # Delete existing runner results and evaluation results
+      @experiment.runner_results.destroy_all
+
+      # Reset experiment status to running
+      @experiment.update(status: :running)
+
+      # Queue the job again
+      ExperimentJob.perform_later(@experiment)
+
+      redirect_to @experiment, notice: 'Experiment has been reset and is now running again.'
     end
 
     private

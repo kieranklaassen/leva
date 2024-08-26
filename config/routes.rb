@@ -5,6 +5,9 @@ Leva::Engine.routes.draw do
     resources :dataset_records, path: 'records', only: [:index, :show]
   end
   resources :experiments, except: [:destroy] do
+    member do
+      post :rerun
+    end
     resources :runner_results, only: [:show]
   end
   resources :prompts

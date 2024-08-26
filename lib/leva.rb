@@ -26,6 +26,21 @@ module Leva
     Rails.logger.error "Error in experiment #{experiment.name}: #{e.message}"
   end
 
+  # Runs a single evaluation for a dataset record
+  #
+  # @param experiment [Leva::Experiment] The experiment to run.
+  # @param run [Leva::BaseRun] The run implementation to use.
+  # @param evals [Array<Leva::BaseEval>] The evaluation implementations to use.
+  # @param dataset_record [Leva::DatasetRecord] The dataset record to process.
+  # @return [void]
+  def self.run_single_evaluation(experiment:, run:, evals:, dataset_record:)
+    runner_result = run.execute_and_store(experiment, dataset_record, experiment.prompt)
+
+    evals.each do |eval|
+      eval.evaluate_and_store(experiment, runner_result)
+    end
+  end
+
   # Base class for all run implementations in Leva.
   #
   # @abstract Subclass and override {#execute} to implement
