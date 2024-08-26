@@ -1,4 +1,9 @@
 <% content_for :title, @experiment.name %>
+<% content_for :head do %>
+  <% if @experiment.status == 'pending' || @experiment.status == 'running' %>
+    <meta http-equiv="refresh" content="5">
+  <% end %>
+<% end %>
 <div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
   <div class="mb-8">
     <div class="flex justify-between items-center">

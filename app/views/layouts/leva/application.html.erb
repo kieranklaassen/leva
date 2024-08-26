@@ -8,6 +8,7 @@
     <%= csp_meta_tag %>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/stimulus@3.2.2/dist/stimulus.umd.min.js"></script>
+    <%= yield(:head) %>
   </head>
   <body class="bg-gray-950 text-white">
     <nav class="bg-gray-900 border-b border-gray-800">
