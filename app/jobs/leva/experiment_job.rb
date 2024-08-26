@@ -17,7 +17,7 @@ module Leva
       total_records = dataset_record_ids.size
 
       dataset_record_ids.each do |record_id|
-        RunEvalJob.new(experiment.id, record_id).perform_now
+        RunEvalJob.perform_later(experiment.id, record_id)
         # TODO: make better
         sleep(3)
       end
