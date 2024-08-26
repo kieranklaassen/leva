@@ -6,7 +6,6 @@ class SentimentRun < Leva::BaseRun
   # @param text_content [TextContent] The text to analyze
   # @return [String] The sentiment analysis result (Positive, Neutral, or Negative)
   def execute(text_content)
-    sleep 4
     text = text_content.text.downcase
 
     sentiment = case
@@ -19,9 +18,9 @@ class SentimentRun < Leva::BaseRun
     end
 
     """
-    Wow, this is a great text!
+Wow, this is a great text!
 
-    <sentiment>#{sentiment}</sentiment>
+<sentiment>#{sentiment}</sentiment>
     """
   end
 end

@@ -39,7 +39,7 @@ module Leva
     def parsed_predictions
       @parsed_predictions ||=
         if extract_regex_pattern
-          prediction.scan(extract_regex_pattern).map { |_, content| content.strip }
+          prediction.scan(extract_regex_pattern).map { |match| match.first&.strip }.compact
         else
           [prediction]
         end
