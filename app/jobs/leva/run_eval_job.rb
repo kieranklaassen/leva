@@ -17,6 +17,8 @@ module Leva
       evals = experiment.evaluator_classes.compact.reject(&:empty?).map { |klass| constantize_class(klass).new }
 
       Leva.run_single_evaluation(experiment: experiment, run: run, evals: evals, dataset_record: dataset_record)
+
+      experiment.update!(status: :completed) if is_last(experiment)
     end
 
     private
@@ -25,6 +27,14 @@ module Leva
       class_name.constantize
     rescue NameError => e
       raise NameError, "Invalid class name: #{class_name}. Error: #{e.message}"
+    end
+
+    # Check if all dataset records for the experiment have a runner result
+    #
+    # @param experiment [Experiment] The experiment to check
+    # @return [Boolean] True if all dataset records have a runner result, false otherwise
+    def is_last(experiment)
+      experiment.dataset.dataset_records.count == experiment.runner_results.count
     end
   end
 end
