@@ -2,6 +2,9 @@
 
 Leva is a Ruby on Rails framework for evaluating Language Models (LLMs) using ActiveRecord datasets on production models. It provides a flexible structure for creating experiments, managing datasets, and implementing various evaluation logic on production data with security in mind.
 
+![Leva - Workbench- Google Chrome](https://github.com/user-attachments/assets/ee487941-e11b-4c2a-983b-771ef27dd73c)
+![Leva - rty- Google Chrome](https://github.com/user-attachments/assets/f9986a12-731b-4747-9f86-5ac6fffd5cbc)
+
 ## Installation
 
 Add this line to your application's Gemfile:
