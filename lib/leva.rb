@@ -72,6 +72,7 @@ module Leva
         dataset_record: dataset_record,
         prompt: prompt,
         prediction: result,
+        runner_class: self.class.name
       )
     end
 

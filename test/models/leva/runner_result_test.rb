@@ -5,6 +5,7 @@
 #  id                :integer          not null, primary key
 #  prediction        :text
 #  prompt_version    :integer
+#  runner_class      :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  dataset_record_id :integer          not null

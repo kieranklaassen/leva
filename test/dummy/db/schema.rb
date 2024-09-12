@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_22_143201) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_12_183556) do
   create_table "leva_dataset_records", force: :cascade do |t|
     t.integer "dataset_id", null: false
     t.string "recordable_type", null: false
@@ -75,6 +75,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_22_143201) do
     t.datetime "updated_at", null: false
     t.integer "prompt_version"
     t.integer "prompt_id", null: false
+    t.string "runner_class"
     t.index ["dataset_record_id"], name: "index_leva_runner_results_on_dataset_record_id"
     t.index ["experiment_id"], name: "index_leva_runner_results_on_experiment_id"
     t.index ["prompt_id"], name: "index_leva_runner_results_on_prompt_id"

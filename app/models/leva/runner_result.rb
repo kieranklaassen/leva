@@ -5,6 +5,7 @@
 #  id                :integer          not null, primary key
 #  prediction        :text
 #  prompt_version    :integer
+#  runner_class      :string
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  dataset_record_id :integer          not null
@@ -32,6 +33,7 @@ module Leva
 
     validates :prediction, presence: true
     validates :prompt, presence: true
+    validates :runner_class, presence: true
 
     delegate :ground_truth, to: :dataset_record
 
