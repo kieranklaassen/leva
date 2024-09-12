@@ -39,18 +39,18 @@ module Leva
 
     # @return [Array<String>] The parsed draft responses
     def parsed_predictions
-      @parsed_predictions ||= runner.parsed_predictions(self)
+      @parsed_predictions ||= runner&.parsed_predictions(self) || []
     end
 
     # @return [String] The ground truth for this runner result
     def ground_truth
-      @ground_truth ||= runner.ground_truth(self)
+      @ground_truth ||= runner&.ground_truth(self)
     end
 
     private
 
     def runner
-      @runner ||= runner_class.constantize.new
+      @runner ||= runner_class&.constantize&.new
     end
   end
 end
