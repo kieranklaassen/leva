@@ -3,7 +3,6 @@
 # Table name: leva_runner_results
 #
 #  id                :integer          not null, primary key
-#  actual_result     :text
 #  prediction        :text
 #  prompt_version    :integer
 #  created_at        :datetime         not null

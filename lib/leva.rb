@@ -74,6 +74,28 @@ module Leva
         prediction: result,
       )
     end
+
+    # @param runner_result [Leva::RunnerResult] The runner result to parse
+    # @return [Array<String>] The parsed predictions
+    def parsed_predictions(runner_result)
+      if extract_regex_pattern(runner_result)
+        runner_result.prediction.scan(extract_regex_pattern(runner_result)).map { |match| match.first&.strip }.compact
+      else
+        [runner_result.prediction]
+      end
+    end
+
+    # @param runner_result [Leva::RunnerResult] The runner result to extract regex from
+    # @return [Regexp, nil] The regex pattern to use for parsing predictions
+    def extract_regex_pattern(runner_result)
+      runner_result.dataset_record.recordable.extract_regex_pattern if runner_result.dataset_record.recordable.respond_to?(:extract_regex_pattern)
+    end
+
+    # @param runner_result [Leva::RunnerResult] The runner result to get ground truth from
+    # @return [String] The ground truth for the runner result
+    def ground_truth(runner_result)
+      runner_result.dataset_record.ground_truth
+    end
   end
 
   # Base class for all evaluation implementations in Leva.

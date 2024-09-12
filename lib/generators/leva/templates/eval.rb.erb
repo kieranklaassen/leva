@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 class <%= class_name %>Eval < Leva::BaseEval
-  # @param prediction [String] The prediction to evaluate
+  # @param runner_result [Leva::RunnerResult] The runner result to evaluate
   # @param recordable [YourRecordClass] The recordable object to evaluate
   # @return [Float] The score of the evaluation
-  def evaluate(prediction, recordable)
+  def evaluate(runner_result, recordable)
     # Implement your evaluation logic here
     # You can access the ground truth using recordable.ground_truth
 
     # Example implementation:
-    prediction == recordable.ground_truth ? 1.0 : 0.0
+    runner_result.parsed_predictions.first == recordable.ground_truth ? 1.0 : 0.0
   end
 end

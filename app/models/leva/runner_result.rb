@@ -37,18 +37,18 @@ module Leva
 
     # @return [Array<String>] The parsed draft responses
     def parsed_predictions
-      @parsed_predictions ||=
-        if extract_regex_pattern
-          prediction.scan(extract_regex_pattern).map { |match| match.first&.strip }.compact
-        else
-          [prediction]
-        end
+      @parsed_predictions ||= runner.parsed_predictions(self)
+    end
+
+    # @return [String] The ground truth for this runner result
+    def ground_truth
+      @ground_truth ||= runner.ground_truth(self)
     end
 
     private
 
-    def extract_regex_pattern
-      dataset_record.recordable.extract_regex_pattern
+    def runner
+      @runner ||= runner_class.constantize.new
     end
   end
 end

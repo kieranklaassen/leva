@@ -8,4 +8,29 @@ class <%= class_name %>Run < Leva::BaseRun
     # This could involve calling an API, running a local model, etc.
     # Return the result of the run to be used to evaluate the model
   end
+
+  # Uncomment and modify this method to customize parsed predictions
+  # @param runner_result [Leva::RunnerResult] The runner result to parse
+  # @return [Array<String>] The parsed predictions
+  # def parsed_predictions(runner_result)
+  #   # Example: Extract predictions from XML-like tags
+  #   runner_result.prediction.scan(/<prediction>(.*?)<\/prediction>/).flatten
+  # end
+
+  # Uncomment and modify this method to customize ground truth extraction
+  # @param runner_result [Leva::RunnerResult] The runner result to get ground truth from
+  # @return [String] The ground truth for the runner result
+  # def ground_truth(runner_result)
+  #   # Example: Extract ground truth from a specific field
+  #   runner_result.dataset_record.recordable.custom_ground_truth_field
+  # end
+
+  # Uncomment and modify this method to customize regex extraction
+  # @param runner_result [Leva::RunnerResult] The runner result to extract regex from
+  # @return [Regexp, nil] The regex pattern to use for parsing predictions
+  # def extract_regex_pattern(runner_result)
+  #   # Your custom regex extraction logic here
+  #   # For example:
+  #   # /\<result\>(.*?)\<\/result\>/
+  # end
 end
