@@ -126,13 +126,15 @@ GEM
     nio4r (2.7.3)
     nokogiri (1.16.7-x86_64-darwin)
       racc (~> 1.4)
+    nokogiri (1.16.7-x86_64-linux)
+      racc (~> 1.4)
     parallel (1.26.2)
     parser (3.3.4.2)
       ast (~> 2.4.1)
       racc
     psych (5.1.2)
       stringio
-    puma (6.4.2)
+    puma (6.4.3)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.1.7)
@@ -220,6 +222,7 @@ GEM
       activesupport (>= 6.1)
       sprockets (>= 3.0.0)
     sqlite3 (2.0.4-x86_64-darwin)
+    sqlite3 (2.0.4-x86_64-linux-gnu)
     stringio (3.1.1)
     strscan (3.1.0)
     thor (1.3.1)
@@ -236,6 +239,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-22
+  x86_64-linux
 
 DEPENDENCIES
   annotate
