@@ -33,9 +33,30 @@
       <%= form.label :user_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
       <%= form.text_area :user_prompt, rows: 5, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
     </div>
-    <div class="mb-4 hidden" data-prompt-selector-target="promptPreview">
+    <div class="mb-4 hidden" data-prompt-selector-target="promptPreview" id="prompt-preview">
       <h3 class="text-lg font-semibold mb-2 text-indigo-300">Prompt Preview</h3>
-      <div class="bg-gray-700 text-white p-3 rounded-lg" data-prompt-selector-target="previewContent"></div>
+      <div 
+        class="bg-gray-700 text-white p-3 rounded-lg overflow-hidden whitespace-pre-wrap" 
+        data-prompt-selector-target="previewContent"
+        id="preview-content"
+      ></div>
+
+      <!-- show-full button, hidden until overflow is detected -->
+      <button
+        id="show-full-preview"
+        type="button"
+        class="mt-2 text-indigo-400 underline hidden"
+      >Show full</button>
+
+      <!-- HTML5 dialog for full text -->
+      <dialog id="full-preview-dialog" class="p-0 m-0">
+        <div class="bg-gray-800 text-white p-4 rounded-lg max-h-[80vh] overflow-auto whitespace-pre-wrap">
+          <div id="dialog-content"></div>
+          <div class="text-right mt-4">
+            <button id="close-full-preview" class="px-4 py-2 bg-indigo-600 rounded text-white">Close</button>
+          </div>
+        </div>
+      </dialog>
     </div>
     <div class="flex items-center justify-end space-x-4">
       <%= link_to "Cancel", workbench_index_path, class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
