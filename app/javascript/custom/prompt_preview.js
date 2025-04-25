@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const checkPreviewContent = () => {
     if (preview.textContent.trim().length > 0) {
       // Detect overflow
-      if (preview.scrollWidth > preview.clientWidth) {
-        preview.style.maxHeight = '6em';  // optional: clamp height
-        preview.style.overflow = 'hidden';
+      if (preview.scrollHeight > preview.clientHeight || preview.scrollWidth > preview.clientWidth) {
+        preview.style.maxHeight = '12em';
+        preview.style.overflow = 'auto';
         showBtn.classList.remove('hidden');
       }
     } else {
