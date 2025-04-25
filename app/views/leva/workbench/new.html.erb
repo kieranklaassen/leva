@@ -33,9 +33,30 @@
       <%= form.label :user_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
       <%= form.text_area :user_prompt, rows: 5, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
     </div>
-    <div class="mb-4 hidden" data-prompt-selector-target="promptPreview">
+    <div class="mb-4 hidden" data-prompt-selector-target="promptPreview" id="prompt-preview">
       <h3 class="text-lg font-semibold mb-2 text-indigo-300">Prompt Preview</h3>
-      <div class="bg-gray-700 text-white p-3 rounded-lg" data-prompt-selector-target="previewContent"></div>
+      <div 
+        class="bg-gray-700 text-white p-3 rounded-lg whitespace-pre-wrap" 
+        data-prompt-selector-target="previewContent"
+        id="preview-content"
+      ></div>
+
+      <!-- show-full button, hidden until overflow is detected -->
+      <button
+        id="show-full-preview"
+        type="button"
+        class="mt-2 text-indigo-400 underline hidden"
+      >Show full</button>
+
+      <!-- HTML5 dialog for full text -->
+      <dialog id="full-preview-dialog" class="p-0 m-0">
+        <div class="bg-gray-800 text-white p-4 rounded-lg max-h-[80vh] overflow-auto whitespace-pre-wrap">
+          <div id="dialog-content"></div>
+          <div class="text-right mt-4">
+            <button id="close-full-preview" class="px-4 py-2 bg-indigo-600 rounded text-white">Close</button>
+          </div>
+        </div>
+      </dialog>
     </div>
     <div class="flex items-center justify-end space-x-4">
       <%= link_to "Cancel", workbench_index_path, class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
@@ -76,6 +97,56 @@
       }
     })
   })()
+
+  // Prompt preview scrollbar and dialog functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const wrapper     = document.getElementById('prompt-preview');
+    const preview     = document.getElementById('preview-content');
+    const showBtn     = document.getElementById('show-full-preview');
+    const dialog      = document.getElementById('full-preview-dialog');
+    const dialogBody  = document.getElementById('dialog-content');
+    const closeBtn    = document.getElementById('close-full-preview');
+
+    if (!preview) return;
+
+    // Check if the preview content is already populated by Stimulus
+    const checkPreviewContent = () => {
+      if (preview.textContent.trim().length > 0) {
+        // Detect overflow
+        if (preview.scrollHeight > preview.clientHeight || preview.scrollWidth > preview.clientWidth) {
+          preview.style.maxHeight = '12em';
+          preview.style.overflow = 'auto';
+          showBtn.classList.remove('hidden');
+        }
+      } else {
+        // If not populated yet, check again after a short delay
+        setTimeout(checkPreviewContent, 100);
+      }
+    };
+
+    // Start checking once the wrapper is visible
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          if (!wrapper.classList.contains('hidden')) {
+            checkPreviewContent();
+            observer.disconnect(); // Stop observing once we've detected the change
+          }
+        }
+      });
+    });
+
+    observer.observe(wrapper, { attributes: true });
+
+    // Show full in dialog
+    showBtn.addEventListener('click', () => {
+      dialogBody.textContent = preview.textContent;
+      dialog.showModal();
+    });
+
+    // Close dialog
+    closeBtn.addEventListener('click', () => dialog.close());
+  });
 </script>
 <!-- Include marked.js for Markdown parsing -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
