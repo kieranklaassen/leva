@@ -1,7 +1,7 @@
 <% content_for :title, "New Prompt" %>
 <div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
   <h1 class="text-3xl font-bold text-indigo-400 mb-6">New Prompt</h1>
-  <%= form_with(model: @prompt, url: workbench_index_path, local: true, class: "bg-gray-800 rounded-lg shadow-lg p-6", data: { controller: "prompt-selector" }) do |form| %>
+  <%= form_with(model: @prompt, url: workbench_index_path, local: true, class: "bg-gray-800 rounded-lg shadow-lg p-6", data: { controller: "prompt-selector-new dialog" }) do |form| %>
     <% if @prompt.errors.any? %>
       <div class="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded-lg mb-4">
         <h2><%= pluralize(@prompt.errors.count, "error") %> prohibited this prompt from being saved:</h2>
@@ -26,18 +26,19 @@
           options_for_select([['Custom Prompt', '']] + @predefined_prompts.map { |name, content| [name, content] }),
           {},
           class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none",
-          data: { action: "change->prompt-selector#toggleUserPrompt" }
+          data: { action: "change->prompt-selector-new#toggleUserPrompt" }
       %>
     </div>
-    <div class="mb-4" data-prompt-selector-target="userPromptField">
+    <div class="mb-4" data-prompt-selector-new-target="userPromptField">
       <%= form.label :user_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
       <%= form.text_area :user_prompt, rows: 5, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
     </div>
-    <div class="mb-4 hidden" data-prompt-selector-target="promptPreview" id="prompt-preview">
+    <div class="mb-4 hidden" data-prompt-selector-new-target="promptPreview" data-dialog-target="wrapper" id="prompt-preview">
       <h3 class="text-lg font-semibold mb-2 text-indigo-300">Prompt Preview</h3>
       <div 
         class="bg-gray-700 text-white p-3 rounded-lg whitespace-pre-wrap" 
-        data-prompt-selector-target="previewContent"
+        data-prompt-selector-new-target="previewContent"
+        data-dialog-target="preview"
         id="preview-content"
       ></div>
 
@@ -46,14 +47,16 @@
         id="show-full-preview"
         type="button"
         class="mt-2 text-indigo-400 underline hidden"
+        data-dialog-target="showButton"
+        data-action="click->dialog#showFull"
       >Show full</button>
 
       <!-- HTML5 dialog for full text -->
-      <dialog id="full-preview-dialog" class="p-0 m-0">
+      <dialog id="full-preview-dialog" class="p-0 m-0" data-dialog-target="dialog">
         <div class="bg-gray-800 text-white p-4 rounded-lg max-h-[80vh] overflow-auto whitespace-pre-wrap">
-          <div id="dialog-content"></div>
+          <div id="dialog-content" data-dialog-target="dialogContent"></div>
           <div class="text-right mt-4">
-            <button id="close-full-preview" class="px-4 py-2 bg-indigo-600 rounded text-white">Close</button>
+            <button id="close-full-preview" class="px-4 py-2 bg-indigo-600 rounded text-white" data-action="click->dialog#close">Close</button>
           </div>
         </div>
       </dialog>
@@ -64,89 +67,3 @@
     </div>
   <% end %>
 </div>
-<script>
-  (() => {
-    const application = Stimulus.Application.start()
-
-    application.register("prompt-selector", class extends Stimulus.Controller {
-      static targets = ["userPromptField", "promptPreview", "previewContent"]
-
-      toggleUserPrompt(event) {
-        const selectedContent = event.target.value
-        if (selectedContent) {
-          this.userPromptFieldTarget.style.display = 'none'
-          this.promptPreviewTarget.classList.remove('hidden')
-          this.loadPredefinedPrompt(selectedContent)
-        } else {
-          this.userPromptFieldTarget.style.display = 'block'
-          this.promptPreviewTarget.classList.add('hidden')
-          this.clearUserPrompt()
-        }
-      }
-
-      loadPredefinedPrompt(content) {
-        const userPromptTextarea = this.userPromptFieldTarget.querySelector('textarea')
-        userPromptTextarea.value = content
-        this.previewContentTarget.innerHTML = marked.parse(content)
-      }
-
-      clearUserPrompt() {
-        const userPromptTextarea = this.userPromptFieldTarget.querySelector('textarea')
-        userPromptTextarea.value = ''
-        this.previewContentTarget.innerHTML = ''
-      }
-    })
-  })()
-
-  // Prompt preview scrollbar and dialog functionality
-  document.addEventListener('DOMContentLoaded', () => {
-    const wrapper     = document.getElementById('prompt-preview');
-    const preview     = document.getElementById('preview-content');
-    const showBtn     = document.getElementById('show-full-preview');
-    const dialog      = document.getElementById('full-preview-dialog');
-    const dialogBody  = document.getElementById('dialog-content');
-    const closeBtn    = document.getElementById('close-full-preview');
-
-    if (!preview) return;
-
-    // Check if the preview content is already populated by Stimulus
-    const checkPreviewContent = () => {
-      if (preview.textContent.trim().length > 0) {
-        // Detect overflow
-        if (preview.scrollHeight > preview.clientHeight || preview.scrollWidth > preview.clientWidth) {
-          preview.style.maxHeight = '12em';
-          preview.style.overflow = 'auto';
-          showBtn.classList.remove('hidden');
-        }
-      } else {
-        // If not populated yet, check again after a short delay
-        setTimeout(checkPreviewContent, 100);
-      }
-    };
-
-    // Start checking once the wrapper is visible
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-          if (!wrapper.classList.contains('hidden')) {
-            checkPreviewContent();
-            observer.disconnect(); // Stop observing once we've detected the change
-          }
-        }
-      });
-    });
-
-    observer.observe(wrapper, { attributes: true });
-
-    // Show full in dialog
-    showBtn.addEventListener('click', () => {
-      dialogBody.textContent = preview.textContent;
-      dialog.showModal();
-    });
-
-    // Close dialog
-    closeBtn.addEventListener('click', () => dialog.close());
-  });
-</script>
-<!-- Include marked.js for Markdown parsing -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
