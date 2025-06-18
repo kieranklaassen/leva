@@ -95,7 +95,7 @@ module Leva
       if extract_regex_pattern(runner_result)
         runner_result.prediction.scan(extract_regex_pattern(runner_result)).map { |match| match.first&.strip }.compact
       else
-        [runner_result.prediction]
+        [ runner_result.prediction ]
       end
     end
 
@@ -157,3 +157,4 @@ module Leva
     end
   end
 end
+

@@ -3,10 +3,10 @@ module Leva
     extend ActiveSupport::Concern
 
     included do
-      has_many :dataset_records, as: :recordable, class_name: 'Leva::DatasetRecord', dependent: :destroy
-      has_many :datasets, through: :dataset_records, class_name: 'Leva::Dataset'
-      has_many :runner_results, through: :dataset_records, class_name: 'Leva::RunnerResult'
-      has_many :evaluation_results, through: :runner_results, class_name: 'Leva::EvaluationResult'
+      has_many :dataset_records, as: :recordable, class_name: "Leva::DatasetRecord", dependent: :destroy
+      has_many :datasets, through: :dataset_records, class_name: "Leva::Dataset"
+      has_many :runner_results, through: :dataset_records, class_name: "Leva::RunnerResult"
+      has_many :evaluation_results, through: :runner_results, class_name: "Leva::EvaluationResult"
     end
 
     # @return [String] The ground truth label for the record

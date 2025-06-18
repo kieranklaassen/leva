@@ -36,7 +36,7 @@ module Leva
       @experiment = Leva::Experiment.create!(name: "Sentiment Analysis", dataset: dataset)
 
       @run = SentimentRun.new
-      @evals = [SentimentAccuracyEval.new, SentimentF1Eval.new]
+      @evals = [ SentimentAccuracyEval.new, SentimentF1Eval.new ]
     end
 
     test "run evaluation with two evals and one runner" do
@@ -44,8 +44,8 @@ module Leva
 
       assert_equal 6, @experiment.evaluation_results.count, "Should have 6 evaluation results (1 run * 3 records * 2 evals)"
 
-      accuracy_results = @experiment.evaluation_results.where(evaluator_class: 'SentimentAccuracyEval')
-      f1_results = @experiment.evaluation_results.where(evaluator_class: 'SentimentF1Eval')
+      accuracy_results = @experiment.evaluation_results.where(evaluator_class: "SentimentAccuracyEval")
+      f1_results = @experiment.evaluation_results.where(evaluator_class: "SentimentF1Eval")
 
       assert_equal 3, accuracy_results.count, "Should have 3 accuracy results"
       assert_equal 3, f1_results.count, "Should have 3 F1 results"

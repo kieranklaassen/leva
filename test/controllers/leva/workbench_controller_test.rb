@@ -14,7 +14,6 @@ end
 
 module Leva
   class WorkbenchControllerTest < ActionDispatch::IntegrationTest
-
     setup do
       @routes = Engine.routes
       @text_content = TextContent.create!(text: "Test text", expected_label: "positive")
@@ -35,7 +34,7 @@ module Leva
       )
 
       assert_response :success
-      
+
       # Verify the page shows both contexts in the liquid tags section
       assert_match(/AVAILABLE LIQUID TAGS/, response.body)
       assert_match(/FROM RECORD:/, response.body)
