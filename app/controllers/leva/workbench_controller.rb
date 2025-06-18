@@ -122,4 +122,3 @@ module Leva
     end
   end
 end
-

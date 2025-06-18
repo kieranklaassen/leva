@@ -39,4 +39,3 @@ Wow, this is a great text!
     }
   end
 end
-
