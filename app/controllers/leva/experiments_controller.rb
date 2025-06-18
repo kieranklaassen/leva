@@ -4,9 +4,9 @@ module Leva
   class ExperimentsController < ApplicationController
     include ApplicationHelper
 
-    before_action :set_experiment, only: [:show, :edit, :update]
-    before_action :check_editable, only: [:edit, :update]
-    before_action :load_runners_and_evaluators, only: [:new, :edit, :create, :update]
+    before_action :set_experiment, only: [ :show, :edit, :update ]
+    before_action :check_editable, only: [ :edit, :update ]
+    before_action :load_runners_and_evaluators, only: [ :new, :edit, :create, :update ]
 
     # GET /experiments
     # @return [void]
@@ -39,7 +39,7 @@ module Leva
 
       if @experiment.save
         ExperimentJob.perform_later(@experiment) unless @experiment.completed?
-        redirect_to @experiment, notice: 'Experiment was successfully created and is now running.'
+        redirect_to @experiment, notice: "Experiment was successfully created and is now running."
       else
         render :new
       end
@@ -49,7 +49,7 @@ module Leva
     # @return [void]
     def update
       if @experiment.update(experiment_params)
-        redirect_to @experiment, notice: 'Experiment was successfully updated.'
+        redirect_to @experiment, notice: "Experiment was successfully updated."
       else
         render :edit
       end
@@ -69,7 +69,7 @@ module Leva
       # Queue the job again
       ExperimentJob.perform_later(@experiment)
 
-      redirect_to @experiment, notice: 'Experiment has been reset and is now running again.'
+      redirect_to @experiment, notice: "Experiment has been reset and is now running again."
     end
 
     private
@@ -92,7 +92,7 @@ module Leva
     end
 
     def check_editable
-      redirect_to @experiment, alert: 'Completed experiments cannot be edited.' if @experiment.completed?
+      redirect_to @experiment, alert: "Completed experiments cannot be edited." if @experiment.completed?
     end
   end
 end

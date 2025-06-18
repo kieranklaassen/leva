@@ -23,4 +23,19 @@ Wow, this is a great text!
 <sentiment>#{sentiment}</sentiment>
     """
   end
+
+  # Provides additional context specific to sentiment analysis.
+  # This demonstrates an expensive operation that shouldn't be in
+  # the record's general to_llm_context method.
+  #
+  # @param record [TextContent] The text content to analyze
+  # @return [Hash] Additional context for the LLM prompt
+  def to_llm_context(record)
+    {
+      # Example: Count similar texts (expensive database query)
+      similar_texts_count: record.class.where(
+        "text LIKE ?", "%#{record.text.split.first}%"
+      ).count
+    }
+  end
 end

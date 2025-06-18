@@ -3,10 +3,10 @@
 module Leva
   module Generators
     class RunnerGenerator < Rails::Generators::NamedBase
-      source_root File.expand_path('templates', __dir__)
+      source_root File.expand_path("templates", __dir__)
 
       def create_runner_file
-        template 'runner.rb.erb', File.join('app/runners', class_path, "#{file_name}_run.rb")
+        template "runner.rb.erb", File.join("app/runners", class_path, "#{file_name}_run.rb")
       end
 
       private
@@ -16,7 +16,7 @@ module Leva
       end
 
       def remove_possible_suffix(name)
-        name.sub(/_?runner$/i, '')
+        name.sub(/_?runner$/i, "")
       end
     end
   end

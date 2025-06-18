@@ -33,4 +33,24 @@ class <%= class_name %>Run < Leva::BaseRun
   #   # For example:
   #   # /\<result\>(.*?)\<\/result\>/
   # end
+
+  # Override this method to provide additional context for LLM prompts
+  # This is useful for expensive operations or runner-specific data
+  # that you don't want to compute in the record's to_llm_context
+  # 
+  # @param record [YourRecordClass] The record to generate context for
+  # @return [Hash] Additional context to merge with the record's context
+  # def to_llm_context(record)
+  #   # Example: Add runner-specific expensive computations
+  #   {
+  #     # Count of similar records (expensive database query)
+  #     similar_<%= singular_name %>_count: record.class.where(
+  #       "some_field LIKE ?", "%#{record.some_field.split.first}%"
+  #     ).count,
+  #     
+  #     # Runner-specific configuration
+  #     model_version: "v1.2.3",
+  #     temperature: 0.7
+  #   }
+  # end
 end
