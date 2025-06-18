@@ -17,6 +17,17 @@ module Leva
       @runners = load_runners
       @selected_runner = params[:runner] || @runners.first&.name
       @selected_dataset_record = params[:dataset_record_id] || DatasetRecord.first&.id
+      
+      # Get merged context if runner and dataset record are available
+      if @selected_runner && @dataset_record
+        runner_class = @selected_runner.constantize rescue nil
+        if runner_class && runner_class < Leva::BaseRun
+          runner = runner_class.new
+          @record_context = @dataset_record.recordable.to_llm_context
+          @runner_context = runner.to_llm_context(@dataset_record.recordable)
+          @merged_context = @record_context.merge(@runner_context)
+        end
+      end
     end
 
     # GET /workbench/new
