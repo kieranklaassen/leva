@@ -5,7 +5,14 @@
 - Run single test: `bin/rails test path/to/test_file.rb`
 - Run specific test: `bin/rails test path/to/test_file.rb:line_number`
 - Run linting: `bin/rubocop`
+- Auto-fix linting issues: `bin/rubocop -a`
 - Start dummy app: `cd test/dummy && bin/rails server`
+
+## Before Committing
+Always run these commands to ensure CI will pass:
+1. `bundle exec rubocop` - Check for style violations
+2. `bundle exec rubocop -a` - Auto-fix correctable issues
+3. `bundle exec rails test` - Run all tests
 
 ## Code Style
 - Ruby 3.2.0, Rails 7.2
