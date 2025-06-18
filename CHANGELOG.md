@@ -6,9 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Migrated from CDN dependencies to internal asset pipeline
+- Extracted all inline JavaScript to proper Stimulus controllers
+- Added importmap-rails, stimulus-rails, and tailwindcss-rails as dependencies
+- Removed external CDN dependencies (Tailwind CSS, Stimulus, Marked.js)
+
 ### Added
 - Runner-specific LLM context support via `BaseRun#to_llm_context(record)` for expensive operations
 - Visual separation of record vs runner context in workbench UI
+- Proper JavaScript module structure with individual controller files
+- Local Tailwind CSS configuration and build process
+- Asset pipeline configuration in engine.rb
 
 ## [0.1.9] - 2025-04-25
 ### Added
