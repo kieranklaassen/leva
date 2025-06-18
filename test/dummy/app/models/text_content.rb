@@ -29,8 +29,8 @@ class TextContent < ApplicationRecord
     {
       text: text,
       expected_label: expected_label,
-      created_at: created_at.strftime('%Y-%m-%d %H:%M:%S'),
-      updated_at: updated_at.strftime('%Y-%m-%d %H:%M:%S')
+      created_at: created_at.strftime("%Y-%m-%d %H:%M:%S"),
+      updated_at: updated_at.strftime("%Y-%m-%d %H:%M:%S")
     }
   end
 

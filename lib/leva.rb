@@ -65,6 +65,7 @@ module Leva
       # Expose these to the subclass execution
       @experiment = experiment
       @prompt = prompt
+      @dataset_record = dataset_record
 
       result = execute(dataset_record.recordable)
       RunnerResult.create!(
@@ -76,13 +77,25 @@ module Leva
       )
     end
 
+    # Gets the merged LLM context for the current execution.
+    # Combines the record's context with the runner's additional context.
+    #
+    # @return [Hash] The merged context for LLM prompt rendering
+    def merged_llm_context
+      return {} unless @dataset_record
+
+      record_context = @dataset_record.recordable.to_llm_context
+      runner_context = to_llm_context(@dataset_record.recordable)
+      record_context.merge(runner_context)
+    end
+
     # @param runner_result [Leva::RunnerResult] The runner result to parse
     # @return [Array<String>] The parsed predictions
     def parsed_predictions(runner_result)
       if extract_regex_pattern(runner_result)
         runner_result.prediction.scan(extract_regex_pattern(runner_result)).map { |match| match.first&.strip }.compact
       else
-        [runner_result.prediction]
+        [ runner_result.prediction ]
       end
     end
 
@@ -96,6 +109,15 @@ module Leva
     # @return [String] The ground truth for the runner result
     def ground_truth(runner_result)
       runner_result.dataset_record.ground_truth
+    end
+
+    # Provides additional LLM context specific to this runner.
+    # Override in subclasses to add expensive or runner-specific context.
+    #
+    # @param record [Object] The recordable object to generate context for
+    # @return [Hash] Additional context to merge with the record's context
+    def to_llm_context(record)
+      {}
     end
   end
 

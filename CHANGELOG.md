@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed external CDN dependencies (Tailwind CSS, Stimulus, Marked.js)
 
 ### Added
+- Runner-specific LLM context support via `BaseRun#to_llm_context(record)` for expensive operations
+- Visual separation of record vs runner context in workbench UI
 - Proper JavaScript module structure with individual controller files
 - Local Tailwind CSS configuration and build process
 - Asset pipeline configuration in engine.rb
