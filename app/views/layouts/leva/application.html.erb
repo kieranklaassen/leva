@@ -9,10 +9,7 @@
     
     <%= stylesheet_link_tag "leva/application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "leva/application.tailwind", "data-turbo-track": "reload" %>
-    <% if respond_to?(:javascript_importmap_tags) %>
-      <%= javascript_importmap_tags %>
-      <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
-    <% end %>
+    <%= javascript_importmap_tags "application", importmap: Leva.importmap %>
     
     <%= yield(:head) %>
   </head>
