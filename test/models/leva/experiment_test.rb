@@ -33,10 +33,24 @@ module Leva
       dataset.add_record TextContent.create(text: "I love this product!", expected_label: "Positive")
       dataset.add_record TextContent.create(text: "Terrible experience", expected_label: "Negative")
       dataset.add_record TextContent.create(text: "It's ok", expected_label: "Neutral")
-      @experiment = Leva::Experiment.create!(name: "Sentiment Analysis", dataset: dataset)
-
+      
       @run = SentimentRun.new
       @evals = [ SentimentAccuracyEval.new, SentimentF1Eval.new ]
+      
+      # Create prompt for the experiment
+      prompt = Leva::Prompt.create!(
+        name: "Sentiment Analysis Prompt",
+        system_prompt: "You are a sentiment analyzer",
+        user_prompt: "Analyze the sentiment of: {{ text }}"
+      )
+      
+      @experiment = Leva::Experiment.create!(
+        name: "Sentiment Analysis", 
+        dataset: dataset,
+        prompt: prompt,
+        runner_class: "SentimentRun",
+        evaluator_classes: ["SentimentAccuracyEval", "SentimentF1Eval"]
+      )
     end
 
     test "run evaluation with two evals and one runner" do
