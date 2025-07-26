@@ -7,6 +7,8 @@ class CreateLevaExperiments < ActiveRecord::Migration[7.2]
       t.references :prompt, null: true, foreign_key: { to_table: :leva_prompts }
       t.integer :status
       t.text :metadata
+      t.string :runner_class
+      t.text :evaluator_classes
 
       t.timestamps
     end

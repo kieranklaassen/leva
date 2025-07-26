@@ -10,3 +10,4 @@
 /test/dummy/tmp/
 .worktrees
 /app/assets/builds/
+test/dummy/db/migrate/*.leva.rb
