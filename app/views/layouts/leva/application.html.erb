@@ -7,9 +7,13 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     
-    <%= stylesheet_link_tag "leva/application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "leva/application.tailwind", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags "application", importmap: Leva.importmap %>
+    <%# Prefer bundled JS if available, fallback to importmap %>
+    <% if respond_to?(:asset_path) && (Rails.application.assets&.find_asset('leva/application.js') rescue false) || (Rails.application.assets_manifest&.assets&.key?('leva/application.js') rescue false) %>
+      <%= javascript_include_tag "leva/application", "data-turbo-track": "reload", defer: true %>
+    <% else %>
+      <%= javascript_importmap_tags "application", importmap: Leva.importmap %>
+    <% end %>
     
     <%= yield(:head) %>
   </head>
