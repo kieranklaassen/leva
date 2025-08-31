@@ -2,8 +2,10 @@
 # NOTE: are sensitive to local FS writes, and besides -- it's just not proper
 # NOTE: to have a dev-mode tool do its thing in production.
 if Rails.env.development?
-  require "annotate"
-  task :set_annotation_options do
+  begin
+    require "annotate"
+    
+    task :set_annotation_options do
     # You can override any of these by setting an environment variable of the
     # same name.
     Annotate.set_defaults(
@@ -55,5 +57,8 @@ if Rails.env.development?
     )
   end
 
-  Annotate.load_tasks
+    Annotate.load_tasks
+  rescue LoadError
+    # annotate gem not available, skipping annotation tasks
+  end
 end

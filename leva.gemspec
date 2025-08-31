@@ -23,4 +23,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "importmap-rails", "~> 2.0"
   spec.add_dependency "stimulus-rails", "~> 1.3"
   spec.add_dependency "tailwindcss-rails", "~> 3.0"
+
+  spec.add_development_dependency "annotate"
 end
