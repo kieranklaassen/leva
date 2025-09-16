@@ -18,8 +18,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_07_192235) do
     t.text "actual_result"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["dataset_id"], name: "index_leva_dataset_records_on_dataset_id"
-    t.index ["recordable_type", "recordable_id"], name: "index_leva_dataset_records_on_recordable"
+    t.index [ "dataset_id" ], name: "index_leva_dataset_records_on_dataset_id"
+    t.index [ "recordable_type", "recordable_id" ], name: "index_leva_dataset_records_on_recordable"
   end
 
   create_table "leva_datasets", force: :cascade do |t|
@@ -37,9 +37,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_07_192235) do
     t.float "score"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["dataset_record_id"], name: "index_leva_evaluation_results_on_dataset_record_id"
-    t.index ["experiment_id"], name: "index_leva_evaluation_results_on_experiment_id"
-    t.index ["runner_result_id"], name: "index_leva_evaluation_results_on_runner_result_id"
+    t.index [ "dataset_record_id" ], name: "index_leva_evaluation_results_on_dataset_record_id"
+    t.index [ "experiment_id" ], name: "index_leva_evaluation_results_on_experiment_id"
+    t.index [ "runner_result_id" ], name: "index_leva_evaluation_results_on_runner_result_id"
   end
 
   create_table "leva_experiments", force: :cascade do |t|
@@ -53,8 +53,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_07_192235) do
     t.text "evaluator_classes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["dataset_id"], name: "index_leva_experiments_on_dataset_id"
-    t.index ["prompt_id"], name: "index_leva_experiments_on_prompt_id"
+    t.index [ "dataset_id" ], name: "index_leva_experiments_on_dataset_id"
+    t.index [ "prompt_id" ], name: "index_leva_experiments_on_prompt_id"
   end
 
   create_table "leva_prompts", force: :cascade do |t|
@@ -76,9 +76,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_07_192235) do
     t.string "runner_class"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["dataset_record_id"], name: "index_leva_runner_results_on_dataset_record_id"
-    t.index ["experiment_id"], name: "index_leva_runner_results_on_experiment_id"
-    t.index ["prompt_id"], name: "index_leva_runner_results_on_prompt_id"
+    t.index [ "dataset_record_id" ], name: "index_leva_runner_results_on_dataset_record_id"
+    t.index [ "experiment_id" ], name: "index_leva_runner_results_on_experiment_id"
+    t.index [ "prompt_id" ], name: "index_leva_runner_results_on_prompt_id"
   end
 
   create_table "text_contents", force: :cascade do |t|
