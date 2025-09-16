@@ -7,18 +7,6 @@
   html {
     @apply antialiased;
   }
-
-  pre {
-    word-wrap: break-word;
-    word-break: break-word;
-    max-width: 100%;
-  }
-
-  textarea {
-    word-wrap: break-word;
-    word-break: break-word;
-    max-width: 100%;
-  }
 }
 
 @layer components {
