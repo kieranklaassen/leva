@@ -22,7 +22,7 @@ Always run these commands to ensure CI will pass:
 - YARD documentation for all classes and methods
 - Minitest for testing (not RSpec)
 - Test naming: `test_{description}` methods in `{ModelName}Test` classes
-- Model annotations with the annotate gem
+- Model annotations with the annotaterb gem
 - Rails engine with isolated `Leva` namespace
 - Place evaluators in `app/evals` and runners in `app/runners`
 
