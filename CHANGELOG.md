@@ -6,9 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.1.10] - 2025-01-16
 ### Added
 - Runner-specific LLM context support via `BaseRun#to_llm_context(record)` for expensive operations
 - Visual separation of record vs runner context in workbench UI
+- Routes mounting instructions to Installation section (Thanks @robzolkos!)
+
+### Fixed
+- NoMethodError when viewing empty dataset records (Thanks @robzolkos!)
+- Added defensive UI for missing runners in new experiment form (Thanks @robzolkos!)
+- Code block formatting in documentation (Thanks @ttilberg!)
+- Migration order: ensure CreateLevaRunnerResults runs before CreateLevaEvaluationResults (Thanks @RutSzymon!)
+- Various asset loading and importmap issues
+
+### Changed
+- Reduced the number of migrations for cleaner database setup (Thanks @RutSzymon!)
+- Reverted experimental asset changes for stability
+
+### Contributors
+Special thanks to the following contributors for their work on this release:
+- @robzolkos - Multiple UI fixes and documentation improvements
+- @RutSzymon - Migration optimizations and ordering fixes
+- @ttilberg - Documentation formatting improvements
 
 ## [0.1.9] - 2025-04-25
 ### Added
