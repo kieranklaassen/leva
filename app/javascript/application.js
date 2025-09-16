@@ -1,2 +1,3 @@
 // Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
-console.log("Dummy app loaded")
+import "@hotwired/stimulus"
+import "controllers"
