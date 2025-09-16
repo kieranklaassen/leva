@@ -12,38 +12,63 @@
     </div>
   </div>
 
-  <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-    <table class="min-w-full divide-y divide-gray-700">
-      <thead class="bg-gray-700">
-        <tr>
-          <% @records.first.index_attributes.keys.each do |key| %>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-              <%= key.to_s.humanize %>
-            </th>
-          <% end %>
-          <th scope="col" class="relative px-6 py-3">
-            <span class="sr-only">Actions</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody class="bg-gray-800 divide-y divide-gray-700">
-        <% @records.each do |record| %>
-          <tr class="hover:bg-gray-700 transition-colors duration-200">
-            <% record.index_attributes.values.each do |value| %>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                <%= value %>
-              </td>
+  <% if @records.any? %>
+    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-700">
+        <thead class="bg-gray-700">
+          <tr>
+            <% @records.first.index_attributes.keys.each do |key| %>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <%= key.to_s.humanize %>
+              </th>
             <% end %>
-            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <%= link_to 'View', dataset_dataset_record_path(@dataset, record), class: 'text-indigo-400 hover:text-indigo-300 transition-colors duration-200' %>
-            </td>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
           </tr>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody class="bg-gray-800 divide-y divide-gray-700">
+          <% @records.each do |record| %>
+            <tr class="hover:bg-gray-700 transition-colors duration-200">
+              <% record.index_attributes.values.each do |value| %>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                  <%= value %>
+                </td>
+              <% end %>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <%= link_to 'View', dataset_dataset_record_path(@dataset, record), class: 'text-indigo-400 hover:text-indigo-300 transition-colors duration-200' %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
 
-  <div class="mt-4 text-gray-400 text-sm">
-    Total records: <%= @records.count %>
-  </div>
+    <div class="mt-4 text-gray-400 text-sm">
+      Total records: <%= @records.count %>
+    </div>
+  <% else %>
+    <div class="bg-gray-800 rounded-lg shadow-lg p-12 text-center">
+      <svg class="mx-auto h-12 w-12 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="mt-2 text-xl font-medium text-indigo-300">No records yet</h3>
+      <p class="mt-1 text-gray-400">This dataset doesn't contain any records yet.</p>
+      <div class="mt-4 text-sm text-gray-500">
+        <p>To add records to this dataset, use the Rails console or create them programmatically:</p>
+        <div class="mt-2 bg-gray-900 rounded px-3 py-2 text-left font-mono text-xs text-gray-300">
+          <p>dataset = Leva::Dataset.find(<%= @dataset.id %>)</p>
+          <p>dataset.add_record(your_model_instance)</p>
+        </div>
+      </div>
+      <div class="mt-6">
+        <%= link_to dataset_path(@dataset), class: "btn btn-secondary inline-flex items-center" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Back to Dataset
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 </div>

@@ -29,6 +29,18 @@ rails leva:install:migrations
 rails db:migrate
 ```
 
+Mount the Leva engine in your application's routes file:
+
+```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  mount Leva::Engine => "/leva"
+  # your other routes...
+end
+```
+
+The Leva UI will then be available at `/leva` in your application.
+
 ## Usage
 
 ### 1. Setting up Datasets
