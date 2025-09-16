@@ -6,11 +6,8 @@
     <title>Leva - <%= yield(:title) || 'AI Evaluation Engine' %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    
-    <%= stylesheet_link_tag "leva/application", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "leva/application.tailwind", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags "application", importmap: Leva.importmap %>
-    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stimulus@3.2.2/dist/stimulus.umd.min.js"></script>
     <%= yield(:head) %>
   </head>
   <body class="bg-gray-950 text-white">

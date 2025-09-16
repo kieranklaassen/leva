@@ -9,5 +9,4 @@
 /test/dummy/storage/
 /test/dummy/tmp/
 .worktrees
-/app/assets/builds/
 test/dummy/db/migrate/*.leva.rb

@@ -1,11 +1,8 @@
 require "leva/version"
 require "leva/engine"
 require "liquid"
-require "importmap-rails"
-require "stimulus-rails"
 
 module Leva
-  mattr_accessor :importmap, default: Importmap::Map.new
   # Runs an evaluation experiment with the given run and evals.
   #
   # @param experiment [Leva::Experiment] The experiment to run.
