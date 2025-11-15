@@ -1,0 +1,40 @@
+<%
+# Score Meter partial - Laboratory Elegance Design System
+# The signature component with precision measurement aesthetic
+#
+# Usage:
+#   <%= render "leva/shared/score_meter", score: 0.87, label: "Accuracy" %>
+#   <%= render "leva/shared/score_meter", score: 42, max: 100, label: "Points" %>
+#
+# Parameters:
+#   score:  Numeric value (required)
+#   max:    Maximum value (default: 1.0 for percentages)
+#   label:  Descriptive label (optional)
+
+max ||= 1.0
+label ||= nil
+percentage = [(score.to_f / max * 100).round(1), 100].min
+
+# Determine score color class
+score_class = case percentage
+              when 0...40 then "score-low"
+              when 40...70 then "score-mid"
+              else "score-high"
+              end
+
+# Format display value
+display_value = max == 1.0 ? "#{(score * 100).round(1)}%" : score.round(2).to_s
+-%>
+
+<div class="score-meter">
+  <% if label.present? %>
+    <div class="score-meter-header">
+      <span class="score-meter-label"><%= label %></span>
+      <span class="score-meter-value <%= score_class %>"><%= display_value %></span>
+    </div>
+  <% end %>
+
+  <div class="score-meter-bar">
+    <div class="score-meter-fill" style="width: <%= percentage %>%"></div>
+  </div>
+</div>

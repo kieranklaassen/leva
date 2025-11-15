@@ -1,0 +1,29 @@
+<%
+# Card partial - Laboratory Elegance Design System
+#
+# Usage:
+#   <%= render "leva/shared/card" do %>
+#     <h3>Card Content</h3>
+#     <p>Details here...</p>
+#   <% end %>
+#
+#   <%= render "leva/shared/card", elevated: true, measure: true do %>
+#     Content with measurement line accent
+#   <% end %>
+#
+# Parameters:
+#   elevated: Boolean - adds shadow for prominence
+#   measure:  Boolean - adds amber measurement line accent
+#   class:    Additional CSS classes
+
+elevated ||= false
+measure ||= false
+classes = ["card"]
+classes << "card-elevated" if elevated
+classes << "card-measure" if measure
+classes << local_assigns[:class] if local_assigns[:class].present?
+-%>
+
+<div class="<%= classes.join(" ") %>">
+  <%= yield %>
+</div>

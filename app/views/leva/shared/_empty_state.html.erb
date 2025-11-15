@@ -1,0 +1,40 @@
+<%
+# Empty State partial - Laboratory Elegance Design System
+#
+# Usage:
+#   <%= render "leva/shared/empty_state",
+#     icon: "<svg>...</svg>",
+#     title: "No experiments yet",
+#     description: "Get started by creating a new experiment.",
+#     button_text: "Create Experiment",
+#     button_href: new_experiment_path %>
+#
+# Parameters:
+#   icon:         SVG markup (required)
+#   title:        Main heading (required)
+#   description:  Supporting text (optional)
+#   button_text:  CTA button label (optional)
+#   button_href:  CTA button link (optional)
+#   button_variant: Button variant (default: primary)
+
+button_variant ||= "primary"
+-%>
+
+<div class="card text-center" style="padding: var(--space-12);">
+  <div class="mx-auto mb-4" style="color: var(--amber-400); width: 3rem; height: 3rem;">
+    <%= icon.html_safe %>
+  </div>
+
+  <h3 class="text-accent mb-2"><%= title %></h3>
+
+  <% if local_assigns[:description].present? %>
+    <p class="text-muted mb-6"><%= description %></p>
+  <% end %>
+
+  <% if local_assigns[:button_text].present? && local_assigns[:button_href].present? %>
+    <%= render "leva/shared/button",
+      text: button_text,
+      href: button_href,
+      variant: button_variant %>
+  <% end %>
+</div>

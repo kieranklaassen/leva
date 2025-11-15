@@ -1,0 +1,87 @@
+<%# Example page showcasing the design system %>
+
+<div class="container">
+  <div class="stack-lg" style="padding: var(--space-8) 0;">
+
+    <%# Hero section %>
+    <div class="fade-in">
+      <h1 class="text-accent">LEVA Design System</h1>
+      <p class="text-muted" style="font-size: 1.125rem;">
+        Laboratory Elegance - Precision instruments for AI evaluation
+      </p>
+    </div>
+
+    <%# Buttons example %>
+    <%= render "leva/shared/card" do %>
+      <h3>Buttons</h3>
+      <div class="cluster mt-4">
+        <%= render "leva/shared/button", text: "Run Experiment", variant: "primary" %>
+        <%= render "leva/shared/button", text: "Save Changes", variant: "secondary" %>
+        <%= render "leva/shared/button", text: "View Details", variant: "ghost" %>
+        <%= render "leva/shared/button", text: "Small Button", variant: "primary", size: "sm" %>
+      </div>
+    <% end %>
+
+    <%# Score meters example %>
+    <%= render "leva/shared/card", measure: true do %>
+      <h3>Score Meters</h3>
+      <div class="stack mt-4">
+        <%= render "leva/shared/score_meter", score: 0.92, label: "Accuracy" %>
+        <%= render "leva/shared/score_meter", score: 0.67, label: "Precision" %>
+        <%= render "leva/shared/score_meter", score: 0.34, label: "Recall" %>
+      </div>
+    <% end %>
+
+    <%# Grid layout example %>
+    <div class="grid grid-2">
+      <%= render "leva/shared/card", elevated: true do %>
+        <h4>Elevated Card</h4>
+        <p class="text-muted">This card has a prominent shadow for emphasis.</p>
+        <div class="cluster mt-4">
+          <span class="badge badge-amber">Active</span>
+          <span class="badge badge-success">Complete</span>
+        </div>
+      <% end %>
+
+      <%= render "leva/shared/card" do %>
+        <h4>Standard Card</h4>
+        <p class="text-muted">Standard framed container with subtle grain texture.</p>
+        <p class="text-mono" style="font-size: 0.875rem; margin: 0;">
+          Score: <span class="score-high">0.87</span>
+        </p>
+      <% end %>
+    </div>
+
+    <%# Table example %>
+    <%= render "leva/shared/card" do %>
+      <h3>Data Table</h3>
+      <table class="mt-4">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Score</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>GPT-4</td>
+            <td class="text-mono">0.92</td>
+            <td><span class="badge badge-success">Complete</span></td>
+          </tr>
+          <tr>
+            <td>Claude 3</td>
+            <td class="text-mono">0.89</td>
+            <td><span class="badge badge-amber">Running</span></td>
+          </tr>
+          <tr>
+            <td>Llama 2</td>
+            <td class="text-mono">0.76</td>
+            <td><span class="badge">Pending</span></td>
+          </tr>
+        </tbody>
+      </table>
+    <% end %>
+
+  </div>
+</div>

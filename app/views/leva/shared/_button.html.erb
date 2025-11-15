@@ -1,0 +1,32 @@
+<%
+# Button partial - Laboratory Elegance Design System
+#
+# Usage:
+#   <%= render "leva/shared/button", text: "Run Experiment", variant: "primary" %>
+#   <%= render "leva/shared/button", text: "Cancel", variant: "secondary", size: "sm" %>
+#   <%= render "leva/shared/button", text: "Delete", variant: "ghost", disabled: true %>
+#
+# Parameters:
+#   text:     Button label (required)
+#   variant:  primary | secondary | ghost (default: secondary)
+#   size:     sm | md | lg (default: md)
+#   href:     If provided, renders as <a> tag
+#   disabled: Boolean (default: false)
+#   class:    Additional CSS classes
+
+variant ||= "secondary"
+size ||= "md"
+disabled ||= false
+href ||= nil
+classes = ["btn", "btn-#{variant}", "btn-#{size}", local_assigns[:class]].compact.join(" ")
+-%>
+
+<% if href.present? %>
+  <a href="<%= href %>" class="<%= classes %>" <%= "aria-disabled='true'" if disabled %>>
+    <%= text %>
+  </a>
+<% else %>
+  <button class="<%= classes %>" <%= "disabled" if disabled %>>
+    <%= text %>
+  </button>
+<% end %>
