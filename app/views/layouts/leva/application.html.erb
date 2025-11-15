@@ -1,40 +1,66 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-gray-950">
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leva - <%= yield(:title) || 'AI Evaluation Engine' %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <%= stylesheet_link_tag "leva/application", "data-turbo-track": "reload" %>
     <script src="https://cdn.jsdelivr.net/npm/stimulus@3.2.2/dist/stimulus.umd.min.js"></script>
     <%= yield(:head) %>
   </head>
-  <body class="bg-gray-950 text-white">
-    <nav class="bg-gray-900 border-b border-gray-800">
+  <body>
+    <%# Skip link for accessibility %>
+    <a href="#main-content" class="sr-only focus:not-sr-only">
+      Skip to main content
+    </a>
+
+    <nav class="card mb-0" style="border-radius: 0; border-left: 0; border-right: 0; border-top: 0;">
       <div class="px-4">
-        <div class="flex h-16 items-center">
-          <%= link_to root_path, class: 'flex items-center text-2xl font-bold text-indigo-400' do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="flex items-center" style="min-height: 4rem;">
+          <%# Logo %>
+          <%= link_to root_path, class: 'flex items-center gap-2' do %>
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 2rem; height: 2rem;" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <defs>
                 <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#4F46E5" />
-                  <stop offset="100%" stop-color="#9333EA" />
+                  <stop offset="0%" stop-color="var(--amber-500)" />
+                  <stop offset="100%" stop-color="var(--amber-600)" />
                 </linearGradient>
               </defs>
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
-            LLM Evals
+            <span class="text-accent" style="font-size: 1.5rem; font-weight: 700;">LLM Evals</span>
           <% end %>
-          <div class="ml-10 flex space-x-6">
-            <%= link_to 'Workbench', workbench_index_path, class: "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out #{request.path.start_with?(workbench_index_path) ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}" %>
-            <%= link_to 'Datasets', datasets_path, class: "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out #{request.path.start_with?(datasets_path) ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}" %>
-            <%= link_to 'Experiments', experiments_path, class: "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out #{request.path.start_with?(experiments_path) ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}" %>
+
+          <%# Desktop Nav (hidden on mobile) %>
+          <div class="hidden-mobile ml-10 flex gap-6">
+            <%= link_to 'Workbench', workbench_index_path, class: nav_link_class(workbench_index_path) %>
+            <%= link_to 'Datasets', datasets_path, class: nav_link_class(datasets_path) %>
+            <%= link_to 'Experiments', experiments_path, class: nav_link_class(experiments_path) %>
           </div>
+
+          <%# Mobile Menu Button (hidden on desktop) %>
+          <button type="button"
+                  class="hidden-desktop ml-auto btn btn-ghost"
+                  aria-label="Toggle menu"
+                  onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+            <svg xmlns="http://www.w3.org/2000/svg" style="width: 1.5rem; height: 1.5rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+
+        <%# Mobile Menu (hidden by default) %>
+        <div id="mobile-menu" class="hidden hidden-desktop stack pb-4">
+          <%= link_to 'Workbench', workbench_index_path, class: nav_link_class(workbench_index_path) %>
+          <%= link_to 'Datasets', datasets_path, class: nav_link_class(datasets_path) %>
+          <%= link_to 'Experiments', experiments_path, class: nav_link_class(experiments_path) %>
         </div>
       </div>
     </nav>
-    <main class="bg-gray-950">
+
+    <main id="main-content">
       <%= yield %>
     </main>
   </body>

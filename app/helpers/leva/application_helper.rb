@@ -26,6 +26,18 @@ module Leva
       prompts
     end
 
+    # Returns CSS classes for navigation links with active state
+    #
+    # @param path [String] The path to check against the current request path
+    # @return [String] CSS classes for the navigation link
+    def nav_link_class(path)
+      base = "px-3 py-2 text-sm font-medium transition-colors duration-150"
+      active = "bg-amber-600 text-neutral-950 rounded-md"
+      inactive = "text-neutral-300 hover:bg-neutral-800 hover:text-white rounded-md"
+
+      request.path.start_with?(path) ? "#{base} #{active}" : "#{base} #{inactive}"
+    end
+
     private
 
     # Loads classes from a specified directory that inherit from a given base class
