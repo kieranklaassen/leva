@@ -1,15 +1,86 @@
 <% content_for :title, 'Workbench' %>
-<div class="flex h-[calc(100vh-4rem)] bg-gray-950 text-white">
-  <!-- Left Sidebar -->
-  <%= render 'prompt_sidebar', prompts: @prompts, selected_prompt: @selected_prompt %>
-  <!-- Main Content -->
-  <div class="flex-1 flex flex-col">
-    <!-- Top Bar -->
-    <%= render 'top_bar', selected_prompt: @selected_prompt %>
-    <!-- Scrollable Content -->
-    <div class="flex-1 flex overflow-hidden">
-      <%= render 'prompt_content', selected_prompt: @selected_prompt %>
-      <%= render 'results_section', evaluators: @evaluators, dataset_record: @dataset_record %>
+
+<div class="workbench-layout">
+  <%# Mobile: Dropdown selector for prompt %>
+  <div class="hidden-desktop px-4 py-4 card" style="border-radius: 0; border-left: 0; border-right: 0; border-top: 0;">
+    <label for="mobile-prompt-selector" class="mb-2">Select Prompt:</label>
+    <select id="mobile-prompt-selector"
+            onchange="window.location.href = '/workbench?prompt_id=' + this.value">
+      <option value="">Choose a prompt...</option>
+      <% @prompts.each do |prompt| %>
+        <option value="<%= prompt.id %>" <%= 'selected' if @selected_prompt&.id == prompt.id %>>
+          <%= prompt.name %>
+        </option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="workbench-grid">
+    <%# Desktop: Sidebar (hidden on mobile) %>
+    <aside class="workbench-sidebar hidden-mobile">
+      <%= render 'prompt_sidebar', prompts: @prompts, selected_prompt: @selected_prompt %>
+    </aside>
+
+    <%# Main content area %>
+    <div class="workbench-main">
+      <%= render 'top_bar', selected_prompt: @selected_prompt %>
+      <div class="workbench-content">
+        <%= render 'prompt_content', selected_prompt: @selected_prompt %>
+        <div class="workbench-results">
+          <%= render 'results_section', evaluators: @evaluators, dataset_record: @dataset_record %>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<style>
+  .workbench-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 4rem);
+  }
+
+  .workbench-grid {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .workbench-sidebar {
+    width: 16rem;
+    background: var(--neutral-900);
+    border-right: 1px solid var(--neutral-800);
+    overflow-y: auto;
+  }
+
+  .workbench-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .workbench-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .workbench-results {
+    width: 100%;
+    overflow-y: auto;
+  }
+
+  /* Tablet/Desktop: Side-by-side content + results */
+  @media (min-width: 1024px) {
+    .workbench-content {
+      flex-direction: row;
+    }
+
+    .workbench-results {
+      width: 50%;
+      border-left: 1px solid var(--neutral-800);
+    }
+  }
+</style>
