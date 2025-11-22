@@ -10,3 +10,4 @@
 /test/dummy/tmp/
 .worktrees
 test/dummy/db/migrate/*.leva.rb
+.claude/settings.local.json
