@@ -247,6 +247,7 @@ strong {
 
 .page {
   padding: var(--space-10) 0;
+  margin: 0 var(--space-6);
   min-width: 0; /* Prevent content from overflowing */
 }
 
