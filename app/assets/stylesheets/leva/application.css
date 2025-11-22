@@ -241,13 +241,12 @@ strong {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 var(--space-10);
+  padding: 0;
   min-width: 0; /* Prevent overflow issues */
 }
 
 .page {
-  padding: var(--space-10) 0;
-  margin: 0 var(--space-6);
+  padding: var(--space-10) var(--space-8);
   min-width: 0; /* Prevent content from overflowing */
 }
 
@@ -1817,14 +1816,14 @@ dialog::backdrop {
     align-items: flex-start;
   }
 
-  .container {
-    padding: 0 var(--space-6);
+  .page {
+    padding: var(--space-8) var(--space-6);
   }
 }
 
 @media (max-width: 480px) {
-  .container {
-    padding: 0 var(--space-4);
+  .page {
+    padding: var(--space-6) var(--space-4);
   }
 
   .table th,
