@@ -835,7 +835,7 @@ strong {
   border-radius: var(--radius-lg);
   overflow: hidden;
   min-width: 0; /* Prevent overflow on narrow screens */
-  padding: var(--space-4);
+  margin: 0 var(--space-4);
 }
 
 .table-scroll {
