@@ -36,9 +36,9 @@ module Leva
       assert_response :success
 
       # Verify the page shows both contexts in the liquid tags section
-      assert_match(/AVAILABLE LIQUID TAGS/, response.body)
-      assert_match(/FROM RECORD:/, response.body)
-      assert_match(/FROM RUNNER:/, response.body)
+      assert_match(/Available Variables/, response.body)
+      assert_match(/From Record:/, response.body)
+      assert_match(/From Runner:/, response.body)
       assert_match(/runner_specific_field/, response.body)
     end
 
