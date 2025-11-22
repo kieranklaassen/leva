@@ -242,10 +242,12 @@ strong {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 var(--space-6);
+  min-width: 0; /* Prevent overflow issues */
 }
 
 .page {
   padding: var(--space-8) 0;
+  min-width: 0; /* Prevent content from overflowing */
 }
 
 .page-header {
@@ -832,6 +834,7 @@ strong {
   border: 1px solid var(--gray-800);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  min-width: 0; /* Prevent overflow on narrow screens */
 }
 
 .table-scroll {
@@ -1814,7 +1817,28 @@ dialog::backdrop {
   }
 
   .container {
+    padding: 0 var(--space-5);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
     padding: 0 var(--space-4);
+  }
+
+  .table th,
+  .table td {
+    padding: var(--space-3) var(--space-3);
+  }
+
+  .table th:first-child,
+  .table td:first-child {
+    padding-left: var(--space-4);
+  }
+
+  .table th:last-child,
+  .table td:last-child {
+    padding-right: var(--space-4);
   }
 }
 
