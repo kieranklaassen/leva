@@ -1,133 +1,146 @@
 <% if @selected_prompt %>
-  <div class="flex-1 overflow-y-auto p-6 space-y-6" data-controller="prompt-autosave collapsible clipboard" data-prompt-autosave-url-value="<%= workbench_path(@selected_prompt) %>">
-    <!-- System Prompt -->
-    <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
-      <div class="flex justify-between items-center mb-3">
-        <h2 class="text-sm font-semibold text-indigo-400">SYSTEM PROMPT</h2>
-        <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="systemPrompt">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <div class="panel" data-controller="prompt-autosave collapsible clipboard" data-prompt-autosave-url-value="<%= workbench_path(@selected_prompt) %>">
+    <%# System Prompt %>
+    <div class="panel-section" style="padding-bottom: var(--space-4); border-bottom: 1px solid var(--gray-800);">
+      <div class="label-inline" style="margin-bottom: var(--space-3);">
+        <div class="flex items-center gap-2">
+          <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <span class="panel-section-title">System Prompt</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" data-action="clipboard#copy" data-clipboard-source="systemPrompt" title="Copy system prompt">
+          <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
           </svg>
-          Copy
         </button>
       </div>
       <textarea
-        class="w-full bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[100px] overflow-y-auto resize-none break-words"
+        class="prompt-textarea"
         name="prompt[system_prompt]"
         data-prompt-autosave-target="input"
         id="systemPrompt"
         data-action="input->prompt-autosave#debouncedSave"
+        placeholder="Define the AI's role and behavior..."
       ><%= @selected_prompt.system_prompt %></textarea>
     </div>
-    <!-- User Message (Prompt Template) -->
-    <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
-      <div class="flex justify-between items-center mb-3">
-        <h2 class="text-sm font-semibold text-indigo-400">USER (PROMPT TEMPLATE)</h2>
-        <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="userPrompt">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+    <%# User Prompt Template %>
+    <div class="panel-section" style="padding-top: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--gray-800);">
+      <div class="label-inline" style="margin-bottom: var(--space-3);">
+        <div class="flex items-center gap-2">
+          <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span class="panel-section-title">User Prompt Template</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" data-action="clipboard#copy" data-clipboard-source="userPrompt" title="Copy user prompt">
+          <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
           </svg>
-          Copy
         </button>
       </div>
       <textarea
-        class="w-full bg-gray-800 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none min-h-[200px] overflow-y-auto resize-none break-words"
+        class="prompt-textarea"
         name="prompt[user_prompt]"
         data-prompt-autosave-target="input"
         id="userPrompt"
         data-action="input->prompt-autosave#debouncedSave"
+        placeholder="Use {{ variable }} syntax for dynamic content..."
+        style="min-height: 140px;"
       ><%= @selected_prompt.user_prompt %></textarea>
     </div>
-    <!-- Available Liquid Tags -->
+
+    <%# Available Liquid Tags %>
     <% if @dataset_record && @dataset_record.recordable.respond_to?(:to_llm_context) %>
-      <div class="bg-gray-900 p-5 rounded-lg shadow-lg" data-controller="collapsible">
-        <h2 class="text-sm font-semibold mb-3 text-indigo-400 cursor-pointer flex items-center" data-action="click->collapsible#toggle">
-          AVAILABLE LIQUID TAGS
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </h2>
-        <div class="bg-gray-800 p-3 rounded-lg text-sm hidden" data-collapsible-target="content">
-          <% # Use merged context if available, otherwise just record context %>
-          <% context_to_display = @merged_context || @dataset_record.recordable.to_llm_context %>
-          
-          <% if @record_context && @runner_context %>
-            <!-- Record Context -->
-            <div class="mb-4">
-              <h3 class="text-xs font-semibold text-gray-400 mb-2">FROM RECORD:</h3>
-              <% @record_context.each do |key, value| %>
-                <details class="mb-2">
-                  <summary class="text-green-400 cursor-pointer flex items-center justify-between">
-                    <span>{{ <%= key %> }}</span>
-                    <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="liquidTag<%= key %>">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                      </svg>
-                      Copy
-                    </button>
-                  </summary>
-                  <pre class="text-xs text-gray-300 mt-1 whitespace-pre-wrap break-words overflow-x-auto max-w-full" id="liquidTag<%= key %>"><%= value.to_s %></pre>
-                </details>
-              <% end %>
+      <div class="panel-section" style="padding-top: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--gray-800);">
+        <details class="collapsible" data-controller="collapsible">
+          <summary class="collapsible-header">
+            <div class="flex items-center gap-2">
+              <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color: var(--accent-400);">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              <span class="collapsible-title">Available Variables</span>
             </div>
-            
-            <!-- Runner Context -->
-            <% if @runner_context.any? %>
+            <svg class="collapsible-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div class="collapsible-body">
+            <% context_to_display = @merged_context || @dataset_record.recordable.to_llm_context %>
+
+            <% if @record_context && @runner_context %>
+              <%# Record Context %>
               <div class="mb-4">
-                <h3 class="text-xs font-semibold text-gray-400 mb-2">FROM RUNNER:</h3>
-                <% @runner_context.each do |key, value| %>
+                <p class="text-xs uppercase text-muted font-semibold mb-2">From Record:</p>
+                <% @record_context.each do |key, value| %>
                   <details class="mb-2">
-                    <summary class="text-yellow-400 cursor-pointer flex items-center justify-between">
-                      <span>{{ <%= key %> }}</span>
-                      <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="liquidTag<%= key %>">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                        </svg>
-                        Copy
-                      </button>
+                    <summary class="flex items-center justify-between cursor-pointer">
+                      <span class="tag tag-green">{{ <%= key %> }}</span>
+                      <button class="btn btn-ghost btn-sm" data-action="clipboard#copy" data-clipboard-source="liquidTag<%= key %>">Copy</button>
                     </summary>
-                    <pre class="text-xs text-gray-300 mt-1 whitespace-pre-wrap break-words overflow-x-auto max-w-full" id="liquidTag<%= key %>"><%= value.to_s %></pre>
+                    <pre class="mt-2" id="liquidTag<%= key %>"><code><%= value.to_s %></code></pre>
                   </details>
                 <% end %>
               </div>
+
+              <%# Runner Context %>
+              <% if @runner_context.any? %>
+                <div>
+                  <p class="text-xs uppercase text-muted font-semibold mb-2">From Runner:</p>
+                  <% @runner_context.each do |key, value| %>
+                    <details class="mb-2">
+                      <summary class="flex items-center justify-between cursor-pointer">
+                        <span class="tag tag-yellow">{{ <%= key %> }}</span>
+                        <button class="btn btn-ghost btn-sm" data-action="clipboard#copy" data-clipboard-source="liquidTag<%= key %>">Copy</button>
+                      </summary>
+                      <pre class="mt-2" id="liquidTag<%= key %>"><code><%= value.to_s %></code></pre>
+                    </details>
+                  <% end %>
+                </div>
+              <% end %>
+            <% else %>
+              <% context_to_display.each do |key, value| %>
+                <details class="mb-2">
+                  <summary class="flex items-center justify-between cursor-pointer">
+                    <span class="tag tag-green">{{ <%= key %> }}</span>
+                    <button class="btn btn-ghost btn-sm" data-action="clipboard#copy" data-clipboard-source="liquidTag<%= key %>">Copy</button>
+                  </summary>
+                  <pre class="mt-2" id="liquidTag<%= key %>"><code><%= value.to_s %></code></pre>
+                </details>
+              <% end %>
             <% end %>
-          <% else %>
-            <!-- Fallback to original display -->
-            <% context_to_display.each do |key, value| %>
-              <details class="mb-2">
-                <summary class="text-green-400 cursor-pointer flex items-center justify-between">
-                  <span>{{ <%= key %> }}</span>
-                  <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="liquidTag<%= key %>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                    </svg>
-                    Copy
-                  </button>
-                </summary>
-                <pre class="text-xs text-gray-300 mt-1 whitespace-pre-wrap break-words overflow-x-auto max-w-full" id="liquidTag<%= key %>"><%= value.to_s %></pre>
-              </details>
-            <% end %>
-          <% end %>
-        </div>
+          </div>
+        </details>
       </div>
     <% end %>
-    <!-- Full Prompt Preview -->
+
+    <%# Full Prompt Preview %>
     <% if @dataset_record %>
-      <div class="bg-gray-900 p-5 rounded-lg shadow-lg">
-        <div class="flex justify-between items-center mb-3">
-          <h2 class="text-sm font-semibold text-indigo-400">FULL PROMPT PREVIEW</h2>
-          <button class="btn btn-small text-blue-400 hover:text-blue-300 flex items-center" data-action="clipboard#copy" data-clipboard-source="fullPrompt">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="panel-section" style="padding-top: var(--space-4);">
+        <div class="label-inline" style="margin-bottom: var(--space-3);">
+          <div class="flex items-center gap-2">
+            <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <span class="panel-section-title">Rendered Preview</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" data-action="clipboard#copy" data-clipboard-source="fullPrompt" title="Copy rendered prompt">
+            <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
             </svg>
-            Copy
           </button>
         </div>
-        <pre class="w-full bg-gray-800 text-white p-3 rounded-lg text-sm whitespace-pre-wrap overflow-x-auto break-words max-w-full" id="fullPrompt"><%= Liquid::Template.parse(@selected_prompt.user_prompt).render((@merged_context || @dataset_record.recordable.to_llm_context).stringify_keys) %></pre>
+        <div class="result-block" style="background: var(--gray-850, #222120); border: 1px solid var(--gray-700); max-height: 200px; overflow-y: auto;">
+          <pre id="fullPrompt" class="result-value" style="color: var(--gray-300);"><%= Liquid::Template.parse(@selected_prompt.user_prompt).render((@merged_context || @dataset_record.recordable.to_llm_context).stringify_keys) %></pre>
+        </div>
       </div>
     <% end %>
-    <div class="text-sm text-center" data-prompt-autosave-target="status"></div>
+
+    <div class="autosave-status" data-prompt-autosave-target="status"></div>
   </div>
+
   <script>
     (() => {
       const application = Stimulus.Application.start()
@@ -149,8 +162,6 @@
           textareas.forEach(ta => {
             ta.style.height = 'auto'
             ta.style.height = (ta.scrollHeight + 5) + 'px'
-            
-            // Ensure horizontal text wrapping
             ta.style.wordBreak = 'break-word'
             ta.style.wordWrap = 'break-word'
           })
@@ -167,7 +178,7 @@
           })
 
           this.statusTarget.textContent = "Saving..."
-          this.statusTarget.classList.add("text-yellow-500")
+          this.statusTarget.style.color = "var(--warning-400)"
 
           fetch(this.urlValue, {
             method: 'PATCH',
@@ -181,24 +192,20 @@
           .then(response => response.json())
           .then(data => {
             if (data.status === 'success') {
-              this.statusTarget.textContent = "Changes saved successfully"
-              this.statusTarget.classList.remove("text-yellow-500")
-              this.statusTarget.classList.add("text-green-500")
+              this.statusTarget.textContent = "Changes saved"
+              this.statusTarget.style.color = "var(--success-400)"
             } else {
               this.statusTarget.textContent = `Error: ${data.errors.join(", ")}`
-              this.statusTarget.classList.remove("text-yellow-500")
-              this.statusTarget.classList.add("text-red-500")
+              this.statusTarget.style.color = "var(--error-400)"
             }
             setTimeout(() => {
               this.statusTarget.textContent = ""
-              this.statusTarget.classList.remove("text-green-500", "text-red-500")
             }, 3000)
           })
           .catch(error => {
             console.error('Error:', error)
             this.statusTarget.textContent = "Error saving changes"
-            this.statusTarget.classList.remove("text-yellow-500")
-            this.statusTarget.classList.add("text-red-500")
+            this.statusTarget.style.color = "var(--error-400)"
           })
         }
 
@@ -224,8 +231,6 @@
       })
 
       application.register("clipboard", class extends Stimulus.Controller {
-        static targets = ["content"]
-
         copy(event) {
           const sourceId = event.currentTarget.dataset.clipboardSource
           const sourceElement = document.getElementById(sourceId)
@@ -234,19 +239,19 @@
             this.showFeedback(event.currentTarget, "Copied!")
           }, (err) => {
             console.error('Could not copy text: ', err)
-            this.showFeedback(event.currentTarget, "Failed to copy", true)
+            this.showFeedback(event.currentTarget, "Failed", true)
           })
         }
 
         showFeedback(button, message, isError = false) {
           const originalText = button.textContent
           button.textContent = message
-          button.classList.add(isError ? "text-red-500" : "text-green-500")
+          button.style.color = isError ? "var(--error-400)" : "var(--success-400)"
           button.disabled = true
 
           setTimeout(() => {
             button.textContent = originalText
-            button.classList.remove("text-green-500", "text-red-500")
+            button.style.color = ""
             button.disabled = false
           }, 2000)
         }
@@ -254,13 +259,13 @@
     })()
   </script>
 <% else %>
-  <div class="flex-1 flex items-center justify-center">
-    <div class="text-center text-gray-500">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+  <div class="panel flex items-center justify-center">
+    <div class="empty-state">
+      <svg class="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
       </svg>
-      <h3 class="text-xl font-medium mb-2">No Prompt Selected</h3>
-      <p class="text-sm">Please select a prompt from the sidebar to begin editing.</p>
+      <h3 class="empty-state-title">No Prompt Selected</h3>
+      <p class="empty-state-description">Select a prompt from the sidebar to begin editing.</p>
     </div>
   </div>
 <% end %>

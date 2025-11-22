@@ -1,14 +1,11 @@
 <% content_for :title, 'Workbench' %>
-<div class="flex h-[calc(100vh-4rem)] bg-gray-950 text-white">
-  <!-- Left Sidebar -->
+<div class="layout-workbench">
   <%= render 'prompt_sidebar', prompts: @prompts, selected_prompt: @selected_prompt %>
-  <!-- Main Content -->
-  <div class="flex-1 flex flex-col">
-    <!-- Top Bar -->
+  <div class="main-content">
     <%= render 'top_bar', selected_prompt: @selected_prompt %>
-    <!-- Scrollable Content -->
-    <div class="flex-1 flex overflow-hidden">
+    <div class="content-body" data-controller="resizable">
       <%= render 'prompt_content', selected_prompt: @selected_prompt %>
+      <div class="resize-handle" data-resizable-target="handle" data-action="mousedown->resizable#startResize"></div>
       <%= render 'results_section', evaluators: @evaluators, dataset_record: @dataset_record %>
     </div>
   </div>

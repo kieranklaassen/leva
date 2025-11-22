@@ -1,27 +1,48 @@
 <% content_for :title, 'New Experiment' %>
-<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
-  <h1 class="text-3xl font-bold text-indigo-400 mb-6">New Experiment</h1>
+<div class="container page">
+  <nav class="breadcrumb mb-4">
+    <%= link_to "Experiments", experiments_path, class: "breadcrumb-link" %>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-current">New</span>
+  </nav>
+
+  <div class="page-header mb-6">
+    <div>
+      <h1>New Experiment</h1>
+      <p class="text-muted text-sm mt-1">Configure and run a new evaluation experiment</p>
+    </div>
+  </div>
+
   <% if @runners.present? %>
     <%= render 'form', experiment: @experiment %>
   <% else %>
-    <div class="bg-gray-800 rounded-lg shadow-lg p-12 text-center">
-      <svg class="mx-auto h-12 w-12 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-      </svg>
-      <h3 class="mt-2 text-xl font-medium text-yellow-300">No runners available</h3>
-      <p class="mt-1 text-gray-400">You need at least one runner to create an experiment.</p>
-      <div class="mt-6 text-left bg-gray-900 rounded-lg p-6">
-        <h4 class="text-lg font-semibold text-indigo-300 mb-3">What are runners?</h4>
-        <p class="text-gray-300 mb-4">Runners define how your model processes dataset records. They contain the execution logic that takes a dataset record and returns a prediction.</p>
-        <h4 class="text-lg font-semibold text-indigo-300 mb-3">Create your first runner:</h4>
-        <div class="bg-gray-800 rounded p-3 mb-4">
-          <code class="text-green-400">rails generate leva:runner sentiment</code>
+    <div class="card p-6">
+      <div class="setup-required">
+        <div class="setup-required-icon">
+          <svg class="icon-xl" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
         </div>
-        <p class="text-gray-400 text-sm">This will create <code class="text-gray-300">app/runners/sentiment_run.rb</code> with a template to implement your model logic.</p>
+        <h3 class="setup-required-title">Setup Required</h3>
+        <p class="setup-required-desc">You need at least one runner to create an experiment.</p>
       </div>
-      <div class="mt-6">
-        <%= link_to experiments_path, class: "btn btn-secondary inline-flex items-center" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+
+      <hr class="form-divider">
+
+      <div class="setup-help">
+        <h4 class="setup-help-title">What are runners?</h4>
+        <p class="setup-help-text">Runners define how your model processes dataset records. They contain the execution logic that takes a dataset record and returns a prediction.</p>
+
+        <h4 class="setup-help-title mt-6">Create your first runner</h4>
+        <div class="setup-code-block">
+          <code>rails generate leva:runner sentiment</code>
+        </div>
+        <p class="setup-help-hint">This creates <code>app/runners/sentiment_run.rb</code> with a template to implement your model logic.</p>
+      </div>
+
+      <div class="form-actions">
+        <%= link_to experiments_path, class: "btn btn-ghost" do %>
+          <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
           </svg>
           Back to Experiments

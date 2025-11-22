@@ -1,10 +1,20 @@
-<div class="bg-gray-900 p-4 flex items-center justify-between border-b border-gray-800">
-  <div>
+<div class="content-header">
+  <div class="header-inline">
     <% if selected_prompt.present? %>
-      <span class="font-medium text-lg"><%= selected_prompt.name %></span>
-      <span class="text-sm text-indigo-300 ml-2">v<%= selected_prompt.version %></span>
+      <h1 class="content-header-title"><%= selected_prompt.name %></h1>
+      <span class="badge badge-default" style="font-family: var(--font-mono); font-size: 11px;">v<%= selected_prompt.version %></span>
     <% else %>
-      <span class="font-medium text-lg text-gray-400">No prompt selected</span>
+      <span class="content-header-title text-muted">Select a prompt to begin</span>
     <% end %>
   </div>
+  <% if selected_prompt.present? %>
+    <div class="flex items-center gap-2">
+      <%= link_to edit_workbench_path(selected_prompt), class: "btn btn-ghost btn-sm" do %>
+        <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edit
+      <% end %>
+    </div>
+  <% end %>
 </div>

@@ -1,6 +1,8 @@
 Leva::Engine.routes.draw do
   root "workbench#index"
 
+  get "design_system", to: "design_system#index"
+
   resources :datasets do
     resources :dataset_records, path: "records", only: [ :index, :show ]
   end

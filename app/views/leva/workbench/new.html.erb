@@ -1,10 +1,23 @@
 <% content_for :title, "New Prompt" %>
-<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
-  <h1 class="text-3xl font-bold text-indigo-400 mb-6">New Prompt</h1>
-  <%= form_with(model: @prompt, url: workbench_index_path, local: true, class: "bg-gray-800 rounded-lg shadow-lg p-6", data: { controller: "prompt-selector" }) do |form| %>
+<div class="container page">
+  <div class="page-header">
+    <div class="flex items-center gap-3">
+      <%= link_to workbench_index_path, class: "btn btn-ghost btn-sm" do %>
+        <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      <% end %>
+      <div>
+        <h1 class="page-title" style="margin-bottom: 0;">New Prompt</h1>
+        <p class="text-sm text-muted" style="margin: 0;">Create a new prompt template</p>
+      </div>
+    </div>
+  </div>
+
+  <%= form_with(model: @prompt, url: workbench_index_path, local: true, class: "card", data: { controller: "prompt-selector" }) do |form| %>
     <% if @prompt.errors.any? %>
-      <div class="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded-lg mb-4">
-        <h2><%= pluralize(@prompt.errors.count, "error") %> prohibited this prompt from being saved:</h2>
+      <div class="form-errors">
+        <p class="form-errors-title"><%= pluralize(@prompt.errors.count, "error") %> prohibited this prompt from being saved:</p>
         <ul>
           <% @prompt.errors.full_messages.each do |message| %>
             <li><%= message %></li>
@@ -12,58 +25,85 @@
         </ul>
       </div>
     <% end %>
-    <div class="mb-4">
-      <%= form.label :name, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-      <%= form.text_field :name, autofocus: true, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+
+    <div class="form-group">
+      <div class="flex items-center gap-2 mb-2">
+        <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+        </svg>
+        <%= form.label :name, class: "form-label", style: "margin-bottom: 0;" %>
+      </div>
+      <%= form.text_field :name, autofocus: true, class: "form-input", placeholder: "Enter a descriptive name..." %>
     </div>
-    <div class="mb-4">
-      <%= form.label :system_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-      <%= form.text_area :system_prompt, rows: 2, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+
+    <div class="form-group">
+      <div class="flex items-center gap-2 mb-2">
+        <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        <%= form.label :system_prompt, "System Prompt", class: "form-label", style: "margin-bottom: 0;" %>
+      </div>
+      <%= form.text_area :system_prompt, rows: 2, class: "form-textarea prompt-textarea", placeholder: "Define the AI's role and behavior..." %>
     </div>
-    <div class="mb-4">
-      <%= form.label :predefined_prompt, "Select Predefined Prompt", class: "block text-sm font-semibold mb-2 text-indigo-300" %>
+
+    <div class="form-group">
+      <div class="flex items-center gap-2 mb-2">
+        <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+        </svg>
+        <%= form.label :predefined_prompt, "Template", class: "form-label", style: "margin-bottom: 0;" %>
+      </div>
       <%= form.select :predefined_prompt,
           options_for_select([['Custom Prompt', '']] + @predefined_prompts.map { |name, content| [name, content] }),
           {},
-          class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none",
+          class: "form-select",
           data: { action: "change->prompt-selector#toggleUserPrompt" }
       %>
     </div>
-    <div class="mb-4" data-prompt-selector-target="userPromptField">
-      <%= form.label :user_prompt, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-      <%= form.text_area :user_prompt, rows: 5, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+
+    <div class="form-group" data-prompt-selector-target="userPromptField">
+      <div class="flex items-center gap-2 mb-2">
+        <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        <%= form.label :user_prompt, "User Prompt Template", class: "form-label", style: "margin-bottom: 0;" %>
+      </div>
+      <%= form.text_area :user_prompt, rows: 5, class: "form-textarea prompt-textarea", placeholder: "Use {{ variable }} syntax for dynamic content..." %>
     </div>
-    <div class="mb-4 hidden" data-prompt-selector-target="promptPreview" id="prompt-preview">
-      <h3 class="text-lg font-semibold mb-2 text-indigo-300">Prompt Preview</h3>
-      <div 
-        class="bg-gray-700 text-white p-3 rounded-lg whitespace-pre-wrap" 
+
+    <div class="form-group hidden" data-prompt-selector-target="promptPreview" id="prompt-preview">
+      <label class="form-label">Prompt Preview</label>
+      <div
+        class="card-subtle p-4"
+        style="background: var(--gray-800); white-space: pre-wrap;"
         data-prompt-selector-target="previewContent"
         id="preview-content"
       ></div>
 
-      <!-- show-full button, hidden until overflow is detected -->
       <button
         id="show-full-preview"
         type="button"
-        class="mt-2 text-indigo-400 underline hidden"
+        class="btn btn-ghost btn-sm mt-2 hidden"
       >Show full</button>
 
-      <!-- HTML5 dialog for full text -->
-      <dialog id="full-preview-dialog" class="p-0 m-0">
-        <div class="bg-gray-800 text-white p-4 rounded-lg max-h-[80vh] overflow-auto whitespace-pre-wrap">
-          <div id="dialog-content"></div>
-          <div class="text-right mt-4">
-            <button id="close-full-preview" class="px-4 py-2 bg-indigo-600 rounded text-white">Close</button>
-          </div>
+      <dialog id="full-preview-dialog">
+        <div class="dialog-header">
+          <h3 class="dialog-title">Full Preview</h3>
+        </div>
+        <div class="dialog-body" id="dialog-content" style="white-space: pre-wrap;"></div>
+        <div class="dialog-footer">
+          <button id="close-full-preview" class="btn btn-primary">Close</button>
         </div>
       </dialog>
     </div>
-    <div class="flex items-center justify-end space-x-4">
-      <%= link_to "Cancel", workbench_index_path, class: "px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors duration-150 ease-in-out" %>
-      <%= form.submit "Create Prompt", class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors duration-150 ease-in-out" %>
+
+    <div class="form-actions justify-end">
+      <%= link_to "Cancel", workbench_index_path, class: "btn btn-ghost" %>
+      <%= form.submit "Create Prompt", class: "btn btn-primary" %>
     </div>
   <% end %>
 </div>
+
 <script>
   (() => {
     const application = Stimulus.Application.start()
@@ -98,7 +138,6 @@
     })
   })()
 
-  // Prompt preview scrollbar and dialog functionality
   document.addEventListener('DOMContentLoaded', () => {
     const wrapper     = document.getElementById('prompt-preview');
     const preview     = document.getElementById('preview-content');
@@ -109,28 +148,24 @@
 
     if (!preview) return;
 
-    // Check if the preview content is already populated by Stimulus
     const checkPreviewContent = () => {
       if (preview.textContent.trim().length > 0) {
-        // Detect overflow
         if (preview.scrollHeight > preview.clientHeight || preview.scrollWidth > preview.clientWidth) {
           preview.style.maxHeight = '12em';
           preview.style.overflow = 'auto';
           showBtn.classList.remove('hidden');
         }
       } else {
-        // If not populated yet, check again after a short delay
         setTimeout(checkPreviewContent, 100);
       }
     };
 
-    // Start checking once the wrapper is visible
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
           if (!wrapper.classList.contains('hidden')) {
             checkPreviewContent();
-            observer.disconnect(); // Stop observing once we've detected the change
+            observer.disconnect();
           }
         }
       });
@@ -138,15 +173,12 @@
 
     observer.observe(wrapper, { attributes: true });
 
-    // Show full in dialog
     showBtn.addEventListener('click', () => {
       dialogBody.textContent = preview.textContent;
       dialog.showModal();
     });
 
-    // Close dialog
     closeBtn.addEventListener('click', () => dialog.close());
   });
 </script>
-<!-- Include marked.js for Markdown parsing -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>

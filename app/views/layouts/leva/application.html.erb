@@ -1,40 +1,39 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-gray-950">
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leva - <%= yield(:title) || 'AI Evaluation Engine' %></title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <%# Fira Code for monospace, Helvetica is system font %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <%= stylesheet_link_tag "leva/application", media: "all" %>
     <script src="https://cdn.jsdelivr.net/npm/stimulus@3.2.2/dist/stimulus.umd.min.js"></script>
     <%= yield(:head) %>
   </head>
-  <body class="bg-gray-950 text-white">
-    <nav class="bg-gray-900 border-b border-gray-800">
-      <div class="px-4">
-        <div class="flex h-16 items-center">
-          <%= link_to root_path, class: 'flex items-center text-2xl font-bold text-indigo-400' do %>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-2" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <defs>
-                <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#4F46E5" />
-                  <stop offset="100%" stop-color="#9333EA" />
-                </linearGradient>
-              </defs>
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
-            LLM Evals
-          <% end %>
-          <div class="ml-10 flex space-x-6">
-            <%= link_to 'Workbench', workbench_index_path, class: "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out #{request.path.start_with?(workbench_index_path) ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}" %>
-            <%= link_to 'Datasets', datasets_path, class: "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out #{request.path.start_with?(datasets_path) ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}" %>
-            <%= link_to 'Experiments', experiments_path, class: "px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ease-in-out #{request.path.start_with?(experiments_path) ? 'bg-indigo-600 text-white shadow-lg' : 'text-gray-300 hover:bg-gray-800 hover:text-white'}" %>
-          </div>
+  <body>
+    <nav class="nav">
+      <div class="nav-inner">
+        <%= link_to root_path, class: 'nav-brand' do %>
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" class="nav-logo">
+            <rect x="2" y="2" width="16" height="16" rx="3" fill="currentColor" fill-opacity="0.15"/>
+            <path d="M6 6V14H14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>leva</span>
+        <% end %>
+        <div class="nav-links">
+          <%= link_to 'Workbench', workbench_index_path, class: "nav-link #{request.path == root_path || request.path.start_with?(workbench_index_path) ? 'active' : ''}" %>
+          <%= link_to 'Datasets', datasets_path, class: "nav-link #{request.path.start_with?(datasets_path) ? 'active' : ''}" %>
+          <%= link_to 'Experiments', experiments_path, class: "nav-link #{request.path.start_with?(experiments_path) ? 'active' : ''}" %>
         </div>
       </div>
     </nav>
-    <main class="bg-gray-950">
+    <main>
       <%= yield %>
     </main>
   </body>

@@ -1,126 +1,182 @@
-<div class="w-1/2 bg-gray-900 border-l border-gray-800 p-5 overflow-y-auto overflow-x-hidden" data-controller="button-loader">
-  <!-- Runner Dropdown -->
-  <div class="mb-5">
-    <h3 class="text-sm font-semibold mb-2 text-indigo-300">Select Runner</h3>
-    <%= form_tag workbench_index_path, method: :get, class: "flex items-center" do %>
-      <%= select_tag :runner,
-                     options_from_collection_for_select(@runners, :name, :name, @selected_runner),
-                     include_blank: "Select a runner",
-                     onchange: "this.form.submit()",
-                     class: "w-full bg-gray-800 text-white border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+<div class="panel-right" data-controller="button-loader collapsible-panel" data-resizable-target="panel" data-collapsible-panel-key-value="leva-panel-right-collapsed" style="position: relative;">
+  <button type="button" class="panel-right-collapse-btn" data-action="click->collapsible-panel#toggle" title="Toggle panel">
+    <svg viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+    </svg>
+  </button>
+  <%# Run Controls %>
+  <div class="run-controls">
+    <div class="flex items-center gap-2 mb-3">
+      <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span class="text-xs font-semibold uppercase text-muted" style="letter-spacing: 0.05em;">Run Configuration</span>
+    </div>
+    <%= form_tag workbench_index_path, method: :get, class: "run-form" do %>
+      <div class="run-selects">
+        <div class="run-select-group">
+          <label class="run-label">Runner</label>
+          <%= select_tag :runner,
+                         options_from_collection_for_select(@runners, :name, :name, @selected_runner),
+                         include_blank: "Select runner...",
+                         onchange: "this.form.submit()",
+                         class: "form-select form-select-sm" %>
+        </div>
+        <div class="run-select-group">
+          <label class="run-label">Record</label>
+          <%= select_tag :dataset_record_id,
+                         options_from_collection_for_select(Leva::DatasetRecord.all, :id, :display_name, @selected_dataset_record),
+                         include_blank: "Select record...",
+                         onchange: "this.form.submit()",
+                         class: "form-select form-select-sm" %>
+        </div>
+      </div>
       <%= hidden_field_tag :prompt_id, @prompt&.id %>
-      <%= hidden_field_tag :dataset_record_id, @selected_dataset_record %>
     <% end %>
-  </div>
-  <!-- Dataset Record Dropdown -->
-  <div class="mb-5">
-    <%= form_tag workbench_index_path, method: :get, class: "flex flex-col" do %>
-      <%= label_tag :dataset_record_id, "Select Test Record", class: "text-sm font-semibold mb-2 text-indigo-300" %>
-      <%= select_tag :dataset_record_id,
-                     options_from_collection_for_select(Leva::DatasetRecord.all, :id, :display_name, @selected_dataset_record),
-                     include_blank: "Select a record",
-                     onchange: "this.form.submit()",
-                     class: "w-full bg-gray-800 text-white border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
-      <%= hidden_field_tag :prompt_id, @prompt&.id %>
-      <%= hidden_field_tag :runner, @selected_runner %>
-    <% end %>
-  </div>
-  <!-- Run Button -->
-  <div class="mb-5">
-    <%= button_to run_workbench_index_path, method: :post, params: { runner: @selected_runner, prompt_id: @prompt&.id, dataset_record_id: @selected_dataset_record }, class: "w-full btn btn-primary bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center justify-center transition duration-300 ease-in-out h-12", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
-      <span data-button-loader-target="buttonText" class="flex items-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+
+    <%= button_to run_workbench_index_path, method: :post, params: { runner: @selected_runner, prompt_id: @prompt&.id, dataset_record_id: @selected_dataset_record }, class: "btn btn-primary btn-run", disabled: @selected_runner.blank? || @selected_dataset_record.blank?, data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
+      <span data-button-loader-target="buttonText" class="flex items-center justify-center">
+        <svg class="icon-sm" style="margin-right: 6px;" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
         </svg>
-        Run
+        Run Prompt
       </span>
     <% end %>
   </div>
-  <!-- Run Result -->
-  <div class="bg-gray-800 p-4 rounded-lg mb-5 shadow-md">
-    <h3 class="text-sm font-semibold mb-2 text-indigo-300">Run Result</h3>
-    <% if @dataset_record && (runner_result = @dataset_record.runner_results.last) %>
-      <div class="mb-3">
-        <h4 class="text-xs font-semibold text-indigo-200 mb-1">Ground Truth:</h4>
-        <pre class="text-sm text-gray-300 whitespace-pre-wrap break-words overflow-x-auto max-w-full bg-gray-700 p-2 rounded"><%= runner_result.ground_truth %></pre>
-      </div>
-      <div>
-        <h4 class="text-xs font-semibold text-indigo-200 mb-1">Raw Prediction:</h4>
-        <pre class="text-sm text-gray-300 whitespace-pre-wrap break-words overflow-x-auto max-w-full bg-gray-700 p-2 rounded"><%= runner_result.prediction %></pre>
-      </div>
-      <% if runner_result.dataset_record.recordable.extract_regex_pattern %>
-        <div>
-          <h4 class="text-xs font-semibold text-indigo-200 my-2 gap-2">Parsed Predictions:  <%= runner_result.dataset_record.recordable.extract_regex_pattern.to_s %></h4>
-          <% runner_result.parsed_predictions.each do |prediction| %>
-            <pre class="text-sm text-gray-300 whitespace-pre-wrap break-words overflow-x-auto max-w-full bg-gray-700 p-2 rounded mb-2"><%= prediction %></pre>
-          <% end %>
-        </div>
-      <% end %>
-      <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
-        <p>Prompt version: <%= runner_result.prompt.version %></p>
-        <p>Run <%= time_ago_in_words(runner_result.created_at) %> ago</p>
-      </div>
-    <% else %>
-      <div class="text-center py-8">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+
+  <%# Output Section %>
+  <div class="output-section">
+    <div class="output-header">
+      <div class="flex items-center gap-2">
+        <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <p class="text-sm text-gray-500">No results yet. Click 'Run' to start the analysis.</p>
+        <span class="output-title">Output</span>
       </div>
-    <% end %>
-  </div>
-  <!-- Evaluators -->
-  <div class="space-y-4">
-    <div class="flex items-center justify-between">
-      <h3 class="text-sm font-semibold text-indigo-400">Evaluators</h3>
-      <%= button_to run_all_evals_workbench_index_path, method: :post, params: { runner: @selected_runner, prompt_id: @prompt&.id, dataset_record_id: @selected_dataset_record }, class: "btn btn-primary bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center justify-center transition duration-300 ease-in-out h-10", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
-        <span data-button-loader-target="buttonText" class="flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd" />
-          </svg>
-          Evaluate All
+      <% if @dataset_record && (runner_result = @dataset_record.runner_results.last) %>
+        <span class="output-meta">
+          <span class="badge badge-default" style="font-size: 10px; padding: 2px 6px;">v<%= runner_result.prompt.version %></span>
+          <span style="margin-left: 4px;"><%= time_ago_in_words(runner_result.created_at) %> ago</span>
         </span>
       <% end %>
     </div>
-    <div class="grid grid-cols-2 gap-2">
-      <% @evaluators.each do |evaluator_class| %>
-        <div class="bg-gray-800 p-4 rounded-lg shadow-md">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-sm font-medium"><%= evaluator_class.name.demodulize %></span>
-            <%= button_to run_evaluator_workbench_index_path, method: :post, params: { evaluator: evaluator_class.name, runner: @selected_runner, prompt_id: @prompt&.id, dataset_record_id: @selected_dataset_record }, class: "p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition duration-150 ease-in-out", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
-              <span data-button-loader-target="buttonText">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
-                </svg>
-              </span>
-            <% end %>
-          </div>
-          <% if @dataset_record %>
-            <% evaluation_result = @dataset_record.evaluation_results.for_evaluator(evaluator_class).last %>
-            <% if evaluation_result %>
-              <% score = evaluation_result.score %>
-              <% color_class = case score
-                 when 0...0.2 then 'text-red-500'
-                 when 0.2...0.4 then 'text-orange-500'
-                 when 0.4...0.6 then 'text-yellow-500'
-                 when 0.6...0.8 then 'text-lime-500'
-                 when 0.8...1.0 then 'text-green-400'
-                 else 'text-green-300'
-                 end %>
-              <div class="text-sm <%= color_class %> font-semibold">
-                Score: <%= sprintf('%.2f', score) %>
-              </div>
-            <% else %>
-              <div class="text-sm text-gray-500">
-                No evaluation result yet.
-              </div>
-            <% end %>
-          <% end %>
+
+    <% if @dataset_record && (runner_result = @dataset_record.runner_results.last) %>
+      <div class="output-grid">
+        <div class="output-block output-block--expected">
+          <span class="output-label">
+            <svg class="icon-sm" style="display: inline; width: 12px; height: 12px; margin-right: 4px; vertical-align: -2px; color: var(--success-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Expected
+          </span>
+          <span class="output-value"><%= runner_result.ground_truth %></span>
         </div>
+        <div class="output-block output-block--got">
+          <span class="output-label">
+            <svg class="icon-sm" style="display: inline; width: 12px; height: 12px; margin-right: 4px; vertical-align: -2px; color: var(--gray-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Result
+          </span>
+          <span class="output-value"><%= runner_result.prediction %></span>
+        </div>
+        <% if runner_result.dataset_record.recordable.extract_regex_pattern && runner_result.parsed_predictions.any? %>
+          <div class="output-block" style="background: rgba(106, 159, 196, 0.08); border-left: 2px solid var(--info-500);">
+            <span class="output-label">
+              <svg class="icon-sm" style="display: inline; width: 12px; height: 12px; margin-right: 4px; vertical-align: -2px; color: var(--info-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+              </svg>
+              Parsed
+            </span>
+            <span class="output-value"><%= runner_result.parsed_predictions.join(", ") %></span>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="output-empty">
+        <svg class="icon-lg" style="margin: 0 auto var(--space-2); color: var(--gray-600);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-sm text-muted">Click Run to see output</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Evaluators Section %>
+  <div class="eval-section">
+    <div class="eval-header">
+      <div class="flex items-center gap-2">
+        <svg class="icon-sm text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <span class="eval-title">Evaluations</span>
+      </div>
+      <% if @evaluators.any? %>
+        <%= button_to run_all_evals_workbench_index_path, method: :post, params: { runner: @selected_runner, prompt_id: @prompt&.id, dataset_record_id: @selected_dataset_record }, class: "btn btn-ghost btn-sm", disabled: @selected_dataset_record.blank?, style: "font-size: 11px;", data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
+          <span data-button-loader-target="buttonText" class="flex items-center gap-1">
+            <svg class="icon-sm" style="width: 12px; height: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Run All
+          </span>
+        <% end %>
       <% end %>
     </div>
+    <% if @evaluators.any? %>
+      <div class="eval-grid">
+        <% @evaluators.each do |evaluator_class| %>
+          <% evaluation_result = @dataset_record&.evaluation_results&.for_evaluator(evaluator_class)&.last %>
+          <% score = evaluation_result&.score %>
+          <%
+            score_class = case score
+              when 0...0.2 then 'score-bad'
+              when 0.2...0.4 then 'score-poor'
+              when 0.4...0.6 then 'score-fair'
+              when 0.6...0.8 then 'score-good'
+              when 0.8..1.0 then 'score-excellent'
+              else ''
+            end
+            bg_style = case score
+              when 0...0.2 then 'background: rgba(207, 111, 98, 0.08);'
+              when 0.2...0.4 then 'background: rgba(232, 161, 88, 0.08);'
+              when 0.4...0.6 then 'background: rgba(212, 168, 74, 0.08);'
+              when 0.6...0.8 then 'background: rgba(159, 204, 111, 0.08);'
+              when 0.8..1.0 then 'background: rgba(125, 179, 103, 0.08);'
+              else ''
+            end
+          %>
+          <%= button_to run_evaluator_workbench_index_path, method: :post, params: { evaluator: evaluator_class.name, runner: @selected_runner, prompt_id: @prompt&.id, dataset_record_id: @selected_dataset_record }, class: "eval-card #{score ? 'eval-card--has-score' : ''}", style: bg_style, disabled: @selected_dataset_record.blank?, data: { action: "click->button-loader#handleClick", "button-loader-target": "button" } do %>
+            <span data-button-loader-target="buttonText" class="eval-card-inner">
+              <span class="eval-name"><%= evaluator_class.name.demodulize.gsub(/Evaluator$/, '').gsub(/([a-z])([A-Z])/, '\1 \2') %></span>
+              <div class="flex items-center gap-2">
+                <% if score %>
+                  <span class="eval-score <%= score_class %>"><%= sprintf('%.0f', score * 100) %></span>
+                  <span class="text-xs text-muted" style="font-size: 10px;">%</span>
+                <% else %>
+                  <span class="eval-score eval-score--empty">
+                    <svg class="icon-sm" style="width: 14px; height: 14px; color: var(--gray-600);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </span>
+                <% end %>
+              </div>
+            </span>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center p-4" style="background: var(--gray-850, #222120); border-radius: var(--radius-md);">
+        <p class="text-sm text-muted">No evaluators configured</p>
+        <p class="text-xs text-subtle mt-1">Add evaluators in app/evals</p>
+      </div>
+    <% end %>
   </div>
 </div>
+
 <script>
   (() => {
     const application = Stimulus.Application.start()
@@ -135,24 +191,130 @@
 
         this.disableButton(button)
         this.showSpinner(button)
-
-        // Submit the form
         form.submit()
       }
 
       disableButton(button) {
         button.disabled = true
-        button.classList.add('opacity-50', 'cursor-not-allowed')
+        button.style.opacity = '0.5'
+        button.style.cursor = 'not-allowed'
       }
 
       showSpinner(button) {
         const buttonText = button.querySelector('[data-button-loader-target="buttonText"]')
-        buttonText.innerHTML = `
-          <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        `
+        buttonText.innerHTML = '<span class="spinner"></span>'
+      }
+    })
+
+    application.register("resizable", class extends Stimulus.Controller {
+      static targets = ["handle", "panel"]
+
+      connect() {
+        this.isResizing = false
+        this.startX = 0
+        this.startWidth = 0
+        this.minWidth = 200
+        this.maxWidth = window.innerWidth * 0.5
+
+        // Restore saved width from localStorage
+        const savedWidth = localStorage.getItem('leva-panel-right-width')
+        if (savedWidth && this.hasPanelTarget) {
+          this.panelTarget.style.width = savedWidth + 'px'
+        }
+
+        // Bind methods for event listeners
+        this.boundOnMouseMove = this.onMouseMove.bind(this)
+        this.boundOnMouseUp = this.onMouseUp.bind(this)
+      }
+
+      startResize(event) {
+        event.preventDefault()
+        this.isResizing = true
+        this.startX = event.clientX
+        this.startWidth = this.panelTarget.offsetWidth
+
+        this.handleTarget.classList.add('dragging')
+        this.panelTarget.classList.add('resizing')
+        document.body.style.cursor = 'col-resize'
+        document.body.style.userSelect = 'none'
+
+        document.addEventListener('mousemove', this.boundOnMouseMove)
+        document.addEventListener('mouseup', this.boundOnMouseUp)
+      }
+
+      onMouseMove(event) {
+        if (!this.isResizing) return
+
+        const deltaX = this.startX - event.clientX
+        let newWidth = this.startWidth + deltaX
+
+        // Clamp width between min and max
+        newWidth = Math.max(this.minWidth, Math.min(this.maxWidth, newWidth))
+
+        this.panelTarget.style.width = newWidth + 'px'
+      }
+
+      onMouseUp() {
+        if (!this.isResizing) return
+
+        this.isResizing = false
+        this.handleTarget.classList.remove('dragging')
+        this.panelTarget.classList.remove('resizing')
+        document.body.style.cursor = ''
+        document.body.style.userSelect = ''
+
+        // Save width to localStorage
+        localStorage.setItem('leva-panel-right-width', this.panelTarget.offsetWidth)
+
+        document.removeEventListener('mousemove', this.boundOnMouseMove)
+        document.removeEventListener('mouseup', this.boundOnMouseUp)
+      }
+
+      disconnect() {
+        document.removeEventListener('mousemove', this.boundOnMouseMove)
+        document.removeEventListener('mouseup', this.boundOnMouseUp)
+      }
+    })
+
+    application.register("collapsible-panel", class extends Stimulus.Controller {
+      static values = { key: String }
+
+      connect() {
+        this.widthKey = 'leva-panel-right-width'
+        const isCollapsed = localStorage.getItem(this.keyValue) === 'true'
+
+        if (isCollapsed) {
+          this.element.classList.add('collapsed')
+        } else {
+          // Restore saved width when not collapsed
+          const savedWidth = localStorage.getItem(this.widthKey)
+          if (savedWidth) {
+            this.element.style.width = savedWidth + 'px'
+          }
+        }
+      }
+
+      toggle() {
+        const isCurrentlyCollapsed = this.element.classList.contains('collapsed')
+
+        if (isCurrentlyCollapsed) {
+          // Expanding - restore the saved width
+          this.element.classList.remove('collapsed')
+          const savedWidth = localStorage.getItem(this.widthKey)
+          if (savedWidth) {
+            this.element.style.width = savedWidth + 'px'
+          }
+        } else {
+          // Collapsing - save current width first, then collapse
+          const currentWidth = this.element.offsetWidth
+          if (currentWidth > 48) {
+            localStorage.setItem(this.widthKey, currentWidth)
+          }
+          this.element.classList.add('collapsed')
+        }
+
+        const isNowCollapsed = this.element.classList.contains('collapsed')
+        localStorage.setItem(this.keyValue, isNowCollapsed)
       }
     })
   })()

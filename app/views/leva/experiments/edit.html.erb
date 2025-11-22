@@ -1,5 +1,19 @@
 <% content_for :title, "Edit #{@experiment.name}" %>
-<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
-  <h1 class="text-3xl font-bold text-indigo-400 mb-6">Edit Experiment</h1>
+<div class="container page">
+  <nav class="breadcrumb mb-4">
+    <%= link_to "Experiments", experiments_path, class: "breadcrumb-link" %>
+    <span class="breadcrumb-sep">/</span>
+    <%= link_to @experiment.name, experiment_path(@experiment), class: "breadcrumb-link" %>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-current">Edit</span>
+  </nav>
+
+  <div class="page-header mb-6">
+    <div>
+      <h1>Edit Experiment</h1>
+      <p class="text-muted text-sm mt-1">Update configuration for "<%= @experiment.name %>"</p>
+    </div>
+  </div>
+
   <%= render 'form', experiment: @experiment %>
 </div>
