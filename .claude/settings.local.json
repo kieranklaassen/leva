@@ -8,7 +8,9 @@
       "WebFetch(domain:www.pencilandpaper.io)",
       "WebFetch(domain:www.uxpin.com)",
       "mcp__puppeteer__puppeteer_hover",
-      "mcp__puppeteer__puppeteer_click"
+      "mcp__puppeteer__puppeteer_click",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

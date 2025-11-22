@@ -461,6 +461,83 @@
         </svg>
       </button>
     </div>
+
+    <h3 class="ds-subsection-title">Button Usage Guidelines</h3>
+    <div class="ds-principles" style="margin-top: var(--space-4);">
+      <div class="ds-principle">
+        <h3>When to Use Each Button Type</h3>
+        <table class="table" style="margin-bottom: 0;">
+          <thead>
+            <tr>
+              <th>Button Type</th>
+              <th>Use For</th>
+              <th>Examples</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><button class="btn btn-primary btn-sm">Primary</button></td>
+              <td>Main actions, creation, submission</td>
+              <td>New Dataset, New Experiment, Create, Save, Run, Submit</td>
+            </tr>
+            <tr>
+              <td><button class="btn btn-secondary btn-sm">Secondary</button></td>
+              <td>Alternative actions, navigation back</td>
+              <td>Cancel, Back, Close, View in Workbench</td>
+            </tr>
+            <tr>
+              <td><button class="btn btn-ghost btn-sm">Ghost</button></td>
+              <td>Tertiary actions, inline actions</td>
+              <td>Run All, Options, Edit (inline), Copy</td>
+            </tr>
+            <tr>
+              <td><button class="btn btn-danger btn-sm">Danger</button></td>
+              <td>Destructive actions</td>
+              <td>Delete, Remove, Clear All</td>
+            </tr>
+            <tr>
+              <td><button class="btn btn-success btn-sm">Success</button></td>
+              <td>Positive confirmation actions</td>
+              <td>Confirm, Approve, Accept</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ds-principle">
+        <h3>Button Placement Rules</h3>
+        <ul style="font-size: var(--text-sm); color: var(--gray-300); margin: 0; padding-left: var(--space-5);">
+          <li><strong>Page headers:</strong> Primary action on the right (e.g., "New Dataset")</li>
+          <li><strong>Forms:</strong> Primary submit on right, Cancel/secondary on left</li>
+          <li><strong>Modals:</strong> Primary on right, Cancel on left</li>
+          <li><strong>Empty states:</strong> Single primary CTA centered</li>
+          <li><strong>Detail pages:</strong> Edit (secondary/ghost), Delete (danger) on right</li>
+        </ul>
+      </div>
+      <div class="ds-principle">
+        <h3>Consistent "New" Button Pattern</h3>
+        <p style="margin-bottom: var(--space-3);">All "New X" buttons should be <strong>primary (orange)</strong> to maintain visual consistency:</p>
+        <div class="ds-button-row" style="margin-bottom: 0;">
+          <button class="btn btn-primary">
+            <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            New Dataset
+          </button>
+          <button class="btn btn-primary">
+            <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            New Experiment
+          </button>
+          <button class="btn btn-primary btn-sm">
+            <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            New Prompt
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- Forms -->
