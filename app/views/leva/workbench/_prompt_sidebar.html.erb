@@ -1,21 +1,66 @@
-<div class="w-64 h-full bg-gray-900 border-r border-gray-800 flex flex-col">
-  <div class="p-4">
-    <h2 class="text-xl font-bold mb-4 text-indigo-400">Prompts</h2>
-    <div class="space-y-2">
-      <% prompts.each do |prompt| %>
-        <%= link_to workbench_index_path(prompt_id: prompt.id), class: "block bg-gray-800 p-3 rounded-lg hover:bg-gray-700 transition duration-150 ease-in-out #{'bg-indigo-600' if prompt == selected_prompt}" do %>
-          <span class="text-sm font-medium"><%= prompt.name %></span>
-          <span class="text-xs text-indigo-300 ml-2">v<%= prompt.version %></span>
-        <% end %>
-      <% end %>
+<div class="sidebar" data-controller="collapsible-sidebar" data-collapsible-sidebar-key-value="leva-sidebar-collapsed">
+  <div class="sidebar-header">
+    <div class="flex items-center justify-between">
+      <h2 class="sidebar-title">Prompts</h2>
+      <div class="flex items-center gap-1">
+        <span class="text-xs text-muted font-mono" data-collapsible-sidebar-target="hideable"><%= prompts.count %></span>
+        <button type="button" class="sidebar-collapse-btn" data-action="click->collapsible-sidebar#toggle" title="Toggle sidebar">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
-  <div class="mt-auto p-4">
-    <%= link_to new_workbench_path, class: "w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 p-3 rounded-lg transition duration-150 ease-in-out" do %>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+  <div class="sidebar-content">
+    <% if prompts.any? %>
+      <% prompts.each do |prompt| %>
+        <%= link_to workbench_index_path(prompt_id: prompt.id), class: "sidebar-item #{prompt == selected_prompt ? 'active' : ''}" do %>
+          <div class="flex items-center gap-2 min-w-0">
+            <% if prompt == selected_prompt %>
+              <span class="status-dot" style="background: var(--accent-500); margin-right: 0;"></span>
+            <% end %>
+            <span class="truncate"><%= prompt.name %></span>
+          </div>
+          <span class="sidebar-item-badge">v<%= prompt.version %></span>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="p-4 text-center">
+        <p class="text-sm text-muted">No prompts yet</p>
+      </div>
+    <% end %>
+  </div>
+  <div class="sidebar-footer">
+    <%= link_to new_workbench_path, class: "btn btn-secondary btn-sm", style: "width: 100%;" do %>
+      <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
       </svg>
       <span>New Prompt</span>
     <% end %>
   </div>
 </div>
+
+<script>
+  (() => {
+    const application = Stimulus.Application.start()
+
+    application.register("collapsible-sidebar", class extends Stimulus.Controller {
+      static targets = ["hideable"]
+      static values = { key: String }
+
+      connect() {
+        const isCollapsed = localStorage.getItem(this.keyValue) === 'true'
+        if (isCollapsed) {
+          this.element.classList.add('collapsed')
+        }
+      }
+
+      toggle() {
+        this.element.classList.toggle('collapsed')
+        const isCollapsed = this.element.classList.contains('collapsed')
+        localStorage.setItem(this.keyValue, isCollapsed)
+      }
+    })
+  })()
+</script>

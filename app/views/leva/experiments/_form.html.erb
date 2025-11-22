@@ -1,49 +1,76 @@
-<%= form_with(model: @experiment, url: @experiment.new_record? ? experiments_path : experiment_path(@experiment), local: true, class: "bg-gray-800 rounded-lg shadow-lg p-6") do |form| %>
+<%= form_with(model: @experiment, url: @experiment.new_record? ? experiments_path : experiment_path(@experiment), local: true, class: "card p-6") do |form| %>
   <% if @experiment.errors.any? %>
-    <div class="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded-lg mb-4" role="alert">
-      <strong class="font-bold">Error:</strong>
-      <ul class="list-disc list-inside">
+    <div class="form-errors">
+      <p class="form-errors-title">Please fix the following errors:</p>
+      <ul>
         <% @experiment.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
-  <div class="mb-4">
-    <%= form.label :name, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.text_field :name, autofocus: true, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+
+  <%# Basic Information %>
+  <div class="form-section">
+    <div class="form-group">
+      <%= form.label :name, class: "form-label" %>
+      <%= form.text_field :name, autofocus: true, class: "form-input", placeholder: "e.g., Sentiment Analysis v2" %>
+    </div>
+
+    <div class="form-group">
+      <%= form.label :description, class: "form-label" %>
+      <%= form.text_area :description, rows: 3, class: "form-textarea", placeholder: "Optional description of this experiment..." %>
+      <p class="form-hint">Describe the purpose or hypothesis of this experiment.</p>
+    </div>
   </div>
-  <div class="mb-4">
-    <%= form.label :description, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.text_area :description, rows: 4, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
+
+  <hr class="form-divider">
+
+  <%# Configuration %>
+  <div class="form-section">
+    <h4 class="form-section-title">Configuration</h4>
+
+    <div class="form-row">
+      <div class="form-group flex-1">
+        <%= form.label :dataset_id, "Dataset", class: "form-label" %>
+        <%= form.collection_select :dataset_id, Leva::Dataset.all, :id, :name, { prompt: "Select a dataset..." }, class: "form-select" %>
+      </div>
+
+      <div class="form-group flex-1">
+        <%= form.label :prompt_id, "Prompt", class: "form-label" %>
+        <%= form.collection_select :prompt_id, Leva::Prompt.all, :id, :name, { prompt: "Select a prompt...", include_blank: "None" }, class: "form-select" %>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <%= form.label :runner_class, "Runner", class: "form-label" %>
+      <%= form.select :runner_class,
+                      options_for_select(@runners.map { |r| [r.name.demodulize, r.name] }, @experiment.runner_class || @runners.first&.name),
+                      {},
+                      class: "form-select" %>
+      <p class="form-hint">The runner executes your model logic for each dataset record.</p>
+    </div>
   </div>
-  <div class="mb-4">
-    <%= form.label :dataset_id, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.collection_select :dataset_id, Leva::Dataset.all, :id, :name, {}, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
-  </div>
-  <div class="mb-4">
-    <%= form.label :prompt_id, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.collection_select :prompt_id, Leva::Prompt.all, :id, :name, {}, class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
-  </div>
-  <div class="mb-4">
-    <%= form.label :runner_class, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <%= form.select :runner_class,
-                    options_for_select(@runners.map { |r| [r.name.demodulize, r.name] }, @runners.first.name),
-                    {},
-                    class: "w-full bg-gray-700 text-white p-3 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" %>
-  </div>
-  <div class="mb-4">
-    <%= form.label :evaluator_classes, class: "block text-sm font-semibold mb-2 text-indigo-300" %>
-    <div class="space-y-2">
+
+  <hr class="form-divider">
+
+  <%# Evaluators %>
+  <div class="form-section">
+    <h4 class="form-section-title">Evaluators</h4>
+    <p class="form-section-desc">Select which evaluators to run on the experiment results.</p>
+
+    <div class="evaluator-checkbox-grid">
       <%= form.collection_check_boxes :evaluator_classes, @evaluators, :name, ->(e) { e.name.demodulize } do |b| %>
-        <div class="flex items-center">
-          <%= b.check_box(class: "mr-2 bg-gray-700 text-indigo-600 focus:ring-indigo-500", checked: !@experiment.persisted?) %>
-          <%= b.label(class: "text-sm text-white") %>
-        </div>
+        <label class="evaluator-checkbox">
+          <%= b.check_box(class: "form-check-input", checked: !@experiment.persisted?) %>
+          <span class="evaluator-checkbox-label"><%= b.text %></span>
+        </label>
       <% end %>
     </div>
   </div>
-  <div class="flex items-center justify-end">
-    <%= form.submit @experiment.persisted? ? "Update Experiment" : "Create Experiment", class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors duration-150 ease-in-out" %>
+
+  <div class="form-actions">
+    <%= link_to "Cancel", experiments_path, class: "btn btn-ghost" %>
+    <%= form.submit @experiment.persisted? ? "Update Experiment" : "Create & Run Experiment", class: "btn btn-primary" %>
   </div>
 <% end %>

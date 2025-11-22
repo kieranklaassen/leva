@@ -1,0 +1,1654 @@
+<% content_for :title, "Design System" %>
+
+<div class="design-system">
+  <header class="ds-header">
+    <h1>Leva Design System</h1>
+    <p class="ds-intro">A warm, refined design system with careful attention to spacing, contrast, and typography.</p>
+  </header>
+
+  <!-- Design Principles -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Design Principles</h2>
+
+    <div class="ds-principles">
+      <div class="ds-principle">
+        <h3>1. Accent Color Restraint</h3>
+        <p>Reserve the accent color (orange/amber) for <strong>primary actions only</strong>. Use gray for labels, titles, and secondary elements. This creates clear visual hierarchy and makes CTAs stand out.</p>
+        <div class="ds-principle-example">
+          <span class="ds-do">Do: </span>
+          <button class="btn btn-primary btn-sm">Run</button>
+          <button class="btn btn-secondary btn-sm">Cancel</button>
+          <button class="btn btn-ghost btn-sm">Options</button>
+        </div>
+        <div class="ds-principle-example">
+          <span class="ds-dont">Don't: </span>
+          <span style="color: var(--accent-400); text-transform: uppercase; font-size: 12px; font-weight: 600;">SECTION TITLE</span>
+          <span style="margin-left: 8px; color: var(--gray-400); text-transform: uppercase; font-size: 12px; font-weight: 600;">SECTION TITLE</span>
+          <span class="text-xs text-muted" style="margin-left: 8px;">(use gray instead)</span>
+        </div>
+      </div>
+
+      <div class="ds-principle">
+        <h3>2. Tight, Purposeful Spacing</h3>
+        <p>Use smaller spacing values (space-1 to space-3) for related elements. Reserve larger spacing for section breaks. Dense UIs feel more professional.</p>
+        <div class="ds-spacing-comparison">
+          <div class="ds-spacing-demo ds-spacing-tight">
+            <span class="ds-do">Tight (8px)</span>
+            <div class="output-block" style="margin-bottom: 4px;">
+              <span class="output-label">Label</span>
+              <span class="output-value">Value</span>
+            </div>
+            <div class="output-block">
+              <span class="output-label">Label</span>
+              <span class="output-value">Value</span>
+            </div>
+          </div>
+          <div class="ds-spacing-demo ds-spacing-loose">
+            <span class="ds-dont">Loose (24px)</span>
+            <div class="output-block" style="margin-bottom: 24px;">
+              <span class="output-label">Label</span>
+              <span class="output-value">Value</span>
+            </div>
+            <div class="output-block">
+              <span class="output-label">Label</span>
+              <span class="output-value">Value</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-principle">
+        <h3>3. Visual Differentiation for Comparisons</h3>
+        <p>When showing expected vs actual values, use subtle visual cues (borders, background tints) to differentiate without being heavy-handed.</p>
+        <div class="ds-principle-example" style="max-width: 300px;">
+          <div class="output-block output-block--expected" style="margin-bottom: 4px;">
+            <span class="output-label">Expected</span>
+            <span class="output-value">Positive</span>
+          </div>
+          <div class="output-block output-block--got">
+            <span class="output-label">Got</span>
+            <span class="output-value">Positive</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-principle">
+        <h3>4. Inline Labels for Compact Data</h3>
+        <p>For key-value pairs, use inline layout with fixed-width labels. This is more scannable than stacked layouts.</p>
+        <div class="ds-principle-example" style="max-width: 300px;">
+          <div class="output-grid">
+            <div class="output-block">
+              <span class="output-label">Status</span>
+              <span class="output-value">Complete</span>
+            </div>
+            <div class="output-block">
+              <span class="output-label">Score</span>
+              <span class="output-value">0.95</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-principle">
+        <h3>5. Clickable Cards for Actions</h3>
+        <p>When items are actionable, make the entire card clickable rather than adding small buttons. Show scores prominently.</p>
+        <div class="ds-principle-example">
+          <div class="eval-grid" style="max-width: 300px;">
+            <button class="eval-card" type="button">
+              <span class="eval-card-inner">
+                <span class="eval-name">Accuracy</span>
+                <span class="eval-score score-excellent">100</span>
+              </span>
+            </button>
+            <button class="eval-card" type="button">
+              <span class="eval-card-inner">
+                <span class="eval-name">F1 Score</span>
+                <span class="eval-score score-fair">55</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-principle">
+        <h3>6. Data Tables Best Practices</h3>
+        <p>Tables should be <strong>compact, scannable, and clickable</strong>. Use monospace for numbers, right-align numeric columns, and make entire rows clickable for navigation.</p>
+        <ul style="font-size: var(--text-sm); color: var(--gray-300); margin-bottom: var(--space-4); padding-left: var(--space-5);">
+          <li>Full row clickable - no separate action buttons needed</li>
+          <li>Right-align numeric data with <code>text-right cell-numeric</code></li>
+          <li>Use relative time ("2 days ago") with <code>text-nowrap</code></li>
+          <li>Compact padding for dense data display</li>
+          <li>Short column headers - abbreviate evaluator names</li>
+          <li>Cursor pointer on hover to indicate clickability</li>
+        </ul>
+      </div>
+
+      <div class="ds-principle">
+        <h3>7. Detail Page Patterns</h3>
+        <p>Detail pages should use <strong>breadcrumb navigation</strong>, <strong>inline metadata</strong>, and <strong>side-by-side comparison panels</strong> for clarity.</p>
+        <ul style="font-size: var(--text-sm); color: var(--gray-300); margin-bottom: var(--space-4); padding-left: var(--space-5);">
+          <li>Breadcrumbs: <code>breadcrumb</code>, <code>breadcrumb-link</code>, <code>breadcrumb-sep</code></li>
+          <li>Inline metadata: <code>exp-meta</code> with <code>exp-meta-item</code></li>
+          <li>Score cards: <code>eval-summary</code> with progress bars</li>
+          <li>Comparison panels: <code>result-comparison</code> with <code>result-panel</code></li>
+          <li>Code output: <code>result-code</code> for monospace content</li>
+        </ul>
+      </div>
+
+      <div class="ds-principle">
+        <h3>8. Status Indicators</h3>
+        <p>Use <strong>colored dots with text labels</strong> for status display. More subtle than badges, better for inline use in tables and lists.</p>
+        <div class="ds-principle-example">
+          <span class="status-indicator">
+            <span class="status-dot status-dot-success"></span>
+            <span class="status-text">Completed</span>
+          </span>
+          <span class="status-indicator">
+            <span class="status-dot status-dot-warning"></span>
+            <span class="status-text">Pending</span>
+          </span>
+          <span class="status-indicator">
+            <span class="status-dot status-dot-error"></span>
+            <span class="status-text">Failed</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="ds-principle">
+        <h3>9. Score Pills</h3>
+        <p>Use compact <strong>score pills with colored backgrounds</strong> for displaying metrics in tables. Shows percentage with subtle color-coded background.</p>
+        <div class="ds-principle-example">
+          <span class="score-pill score-excellent">100%</span>
+          <span class="score-pill score-good">78%</span>
+          <span class="score-pill score-fair">55%</span>
+          <span class="score-pill score-poor">32%</span>
+          <span class="score-pill score-bad">12%</span>
+          <span class="score-empty">—</span>
+        </div>
+      </div>
+
+      <div class="ds-principle">
+        <h3>10. Section Headers with Counts</h3>
+        <p>Use <strong>section headers with inline counts</strong> to show what's in each section at a glance. Gray count badge provides context without drawing focus.</p>
+        <div class="ds-principle-example" style="flex-direction: column; align-items: flex-start; gap: var(--space-2);">
+          <div class="section-header" style="width: 100%; max-width: 400px; margin: 0;">
+            <h3 class="section-title" style="margin: 0;">Results</h3>
+            <span class="section-count">3 runs</span>
+          </div>
+          <div class="section-header" style="width: 100%; max-width: 400px; margin: 0;">
+            <h3 class="section-title" style="margin: 0;">Records</h3>
+            <span class="section-count">15 total</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-principle">
+        <h3>11. Icons for Scanability</h3>
+        <p>Add <strong>meaningful icons to section headers</strong> to help users quickly identify content areas. Use subtle gray icons, not accent colors.</p>
+        <div class="ds-principle-example">
+          <div class="flex items-center gap-2">
+            <svg class="icon-sm" style="color: var(--gray-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span class="text-sm text-muted">SYSTEM PROMPT</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg class="icon-sm" style="color: var(--gray-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span class="text-sm text-muted">USER TEMPLATE</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg class="icon-sm" style="color: var(--gray-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span class="text-sm text-muted">OUTPUT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Colors -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Colors</h2>
+
+    <h3 class="ds-subsection-title">Gray Scale (Warm)</h3>
+    <div class="ds-color-grid">
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-50);"></div>
+        <span class="ds-color-name">gray-50</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-100);"></div>
+        <span class="ds-color-name">gray-100</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-200);"></div>
+        <span class="ds-color-name">gray-200</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-300);"></div>
+        <span class="ds-color-name">gray-300</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-400);"></div>
+        <span class="ds-color-name">gray-400</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-500);"></div>
+        <span class="ds-color-name">gray-500</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-600);"></div>
+        <span class="ds-color-name">gray-600</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-700);"></div>
+        <span class="ds-color-name">gray-700</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-800);"></div>
+        <span class="ds-color-name">gray-800</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-900);"></div>
+        <span class="ds-color-name">gray-900</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--gray-950);"></div>
+        <span class="ds-color-name">gray-950</span>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Accent (Warm Amber)</h3>
+    <div class="ds-color-grid">
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--accent-50);"></div>
+        <span class="ds-color-name">accent-50</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--accent-100);"></div>
+        <span class="ds-color-name">accent-100</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--accent-200);"></div>
+        <span class="ds-color-name">accent-200</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--accent-300);"></div>
+        <span class="ds-color-name">accent-300</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--accent-400);"></div>
+        <span class="ds-color-name">accent-400</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--accent-500);"></div>
+        <span class="ds-color-name">accent-500</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--accent-600);"></div>
+        <span class="ds-color-name">accent-600</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--accent-700);"></div>
+        <span class="ds-color-name">accent-700</span>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Semantic Colors</h3>
+    <div class="ds-color-grid">
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--success-500);"></div>
+        <span class="ds-color-name">success</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--warning-500);"></div>
+        <span class="ds-color-name">warning</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--error-500);"></div>
+        <span class="ds-color-name">error</span>
+      </div>
+      <div class="ds-color-swatch">
+        <div class="ds-color-preview" style="background: var(--info-500);"></div>
+        <span class="ds-color-name">info</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Typography -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Typography</h2>
+
+    <div class="ds-typography-samples">
+      <div class="ds-type-sample">
+        <span class="ds-type-label">Display / H1</span>
+        <h1 style="margin: 0;">The quick brown fox</h1>
+      </div>
+      <div class="ds-type-sample">
+        <span class="ds-type-label">H2</span>
+        <h2 style="margin: 0;">The quick brown fox jumps over the lazy dog</h2>
+      </div>
+      <div class="ds-type-sample">
+        <span class="ds-type-label">H3</span>
+        <h3 style="margin: 0;">The quick brown fox jumps over the lazy dog</h3>
+      </div>
+      <div class="ds-type-sample">
+        <span class="ds-type-label">H4</span>
+        <h4 style="margin: 0;">The quick brown fox jumps over the lazy dog</h4>
+      </div>
+      <div class="ds-type-sample">
+        <span class="ds-type-label">Body</span>
+        <p style="margin: 0;">The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs. How vexingly quick daft zebras jump!</p>
+      </div>
+      <div class="ds-type-sample">
+        <span class="ds-type-label">Small</span>
+        <p class="text-sm" style="margin: 0;">The quick brown fox jumps over the lazy dog. Pack my box with five dozen liquor jugs.</p>
+      </div>
+      <div class="ds-type-sample">
+        <span class="ds-type-label">Code</span>
+        <code>const greeting = "Hello, World!";</code>
+      </div>
+      <div class="ds-type-sample">
+        <span class="ds-type-label">Code Block</span>
+        <pre><code>function evaluate(prompt, context) {
+  const result = model.generate(prompt);
+  return scorer.score(result, context);
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Spacing -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Spacing Scale</h2>
+    <p class="ds-description">Generous spacing scale for better breathing room and visual rhythm.</p>
+
+    <div class="ds-spacing-samples">
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-1); height: var(--space-1);"></div>
+        <span>space-1 (4px)</span>
+      </div>
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-2); height: var(--space-2);"></div>
+        <span>space-2 (8px)</span>
+      </div>
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-3); height: var(--space-3);"></div>
+        <span>space-3 (12px)</span>
+      </div>
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-4); height: var(--space-4);"></div>
+        <span>space-4 (16px)</span>
+      </div>
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-5); height: var(--space-5);"></div>
+        <span>space-5 (24px)</span>
+      </div>
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-6); height: var(--space-6);"></div>
+        <span>space-6 (32px)</span>
+      </div>
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-8); height: var(--space-8);"></div>
+        <span>space-8 (40px)</span>
+      </div>
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-10); height: var(--space-10);"></div>
+        <span>space-10 (48px)</span>
+      </div>
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-12); height: var(--space-12);"></div>
+        <span>space-12 (64px)</span>
+      </div>
+      <div class="ds-spacing-item">
+        <div class="ds-spacing-box" style="width: var(--space-16); height: var(--space-16);"></div>
+        <span>space-16 (80px)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Buttons -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Buttons</h2>
+
+    <h3 class="ds-subsection-title">Primary</h3>
+    <div class="ds-button-row">
+      <button class="btn btn-primary btn-sm">Small</button>
+      <button class="btn btn-primary">Default</button>
+      <button class="btn btn-primary btn-lg">Large</button>
+      <button class="btn btn-primary" disabled>Disabled</button>
+    </div>
+
+    <h3 class="ds-subsection-title">Secondary</h3>
+    <div class="ds-button-row">
+      <button class="btn btn-secondary btn-sm">Small</button>
+      <button class="btn btn-secondary">Default</button>
+      <button class="btn btn-secondary btn-lg">Large</button>
+      <button class="btn btn-secondary" disabled>Disabled</button>
+    </div>
+
+    <h3 class="ds-subsection-title">Ghost</h3>
+    <div class="ds-button-row">
+      <button class="btn btn-ghost btn-sm">Small</button>
+      <button class="btn btn-ghost">Default</button>
+      <button class="btn btn-ghost btn-lg">Large</button>
+    </div>
+
+    <h3 class="ds-subsection-title">Success / Danger</h3>
+    <div class="ds-button-row">
+      <button class="btn btn-success">Success</button>
+      <button class="btn btn-danger">Danger</button>
+    </div>
+
+    <h3 class="ds-subsection-title">Icon Buttons</h3>
+    <div class="ds-button-row">
+      <button class="btn btn-icon btn-primary btn-sm">
+        <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+      </button>
+      <button class="btn btn-icon btn-secondary">
+        <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+        </svg>
+      </button>
+      <button class="btn btn-icon btn-ghost">
+        <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Forms -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Forms</h2>
+
+    <div class="ds-form-demo">
+      <div class="form-group">
+        <label class="form-label">Text Input</label>
+        <input type="text" class="form-input" placeholder="Enter text...">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">With Helper Text</label>
+        <input type="email" class="form-input" placeholder="you@example.com">
+        <p class="form-hint">We'll never share your email.</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Select</label>
+        <select class="form-select">
+          <option value="">Choose an option...</option>
+          <option value="1">Option One</option>
+          <option value="2">Option Two</option>
+          <option value="3">Option Three</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Textarea</label>
+        <textarea class="form-textarea" rows="4" placeholder="Enter longer text..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Disabled Input</label>
+        <input type="text" class="form-input" placeholder="Cannot edit" disabled>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cards -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Cards</h2>
+
+    <div class="ds-cards-grid">
+      <div class="card">
+        <h3>Default Card</h3>
+        <p>This is a standard card component with some content inside it. Cards provide a contained surface for content.</p>
+        <div class="form-actions">
+          <button class="btn btn-ghost">Cancel</button>
+          <button class="btn btn-primary">Save</button>
+        </div>
+      </div>
+
+      <div class="card-subtle">
+        <h3>Subtle Card</h3>
+        <p>A more subtle card variant with less visual weight. Good for secondary content or nested cards.</p>
+      </div>
+
+      <div class="card card-hover">
+        <h3>Hoverable Card</h3>
+        <p>This card has a hover state. Good for clickable/interactive cards.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Badges -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Badges & Tags</h2>
+
+    <h3 class="ds-subsection-title">Status Badges</h3>
+    <div class="ds-badge-row">
+      <span class="badge">Default</span>
+      <span class="badge badge-success">Success</span>
+      <span class="badge badge-warning">Warning</span>
+      <span class="badge badge-error">Error</span>
+      <span class="badge badge-info">Info</span>
+    </div>
+
+    <h3 class="ds-subsection-title">Tags</h3>
+    <div class="ds-badge-row">
+      <span class="tag">Default Tag</span>
+      <span class="tag tag-green">Green Tag</span>
+      <span class="tag tag-yellow">Yellow Tag</span>
+      <span class="tag tag-blue">Blue Tag</span>
+    </div>
+  </section>
+
+  <!-- Scores -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Score Indicators</h2>
+
+    <div class="ds-scores-grid">
+      <div class="score-card">
+        <span class="text-sm">Excellent</span>
+        <p class="score score-lg score-excellent">0.95</p>
+      </div>
+      <div class="score-card">
+        <span class="text-sm">Good</span>
+        <p class="score score-lg score-good">0.78</p>
+      </div>
+      <div class="score-card">
+        <span class="text-sm">Fair</span>
+        <p class="score score-lg score-fair">0.52</p>
+      </div>
+      <div class="score-card">
+        <span class="text-sm">Poor</span>
+        <p class="score score-lg score-poor">0.31</p>
+      </div>
+      <div class="score-card">
+        <span class="text-sm">Bad</span>
+        <p class="score score-lg score-bad">0.12</p>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Inline Scores</h3>
+    <p>
+      The model achieved a score of <span class="score score-excellent">0.92</span> on accuracy,
+      <span class="score score-good">0.71</span> on relevance, and
+      <span class="score score-fair">0.45</span> on conciseness.
+    </p>
+  </section>
+
+  <!-- Tables -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Tables</h2>
+
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Score</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Summarization Eval</td>
+            <td><span class="badge badge-success">Complete</span></td>
+            <td><span class="score score-excellent">0.89</span></td>
+            <td>
+              <button class="btn btn-ghost btn-sm">View</button>
+            </td>
+          </tr>
+          <tr>
+            <td>QA Evaluation</td>
+            <td><span class="badge badge-warning">Running</span></td>
+            <td><span class="text-muted">-</span></td>
+            <td>
+              <button class="btn btn-ghost btn-sm">View</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Classification Test</td>
+            <td><span class="badge badge-error">Failed</span></td>
+            <td><span class="score score-poor">0.23</span></td>
+            <td>
+              <button class="btn btn-ghost btn-sm">View</button>
+            </td>
+          </tr>
+          <tr>
+            <td>Extraction Eval</td>
+            <td><span class="badge badge-info">Pending</span></td>
+            <td><span class="text-muted">-</span></td>
+            <td>
+              <button class="btn btn-ghost btn-sm">View</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Empty States -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Empty States</h2>
+
+    <div class="card">
+      <div class="empty-state">
+        <svg class="empty-state-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+        </svg>
+        <h3 class="empty-state-title">No Results Yet</h3>
+        <p class="empty-state-description">Run an evaluation to see results here.</p>
+        <button class="btn btn-primary">Run Evaluation</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Panels & Layout -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Panels</h2>
+
+    <div class="ds-panel-demo">
+      <div class="panel" style="max-width: 400px;">
+        <div class="panel-section">
+          <div class="panel-section-header">
+            <h2 class="panel-section-title">Panel Section</h2>
+            <button class="btn btn-ghost btn-sm">Action</button>
+          </div>
+          <p class="text-sm text-muted">Panel sections organize related content with consistent spacing.</p>
+        </div>
+        <div class="panel-section">
+          <div class="panel-section-header">
+            <h2 class="panel-section-title">Another Section</h2>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Input in Panel</label>
+            <input type="text" class="form-input" placeholder="Type here...">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Collapsibles -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Collapsible Sections</h2>
+
+    <details class="collapsible">
+      <summary class="collapsible-header">
+        <span class="collapsible-title">Click to Expand</span>
+        <svg class="collapsible-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <div class="collapsible-body">
+        <p>This content is hidden by default and revealed when the summary is clicked. Useful for progressive disclosure of complex information.</p>
+      </div>
+    </details>
+
+    <details class="collapsible">
+      <summary class="collapsible-header">
+        <span class="collapsible-title">Another Collapsible</span>
+        <svg class="collapsible-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <div class="collapsible-body">
+        <div class="form-group">
+          <label class="form-label">Setting</label>
+          <select class="form-select">
+            <option>Option A</option>
+            <option>Option B</option>
+          </select>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- Workbench Components -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Workbench Components</h2>
+    <p class="ds-description">Specialized components for the prompt workbench interface.</p>
+
+    <h3 class="ds-subsection-title">Run Controls</h3>
+    <div class="ds-workbench-demo">
+      <div class="run-controls" style="max-width: 320px;">
+        <div class="run-selects">
+          <div class="run-select-group">
+            <label class="run-label">Runner</label>
+            <select class="form-select form-select-sm">
+              <option>SentimentRun</option>
+              <option>ClassificationRun</option>
+            </select>
+          </div>
+          <div class="run-select-group">
+            <label class="run-label">Record</label>
+            <select class="form-select form-select-sm">
+              <option>TextContent #1</option>
+              <option>TextContent #2</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-run">
+          <svg class="icon-sm" style="margin-right: 6px;" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+          </svg>
+          Run
+        </button>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Output Display</h3>
+    <div class="ds-workbench-demo">
+      <div class="output-section" style="max-width: 320px; border: none; padding: 0;">
+        <div class="output-header">
+          <span class="output-title">Output</span>
+          <span class="output-meta">v36 · 5 months</span>
+        </div>
+        <div class="output-grid">
+          <div class="output-block output-block--expected">
+            <span class="output-label">Expected</span>
+            <span class="output-value">Positive</span>
+          </div>
+          <div class="output-block output-block--got">
+            <span class="output-label">Got</span>
+            <span class="output-value">Positive</span>
+          </div>
+          <div class="output-block">
+            <span class="output-label">Parsed</span>
+            <span class="output-value">Positive</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Evaluator Cards</h3>
+    <div class="ds-workbench-demo">
+      <div class="eval-section" style="max-width: 320px;">
+        <div class="eval-header">
+          <span class="eval-title">Evaluate</span>
+          <button class="btn btn-ghost btn-sm">Run All</button>
+        </div>
+        <div class="eval-grid">
+          <button class="eval-card" type="button">
+            <span class="eval-card-inner">
+              <span class="eval-name">Sentiment Accuracy</span>
+              <span class="eval-score score-excellent">100</span>
+            </span>
+          </button>
+          <button class="eval-card" type="button">
+            <span class="eval-card-inner">
+              <span class="eval-name">Sentiment F1</span>
+              <span class="eval-score score-fair">55</span>
+            </span>
+          </button>
+          <button class="eval-card" type="button">
+            <span class="eval-card-inner">
+              <span class="eval-name">Precision</span>
+              <span class="eval-score score-good">78</span>
+            </span>
+          </button>
+          <button class="eval-card" type="button">
+            <span class="eval-card-inner">
+              <span class="eval-name">Recall</span>
+              <span class="eval-score eval-score--empty">—</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Prompt Textarea</h3>
+    <div class="ds-workbench-demo">
+      <div style="max-width: 500px;">
+        <div class="label-inline">
+          <span class="panel-section-title">System</span>
+          <button class="btn btn-ghost btn-sm">
+            <svg class="icon-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+            </svg>
+          </button>
+        </div>
+        <textarea class="prompt-textarea" placeholder="System instructions...">You are a helpful assistant that analyzes sentiment.</textarea>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Sidebar Item States</h3>
+    <div class="ds-workbench-demo">
+      <div style="max-width: 220px; background: var(--gray-900); padding: var(--space-2); border-radius: var(--radius-md);">
+        <a href="#" class="sidebar-item active">
+          <span style="display: flex; align-items: center; gap: var(--space-2);">
+            <span class="status-dot status-dot-success" style="margin-right: 0;"></span>
+            <span class="truncate">Selected Prompt</span>
+          </span>
+          <span class="sidebar-item-badge">v36</span>
+        </a>
+        <a href="#" class="sidebar-item">
+          <span class="truncate">Another Prompt</span>
+          <span class="sidebar-item-badge">v12</span>
+        </a>
+        <a href="#" class="sidebar-item">
+          <span class="truncate">Third Prompt with Long Name</span>
+          <span class="sidebar-item-badge">v3</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Breadcrumb Navigation -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Breadcrumb Navigation</h2>
+    <p class="ds-description">Hierarchical navigation for detail pages. Links are accent-colored, separators and current page are muted.</p>
+
+    <div class="ds-workbench-demo">
+      <nav class="breadcrumb">
+        <a href="#" class="breadcrumb-link">Datasets</a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="#" class="breadcrumb-link">Sentiment Analysis</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Records</span>
+      </nav>
+    </div>
+
+    <h3 class="ds-subsection-title">With Home Icon</h3>
+    <div class="ds-workbench-demo">
+      <nav class="breadcrumb">
+        <a href="#" class="breadcrumb-link" style="display: flex; align-items: center;">
+          <svg class="icon-sm" style="color: var(--gray-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </a>
+        <span class="breadcrumb-sep">/</span>
+        <a href="#" class="breadcrumb-link">sdf</a>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Result #11</span>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Metadata Bars -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Metadata Bars</h2>
+    <p class="ds-description">Inline metadata display for detail pages. Key-value pairs separated by vertical dividers.</p>
+
+    <h3 class="ds-subsection-title">Experiment Metadata</h3>
+    <div class="ds-workbench-demo">
+      <div class="exp-meta" style="margin-bottom: 0;">
+        <div class="exp-meta-item">
+          <span class="exp-meta-label">Dataset</span>
+          <a href="#" class="exp-meta-value exp-meta-link">Sentiment Analysis Dataset</a>
+        </div>
+        <div class="exp-meta-item">
+          <span class="exp-meta-label">Prompt</span>
+          <span class="exp-meta-value">Test Prompt</span>
+        </div>
+        <div class="exp-meta-item">
+          <span class="exp-meta-label">Runner</span>
+          <span class="exp-meta-value font-mono">SentimentRun</span>
+        </div>
+        <div class="exp-meta-item">
+          <span class="exp-meta-label">Created</span>
+          <span class="exp-meta-value">over 1 year ago</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">With Icons (Result Metadata)</h3>
+    <div class="ds-workbench-demo">
+      <div class="result-meta-bar">
+        <div class="result-meta-item">
+          <svg class="icon-sm" style="color: var(--gray-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span class="result-meta-label">PROMPT</span>
+          <a href="#" class="result-meta-link">Test Prompt</a>
+          <span class="badge badge-default" style="font-size: 10px; padding: 2px 6px;">v</span>
+        </div>
+        <span class="result-meta-divider"></span>
+        <div class="result-meta-item">
+          <svg class="icon-sm" style="color: var(--gray-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span class="result-meta-label">RUNNER</span>
+          <span class="result-meta-value">SentimentRun</span>
+        </div>
+        <span class="result-meta-divider"></span>
+        <div class="result-meta-item">
+          <svg class="icon-sm" style="color: var(--gray-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="result-meta-label">RAN</span>
+          <span class="result-meta-value">over 1 year ago</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Evaluation Summary Cards -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Evaluation Summary Cards</h2>
+    <p class="ds-description">Score cards with progress bars for displaying evaluation metrics. Used on experiment show and runner result pages.</p>
+
+    <div class="ds-workbench-demo">
+      <div class="eval-summary">
+        <div class="eval-summary-card">
+          <span class="eval-summary-score score-excellent">100<span class="eval-summary-pct">%</span></span>
+          <span class="eval-summary-name">ACCURACY</span>
+          <div class="eval-summary-bar">
+            <div class="eval-summary-bar-fill score-excellent" style="width: 100%"></div>
+          </div>
+          <span class="eval-summary-count">3 runs</span>
+        </div>
+        <div class="eval-summary-card">
+          <span class="eval-summary-score score-fair">44<span class="eval-summary-pct">%</span></span>
+          <span class="eval-summary-name">F1</span>
+          <div class="eval-summary-bar">
+            <div class="eval-summary-bar-fill score-fair" style="width: 44%"></div>
+          </div>
+          <span class="eval-summary-count">3 runs</span>
+        </div>
+        <div class="eval-summary-card">
+          <span class="eval-summary-score score-good">78<span class="eval-summary-pct">%</span></span>
+          <span class="eval-summary-name">PRECISION</span>
+          <div class="eval-summary-bar">
+            <div class="eval-summary-bar-fill score-good" style="width: 78%"></div>
+          </div>
+          <span class="eval-summary-count">3 runs</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">With Score Labels</h3>
+    <div class="ds-workbench-demo">
+      <div class="eval-summary">
+        <div class="eval-summary-card">
+          <span class="eval-summary-score score-excellent">100<span class="eval-summary-pct">%</span></span>
+          <span class="eval-summary-name">ACCURACY</span>
+          <div class="eval-summary-bar">
+            <div class="eval-summary-bar-fill score-excellent" style="width: 100%"></div>
+          </div>
+          <span class="eval-summary-label score-excellent">EXCELLENT</span>
+        </div>
+        <div class="eval-summary-card">
+          <span class="eval-summary-score score-fair">44<span class="eval-summary-pct">%</span></span>
+          <span class="eval-summary-name">F1</span>
+          <div class="eval-summary-bar">
+            <div class="eval-summary-bar-fill score-fair" style="width: 44%"></div>
+          </div>
+          <span class="eval-summary-label score-fair">FAIR</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Result Comparison Panels -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Result Comparison Panels</h2>
+    <p class="ds-description">Side-by-side panels for comparing prediction vs expected values. Used on runner result detail pages.</p>
+
+    <div class="ds-workbench-demo">
+      <div class="result-comparison">
+        <div class="result-panel">
+          <div class="result-panel-header">
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <svg class="icon-sm" style="color: var(--info-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span class="result-panel-label">PREDICTION</span>
+            </div>
+            <span class="text-xs text-muted">8 chars</span>
+          </div>
+          <div class="result-panel-content">
+            <pre class="result-code"><code>Positive</code></pre>
+          </div>
+        </div>
+        <div class="result-panel result-panel--expected">
+          <div class="result-panel-header">
+            <div style="display: flex; align-items: center; gap: var(--space-2);">
+              <svg class="icon-sm" style="color: var(--success-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="result-panel-label">EXPECTED (GROUND TRUTH)</span>
+            </div>
+            <span class="text-xs text-muted">8 chars</span>
+          </div>
+          <div class="result-panel-content">
+            <pre class="result-code"><code>Positive</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">With Empty State</h3>
+    <div class="ds-workbench-demo">
+      <div class="result-comparison">
+        <div class="result-panel">
+          <div class="result-panel-header">
+            <span class="result-panel-label">PREDICTION</span>
+          </div>
+          <div class="result-panel-content">
+            <pre class="result-code"><code>Negative</code></pre>
+          </div>
+        </div>
+        <div class="result-panel result-panel--expected">
+          <div class="result-panel-header">
+            <span class="result-panel-label">EXPECTED</span>
+          </div>
+          <div class="result-panel-content">
+            <div class="result-empty-state">
+              <svg class="icon" style="color: var(--gray-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm text-muted">No ground truth defined</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Clickable Table Rows -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Clickable Tables</h2>
+    <p class="ds-description">Tables with full-row click targets. No action buttons needed - entire row navigates to detail page.</p>
+
+    <div class="table-wrapper">
+      <table class="table table-clickable">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>STATUS</th>
+            <th class="text-right">RUNS</th>
+            <th class="text-right">ACCURACY</th>
+            <th class="text-right">F1</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="clickable-row">
+            <td>
+              <div>
+                <span class="row-title">test exp</span>
+                <div class="text-xs text-muted" style="margin-top: 2px;">Sentiment analysis test</div>
+              </div>
+            </td>
+            <td>
+              <span class="status-indicator">
+                <span class="status-dot status-dot-success"></span>
+                <span class="status-text">Completed</span>
+              </span>
+            </td>
+            <td class="text-right cell-numeric">3</td>
+            <td class="text-right"><span class="score-pill score-excellent">100%</span></td>
+            <td class="text-right"><span class="score-pill score-poor">18%</span></td>
+            <td class="text-right">
+              <svg class="icon-sm" style="color: var(--gray-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </td>
+          </tr>
+          <tr class="clickable-row">
+            <td>
+              <div>
+                <span class="row-title">sdf</span>
+                <div class="text-xs text-muted" style="margin-top: 2px;">Another experiment</div>
+              </div>
+            </td>
+            <td>
+              <span class="status-indicator">
+                <span class="status-dot status-dot-warning"></span>
+                <span class="status-text">Pending</span>
+              </span>
+            </td>
+            <td class="text-right cell-numeric">0</td>
+            <td class="text-right"><span class="score-empty">—</span></td>
+            <td class="text-right"><span class="score-empty">—</span></td>
+            <td class="text-right">
+              <svg class="icon-sm" style="color: var(--gray-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Collapsible Sidebars & Resizable Panels -->
+  <section class="ds-section">
+    <h2 class="ds-section-title">Collapsible Sidebars & Resizable Panels</h2>
+    <p class="ds-description">Panels that can be collapsed to maximize workspace. State persists in localStorage. Use Stimulus controllers for interactivity.</p>
+
+    <h3 class="ds-subsection-title">Design Principles</h3>
+    <div class="ds-principles" style="margin-bottom: var(--space-6);">
+      <div class="ds-principle">
+        <h3>12. Collapsible Panels</h3>
+        <p>Sidebars and panels should be collapsible to give users control over their workspace. Collapsed state should show minimal visual indicators (dots for list items) and persist across sessions via localStorage.</p>
+      </div>
+      <div class="ds-principle">
+        <h3>13. Resizable Panels</h3>
+        <p>Panels should be resizable via drag handles. The handle should be subtle (6px wide) with hover/active states. Width constraints (min/max) prevent unusable sizes.</p>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Collapse Button</h3>
+    <div class="ds-workbench-demo">
+      <div style="display: flex; gap: var(--space-4); align-items: center;">
+        <div>
+          <span class="text-xs text-muted mb-2" style="display: block;">Default</span>
+          <button type="button" class="sidebar-collapse-btn" style="position: relative;">
+            <svg viewBox="0 0 20 20" fill="currentColor" style="width: 14px; height: 14px;">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <span class="text-xs text-muted mb-2" style="display: block;">Hover</span>
+          <button type="button" class="sidebar-collapse-btn" style="position: relative; color: var(--gray-200); background: var(--gray-700);">
+            <svg viewBox="0 0 20 20" fill="currentColor" style="width: 14px; height: 14px;">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <span class="text-xs text-muted mb-2" style="display: block;">Collapsed (rotated)</span>
+          <button type="button" class="sidebar-collapse-btn" style="position: relative;">
+            <svg viewBox="0 0 20 20" fill="currentColor" style="width: 14px; height: 14px; transform: rotate(180deg);">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Collapsed Sidebar Items (Dots)</h3>
+    <div class="ds-workbench-demo">
+      <div style="width: 48px; background: var(--gray-900); padding: var(--space-2); border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; gap: var(--space-1);">
+        <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--gray-700); border-radius: var(--radius-sm);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-500);"></span>
+        </div>
+        <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--gray-600);"></span>
+        </div>
+        <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--gray-600);"></span>
+        </div>
+      </div>
+      <p class="text-xs text-muted mt-2">Active item has accent-colored dot, others are muted gray.</p>
+    </div>
+
+    <h3 class="ds-subsection-title">Resize Handle</h3>
+    <div class="ds-workbench-demo">
+      <div style="display: flex; gap: var(--space-6); align-items: center;">
+        <div>
+          <span class="text-xs text-muted mb-2" style="display: block;">Default</span>
+          <div style="width: 6px; height: 80px; background: transparent; border-radius: 2px; cursor: col-resize;"></div>
+        </div>
+        <div>
+          <span class="text-xs text-muted mb-2" style="display: block;">Hover</span>
+          <div style="width: 6px; height: 80px; background: var(--gray-800); border-radius: 2px; cursor: col-resize; position: relative;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2px; height: 32px; background: var(--gray-700); border-radius: 1px;"></div>
+          </div>
+        </div>
+        <div>
+          <span class="text-xs text-muted mb-2" style="display: block;">Dragging</span>
+          <div style="width: 6px; height: 80px; background: var(--accent-500); border-radius: 2px; cursor: col-resize; position: relative;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 2px; height: 32px; background: var(--accent-400); border-radius: 1px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="ds-subsection-title">Stimulus Controller Pattern</h3>
+    <div class="ds-code-block">
+      <pre style="margin: 0; font-size: 12px; color: var(--gray-300); overflow-x: auto;"><code>// Collapsible sidebar controller
+application.register("collapsible-sidebar", class extends Stimulus.Controller {
+  static values = { key: String }
+
+  connect() {
+    const isCollapsed = localStorage.getItem(this.keyValue) === 'true'
+    if (isCollapsed) this.element.classList.add('collapsed')
+  }
+
+  toggle() {
+    this.element.classList.toggle('collapsed')
+    localStorage.setItem(this.keyValue, this.element.classList.contains('collapsed'))
+  }
+})
+
+// Usage in HTML:
+// &lt;div class="sidebar" data-controller="collapsible-sidebar"
+//      data-collapsible-sidebar-key-value="leva-sidebar-collapsed"&gt;</code></pre>
+    </div>
+  </section>
+
+</div>
+
+<style>
+  /* Design System Page Styles */
+  .design-system {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-10) var(--space-6);
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .ds-section {
+    animation: fadeInUp 0.6s ease-out backwards;
+  }
+
+  .ds-section:nth-child(2) { animation-delay: 0.05s; }
+  .ds-section:nth-child(3) { animation-delay: 0.1s; }
+  .ds-section:nth-child(4) { animation-delay: 0.15s; }
+  .ds-section:nth-child(5) { animation-delay: 0.2s; }
+  .ds-section:nth-child(6) { animation-delay: 0.25s; }
+  .ds-section:nth-child(7) { animation-delay: 0.3s; }
+  .ds-section:nth-child(8) { animation-delay: 0.35s; }
+  .ds-section:nth-child(9) { animation-delay: 0.4s; }
+  .ds-section:nth-child(10) { animation-delay: 0.45s; }
+  .ds-section:nth-child(11) { animation-delay: 0.5s; }
+  .ds-section:nth-child(12) { animation-delay: 0.55s; }
+
+  .ds-header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .ds-header h1 {
+    font-size: var(--text-3xl);
+    margin-bottom: var(--space-3);
+  }
+
+  .ds-intro {
+    font-size: var(--text-lg);
+    color: var(--text-secondary);
+    max-width: 600px;
+  }
+
+  .ds-section {
+    margin-bottom: var(--space-16);
+  }
+
+  .ds-section-title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .ds-subsection-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-4);
+  }
+
+  .ds-description {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-6);
+  }
+
+  /* Color Swatches */
+  .ds-color-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .ds-color-swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .ds-color-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+  }
+
+  .ds-color-name {
+    font-size: var(--text-xs);
+    font-family: var(--font-mono);
+    color: var(--text-tertiary);
+  }
+
+  /* Typography Samples */
+  .ds-typography-samples {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .ds-type-sample {
+    padding: var(--space-4);
+    background: var(--gray-800);
+    border-radius: var(--radius-md);
+  }
+
+  .ds-type-label {
+    display: block;
+    font-size: var(--text-xs);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-2);
+  }
+
+  /* Spacing Samples */
+  .ds-spacing-samples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    align-items: flex-end;
+  }
+
+  .ds-spacing-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .ds-spacing-box {
+    background: var(--accent-500);
+    border-radius: var(--radius-sm);
+  }
+
+  .ds-spacing-item span {
+    font-size: var(--text-xs);
+    font-family: var(--font-mono);
+    color: var(--text-tertiary);
+  }
+
+  /* Button Rows */
+  .ds-button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+    margin-bottom: var(--space-4);
+  }
+
+  /* Form Demo */
+  .ds-form-demo {
+    max-width: 400px;
+  }
+
+  /* Cards Grid */
+  .ds-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .ds-cards-grid .card,
+  .ds-cards-grid .card-subtle {
+    height: 100%;
+  }
+
+  /* Badge Row */
+  .ds-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  /* Scores Grid */
+  .ds-scores-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+
+  .ds-scores-grid .score-card {
+    text-align: center;
+    padding: var(--space-4);
+  }
+
+  /* Panel Demo */
+  .ds-panel-demo {
+    background: var(--gray-900);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+  }
+
+  /* Principles Section */
+  .ds-principles {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .ds-principle {
+    padding: var(--space-5);
+    background: var(--gray-800);
+    border-radius: var(--radius-lg);
+  }
+
+  .ds-principle h3 {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-3);
+    color: var(--gray-100);
+  }
+
+  .ds-principle p {
+    color: var(--gray-300);
+    margin-bottom: var(--space-4);
+    font-size: var(--text-sm);
+  }
+
+  .ds-principle-example {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3);
+  }
+
+  .ds-do {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--success-400);
+    text-transform: uppercase;
+  }
+
+  .ds-dont {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--error-400);
+    text-transform: uppercase;
+  }
+
+  .ds-spacing-comparison {
+    display: flex;
+    gap: var(--space-6);
+  }
+
+  .ds-spacing-demo {
+    flex: 1;
+    padding: var(--space-4);
+    background: var(--gray-900);
+    border-radius: var(--radius-md);
+  }
+
+  .ds-spacing-demo > span {
+    display: block;
+    margin-bottom: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  /* Workbench Demo */
+  .ds-workbench-demo {
+    padding: var(--space-5);
+    background: var(--gray-900);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
+  }
+
+  /* Status Indicator */
+  .status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .status-text {
+    font-size: var(--text-sm);
+    color: var(--gray-300);
+  }
+
+  /* Score Pills */
+  .score-pill {
+    display: inline-block;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 500;
+  }
+
+  .score-pill.score-excellent {
+    background: rgba(125, 179, 103, 0.15);
+    color: var(--success-400);
+  }
+
+  .score-pill.score-good {
+    background: rgba(159, 204, 111, 0.15);
+    color: #9fcc6f;
+  }
+
+  .score-pill.score-fair {
+    background: rgba(212, 168, 74, 0.15);
+    color: var(--warning-400);
+  }
+
+  .score-pill.score-poor {
+    background: rgba(232, 161, 88, 0.15);
+    color: #e8a158;
+  }
+
+  .score-pill.score-bad {
+    background: rgba(207, 111, 98, 0.15);
+    color: var(--error-400);
+  }
+
+  .score-empty {
+    color: var(--gray-600);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+
+  /* Result Metadata Bar */
+  .result-meta-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--gray-800);
+    border-radius: var(--radius-md);
+  }
+
+  .result-meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .result-meta-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .result-meta-value {
+    font-size: var(--text-sm);
+    color: var(--gray-200);
+  }
+
+  .result-meta-link {
+    font-size: var(--text-sm);
+    color: var(--accent-400);
+  }
+
+  .result-meta-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--gray-700);
+  }
+
+  /* Eval Summary Label */
+  .eval-summary-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: var(--space-1);
+  }
+
+  /* Result Empty State */
+  .result-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-6);
+    text-align: center;
+  }
+
+  /* Result Panel Header with flex */
+  .result-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  /* Code Block for Design System */
+  .ds-code-block {
+    background: var(--gray-900);
+    border: 1px solid var(--gray-800);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    overflow-x: auto;
+  }
+
+  .ds-code-block code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--gray-300);
+  }
+</style>

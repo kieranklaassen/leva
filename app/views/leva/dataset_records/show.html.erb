@@ -1,30 +1,120 @@
 <% content_for :title, "#{@dataset.name} - Record Details" %>
-<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
-  <div class="mb-8">
-    <div class="flex justify-between items-center">
-      <h1 class="text-3xl font-bold text-indigo-400 mb-2"><%= @dataset.name %> - Record Details</h1>
-      <div class="flex space-x-4">
-        <%= link_to dataset_dataset_records_path(@dataset), class: 'btn btn-secondary flex items-center' do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-          </svg>
-          Back to Records
-        <% end %>
-        <%= link_to workbench_index_path(dataset_record_id: @record.id), class: 'btn btn-primary flex items-center' do %>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-          </svg>
-          Use in Workbench
-        <% end %>
-      </div>
+<div class="container page">
+  <%# Breadcrumb Navigation %>
+  <nav class="breadcrumb mb-4">
+    <%= link_to datasets_path, class: 'breadcrumb-link' do %>Datasets<% end %>
+    <span class="breadcrumb-sep">/</span>
+    <%= link_to @dataset.name, dataset_path(@dataset), class: 'breadcrumb-link' %>
+    <span class="breadcrumb-sep">/</span>
+    <%= link_to 'Records', dataset_dataset_records_path(@dataset), class: 'breadcrumb-link' %>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-current"><%= @record.display_name.truncate(30) %></span>
+  </nav>
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><%= @record.display_name %></h1>
+      <p class="text-muted mt-2">Record from <strong><%= @dataset.name %></strong></p>
+    </div>
+    <div class="btn-group">
+      <%= link_to workbench_index_path(dataset_record_id: @record.id), class: 'btn btn-primary' do %>
+        <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+        </svg>
+        Open in Workbench
+      <% end %>
     </div>
   </div>
-  <div class="bg-gray-800 rounded-lg shadow-lg p-6">
-    <% @record.show_attributes.each do |key, value| %>
-      <div class="mb-4">
-        <h3 class="text-lg font-semibold text-indigo-300 mb-2"><%= key.to_s.humanize %></h3>
-        <p class="text-gray-300"><%= value %></p>
+
+  <%# Record Metadata %>
+  <section class="mb-6">
+    <div class="exp-meta">
+      <div class="exp-meta-item">
+        <span class="exp-meta-label">Record ID</span>
+        <span class="exp-meta-value font-mono"><%= @record.id %></span>
+      </div>
+      <div class="exp-meta-item">
+        <span class="exp-meta-label">Recordable Type</span>
+        <span class="exp-meta-value"><%= @record.recordable_type %></span>
+      </div>
+      <div class="exp-meta-item">
+        <span class="exp-meta-label">Recordable ID</span>
+        <span class="exp-meta-value font-mono"><%= @record.recordable_id %></span>
+      </div>
+      <div class="exp-meta-item">
+        <span class="exp-meta-label">Created</span>
+        <span class="exp-meta-value"><%= time_ago_in_words(@record.created_at) %> ago</span>
+      </div>
+    </div>
+  </section>
+
+  <%# Record Attributes %>
+  <section class="mb-8">
+    <div class="section-header">
+      <h3 class="section-title">Record Data</h3>
+      <span class="section-count"><%= @record.show_attributes.count %> fields</span>
+    </div>
+
+    <% if @record.show_attributes.any? %>
+      <div class="grid gap-4" style="grid-template-columns: 1fr;">
+        <% @record.show_attributes.each do |key, value| %>
+          <div class="result-panel">
+            <div class="result-panel-header">
+              <span class="result-panel-label"><%= key.to_s.humanize %></span>
+            </div>
+            <div class="result-panel-content">
+              <% if value.to_s.length > 200 || value.to_s.include?("\n") %>
+                <pre class="result-code"><code><%= value %></code></pre>
+              <% else %>
+                <p style="color: var(--gray-200); margin: 0; font-size: var(--text-sm);"><%= value.presence || '—' %></p>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="empty-state-inline">
+        <p class="text-muted">No display attributes defined for this record type.</p>
       </div>
     <% end %>
-  </div>
+  </section>
+
+  <%# Record Navigation %>
+  <%
+    all_records = @dataset.dataset_records.order(:id).pluck(:id)
+    current_index = all_records.index(@record.id)
+    prev_record_id = current_index && current_index > 0 ? all_records[current_index - 1] : nil
+    next_record_id = current_index && current_index < all_records.length - 1 ? all_records[current_index + 1] : nil
+  %>
+  <% if prev_record_id || next_record_id %>
+    <section>
+      <div class="flex justify-between items-center" style="padding: var(--space-4) 0; border-top: 1px solid var(--gray-800);">
+        <% if prev_record_id %>
+          <%= link_to dataset_dataset_record_path(@dataset, prev_record_id), class: 'btn btn-ghost' do %>
+            <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+            </svg>
+            Previous Record
+          <% end %>
+        <% else %>
+          <span></span>
+        <% end %>
+
+        <span class="text-sm text-muted">
+          Record <%= (current_index || 0) + 1 %> of <%= all_records.length %>
+        </span>
+
+        <% if next_record_id %>
+          <%= link_to dataset_dataset_record_path(@dataset, next_record_id), class: 'btn btn-ghost' do %>
+            Next Record
+            <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+          <% end %>
+        <% else %>
+          <span></span>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
 </div>

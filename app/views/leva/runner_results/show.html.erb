@@ -1,64 +1,281 @@
-<% content_for :title, "Runner Result Details" %>
-<div class="container mx-auto px-4 py-8 bg-gray-950 text-white">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-indigo-400 mb-2">Runner Result Details</h1>
-    <%= link_to "Back to Experiment", experiment_path(@experiment), class: "text-indigo-400 hover:underline" %>
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-    <div class="bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Details</h2>
-      <p class="text-gray-400">
-        <strong class="text-indigo-300">Dataset Record:</strong>
-        <%= link_to @runner_result.dataset_record.display_name, dataset_dataset_record_path(@runner_result.dataset_record.dataset, @runner_result.dataset_record), class: "text-indigo-400 hover:underline" %>
-      </p>
-      <p class="text-gray-400">
-        <strong class="text-indigo-300">Prompt:</strong>
-        <%= link_to "#{@runner_result.prompt.name} (v#{@runner_result.prompt_version})", prompt_path(@runner_result.prompt), class: "text-indigo-400 hover:underline" %>
-      </p>
-      <p class="text-gray-400"><strong class="text-indigo-300">Created At:</strong> <%= @runner_result.created_at.strftime("%Y-%m-%d %H:%M:%S") %></p>
-      <%= link_to 'Run in Workbench', workbench_index_path(prompt_id: @runner_result.prompt_id, dataset_record_id: @runner_result.dataset_record_id, runner: @experiment.runner_class), class: 'mt-4 inline-block px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors duration-200' %>
+<% content_for :title, @runner_result.dataset_record.display_name %>
+<%
+  # Calculate overall status based on average score
+  avg_score = @runner_result.evaluation_results.any? ? @runner_result.evaluation_results.average(:score).to_f : nil
+  status_class = case avg_score
+    when nil then 'status-dot-pending'
+    when 0...0.4 then 'status-dot-error'
+    when 0.4...0.7 then 'status-dot-warning'
+    else 'status-dot-success'
+  end
+%>
+<div class="container page">
+  <%# Header with back link %>
+  <div class="page-header">
+    <div>
+      <nav class="breadcrumb mb-2">
+        <%= link_to experiments_path, class: 'breadcrumb-link', title: 'All Experiments' do %>
+          <svg class="icon-sm" style="vertical-align: -2px; margin-right: 2px;" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+          </svg>
+        <% end %>
+        <span class="breadcrumb-sep">/</span>
+        <%= link_to @experiment.name, experiment_path(@experiment), class: 'breadcrumb-link' %>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Result #<%= @runner_result.id %></span>
+      </nav>
+      <h1 class="flex items-center gap-3">
+        <span class="status-dot <%= status_class %>"></span>
+        <%= @runner_result.dataset_record.display_name %>
+      </h1>
     </div>
-    <div class="bg-gray-800 rounded-lg shadow-lg p-6">
-      <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Evaluation Results</h2>
-      <% if @runner_result.evaluation_results.any? %>
-        <div class="space-y-4">
-          <% @runner_result.evaluation_results.each do |eval_result| %>
-            <div class="bg-gray-700 rounded-lg p-4">
-              <h3 class="text-lg font-semibold text-indigo-200 mb-2"><%= eval_result.evaluator_class %></h3>
-              <% score = eval_result.score %>
-              <% color_class = case score
-                 when 0...0.2 then 'text-red-500'
-                 when 0.2...0.4 then 'text-orange-500'
-                 when 0.4...0.6 then 'text-yellow-500'
-                 when 0.6...0.8 then 'text-lime-500'
-                 when 0.8...1.0 then 'text-green-400'
-                 else 'text-green-300'
-                 end %>
-              <p class="text-xl font-bold <%= color_class %>"><%= sprintf('%.2f', score) %></p>
-            </div>
-          <% end %>
-        </div>
-      <% else %>
-        <p class="text-gray-400">No evaluation results available.</p>
+    <div class="btn-group">
+      <%= link_to workbench_index_path(prompt_id: @runner_result.prompt_id, dataset_record_id: @runner_result.dataset_record_id, runner: @experiment.runner_class), class: 'btn btn-secondary' do %>
+        <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+        </svg>
+        Open in Workbench
       <% end %>
     </div>
   </div>
-  <div class="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-    <h2 class="text-2xl font-semibold text-indigo-300 mb-4">Predictions and Ground Truth</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <h3 class="text-xl font-semibold text-indigo-200 mb-2">Predictions</h3>
-        <% @runner_result.parsed_predictions.each_with_index do |prediction, index| %>
-          <div class="mb-4">
-            <h4 class="text-lg font-semibold text-indigo-100 mb-2">Prediction <%= index + 1 %></h4>
-            <pre class="bg-gray-700 p-4 rounded-lg mt-2 text-sm text-gray-300 whitespace-pre-wrap"><%= prediction %></pre>
+
+  <%# Inline metadata with icons %>
+  <div class="result-meta-bar mb-6">
+    <div class="result-meta-item">
+      <svg class="icon-sm text-muted" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+      </svg>
+      <span class="result-meta-label">Prompt</span>
+      <%= link_to @runner_result.prompt.name, prompt_path(@runner_result.prompt), class: 'result-meta-value result-meta-link' %>
+      <span class="tag tag-gray">v<%= @runner_result.prompt_version %></span>
+    </div>
+    <div class="result-meta-divider"></div>
+    <div class="result-meta-item">
+      <svg class="icon-sm text-muted" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+      </svg>
+      <span class="result-meta-label">Runner</span>
+      <span class="result-meta-value font-mono text-sm"><%= @experiment.runner_class.to_s.demodulize %></span>
+    </div>
+    <div class="result-meta-divider"></div>
+    <div class="result-meta-item">
+      <svg class="icon-sm text-muted" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+      </svg>
+      <span class="result-meta-label">Ran</span>
+      <span class="result-meta-value" title="<%= @runner_result.created_at.strftime('%B %d, %Y at %I:%M %p') %>"><%= time_ago_in_words(@runner_result.created_at) %> ago</span>
+    </div>
+    <% if @runner_result.evaluation_results.any? %>
+    <div class="result-meta-divider"></div>
+    <div class="result-meta-item">
+      <svg class="icon-sm text-muted" viewBox="0 0 20 20" fill="currentColor">
+        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+      </svg>
+      <span class="result-meta-label">Evaluations</span>
+      <span class="result-meta-value"><%= @runner_result.evaluation_results.count %></span>
+    </div>
+    <% end %>
+  </div>
+
+  <%# Evaluation Scores Section %>
+  <% if @runner_result.evaluation_results.any? %>
+    <div class="result-section mb-6">
+      <div class="result-section-header">
+        <h2 class="result-section-title">
+          <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+          Evaluation Scores
+        </h2>
+        <span class="result-section-count"><%= @runner_result.evaluation_results.count %> evaluator<%= @runner_result.evaluation_results.count == 1 ? '' : 's' %></span>
+      </div>
+      <div class="eval-summary">
+        <% @runner_result.evaluation_results.each do |eval_result| %>
+          <%
+            score = eval_result.score
+            score_pct = (score * 100).round
+            score_class = case score
+              when 0...0.2 then 'score-bad'
+              when 0.2...0.4 then 'score-poor'
+              when 0.4...0.6 then 'score-fair'
+              when 0.6...0.8 then 'score-good'
+              else 'score-excellent'
+            end
+            score_label = case score
+              when 0...0.2 then 'Bad'
+              when 0.2...0.4 then 'Poor'
+              when 0.4...0.6 then 'Fair'
+              when 0.6...0.8 then 'Good'
+              else 'Excellent'
+            end
+            short_name = eval_result.evaluator_class.demodulize
+              .gsub(/Evaluator$/, '')
+              .gsub(/Eval$/, '')
+              .gsub(/^Sentiment/, '')
+            short_name = short_name.presence || eval_result.evaluator_class.demodulize.gsub(/Eval(uator)?$/, '')
+          %>
+          <div class="eval-summary-card" title="<%= eval_result.evaluator_class %>">
+            <span class="eval-summary-score <%= score_class %>"><%= score_pct %><span class="eval-summary-pct">%</span></span>
+            <span class="eval-summary-name"><%= short_name %></span>
+            <div class="eval-summary-bar">
+              <div class="eval-summary-bar-fill <%= score_class %>" style="width: <%= score_pct %>%"></div>
+            </div>
+            <span class="eval-summary-label <%= score_class %>"><%= score_label %></span>
           </div>
         <% end %>
       </div>
-      <div>
-        <h3 class="text-xl font-semibold text-indigo-200 mb-2">Ground Truth</h3>
-        <pre class="bg-gray-700 p-4 rounded-lg mt-2 text-sm text-gray-300 whitespace-pre-wrap"><%= @runner_result.ground_truth %></pre>
+    </div>
+  <% end %>
+
+  <%# Predictions and Ground Truth - Side by side comparison %>
+  <%
+    predictions = @runner_result.parsed_predictions.presence || [@runner_result.prediction].compact
+    prediction_text = predictions.first.to_s
+    expected_text = @runner_result.ground_truth.to_s
+    is_match = prediction_text.strip == expected_text.strip && prediction_text.present?
+  %>
+  <div class="result-section mb-6">
+    <div class="result-section-header">
+      <h2 class="result-section-title">
+        <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+        </svg>
+        Output Comparison
+      </h2>
+      <% if is_match %>
+        <span class="comparison-match-badge comparison-match-badge--match">
+          <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          Exact Match
+        </span>
+      <% elsif prediction_text.present? && expected_text.present? %>
+        <span class="comparison-match-badge comparison-match-badge--mismatch">
+          <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          Difference
+        </span>
+      <% end %>
+    </div>
+
+    <div class="result-comparison">
+      <div class="result-panel result-panel--prediction">
+        <div class="result-panel-header">
+          <div class="result-panel-header-content">
+            <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+            </svg>
+            <span class="result-panel-label">Prediction</span>
+          </div>
+          <span class="result-panel-meta"><%= prediction_text.length %> chars</span>
+        </div>
+        <div class="result-panel-content">
+          <% if predictions.any? %>
+            <% predictions.each_with_index do |prediction, index| %>
+              <div class="result-value-block <%= index > 0 ? 'mt-3' : '' %>">
+                <% if predictions.size > 1 %>
+                  <span class="result-index"><%= index + 1 %></span>
+                <% end %>
+                <pre class="result-code"><code><%= prediction.presence || '—' %></code></pre>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="result-empty-state">
+              <svg class="icon-lg text-muted" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+              <span>No prediction generated</span>
+            </div>
+          <% end %>
+        </div>
       </div>
+      <div class="result-panel result-panel--expected">
+        <div class="result-panel-header">
+          <div class="result-panel-header-content">
+            <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            <span class="result-panel-label">Expected (Ground Truth)</span>
+          </div>
+          <span class="result-panel-meta"><%= expected_text.length %> chars</span>
+        </div>
+        <div class="result-panel-content">
+          <% if expected_text.present? %>
+            <pre class="result-code"><code><%= expected_text %></code></pre>
+          <% else %>
+            <div class="result-empty-state">
+              <svg class="icon-lg text-muted" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+              <span>No ground truth defined</span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Raw Output - Enhanced Collapsible Section %>
+  <% if @runner_result.respond_to?(:raw_output) && @runner_result.raw_output.present? %>
+    <%
+      raw_output = @runner_result.raw_output
+      line_count = raw_output.lines.count
+      char_count = raw_output.length
+    %>
+    <div class="result-section">
+      <details class="raw-output-collapsible">
+        <summary class="raw-output-header">
+          <div class="raw-output-header-left">
+            <svg class="icon-sm raw-output-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+            <span class="raw-output-title">Raw Output</span>
+            <span class="raw-output-stats">
+              <span class="raw-output-stat"><%= line_count %> line<%= line_count == 1 ? '' : 's' %></span>
+              <span class="raw-output-stat-sep"></span>
+              <span class="raw-output-stat"><%= number_to_human_size(char_count) %></span>
+            </span>
+          </div>
+          <div class="raw-output-header-right">
+            <span class="raw-output-expand-hint">
+              <span class="expand-text">Show</span>
+              <span class="collapse-text">Hide</span>
+            </span>
+            <svg class="raw-output-chevron" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </summary>
+        <div class="raw-output-body">
+          <div class="raw-output-toolbar">
+            <span class="raw-output-lang-hint">
+              <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+              Response from LLM
+            </span>
+          </div>
+          <pre class="raw-output-code"><code><%= raw_output %></code></pre>
+        </div>
+      </details>
+    </div>
+  <% end %>
+
+  <%# Dataset Record Link - Footer %>
+  <div class="result-footer mt-8">
+    <div class="result-footer-content">
+      <span class="result-footer-label">Dataset Record:</span>
+      <%= link_to dataset_dataset_record_path(@runner_result.dataset_record.dataset, @runner_result.dataset_record), class: 'result-footer-link' do %>
+        <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
+        </svg>
+        <%= @runner_result.dataset_record.display_name %>
+        <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+        </svg>
+      <% end %>
     </div>
   </div>
 </div>
