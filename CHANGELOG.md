@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.11] - 2025-11-22
+### Added
+- Comprehensive CSS design system with custom properties for colors, spacing, typography, and transitions
+- Design system reference page at `/design-system` with documented component patterns
+- Collapsible left sidebar with dot indicators when collapsed
+- Resizable right panel with localStorage persistence
+- Stimulus JS controllers for collapse and resize interactions
+
+### Changed
+- Improved page layouts with better spacing, responsive breakpoints, and overflow handling
+- Updated all views to use design system CSS classes and custom properties
+- Button consistency improvements across all pages with documented usage guidelines
+- Dark theme optimized for AI/developer tools
+
+### Fixed
+- Right-side overflow on experiments table
+- Consistent margin handling between workbench and standard pages
+
 ## [0.1.10] - 2025-01-16
 ### Added
 - Runner-specific LLM context support via `BaseRun#to_llm_context(record)` for expensive operations
