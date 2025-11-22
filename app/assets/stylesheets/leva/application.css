@@ -241,7 +241,7 @@ strong {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 var(--space-6);
+  padding: 0 var(--space-8);
   min-width: 0; /* Prevent overflow issues */
 }
 
@@ -835,6 +835,7 @@ strong {
   border-radius: var(--radius-lg);
   overflow: hidden;
   min-width: 0; /* Prevent overflow on narrow screens */
+  padding: var(--space-4);
 }
 
 .table-scroll {
@@ -857,6 +858,16 @@ strong {
   letter-spacing: var(--tracking-wide);
   background: var(--gray-800);
   border-bottom: 1px solid var(--gray-700);
+}
+
+.table th:first-child,
+.table td:first-child {
+  padding-left: var(--space-6);
+}
+
+.table th:last-child,
+.table td:last-child {
+  padding-right: var(--space-6);
 }
 
 .table td {
