@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    leva (0.2.0)
+    leva (0.2.1)
       liquid (~> 5.5.0)
       rails (>= 7.2.0)
 
