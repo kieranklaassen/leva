@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-11-22
+### Fixed
+- Asset loading for Rails apps using Sprockets or Propshaft by properly configuring asset paths in the engine initializer
+
 ## [0.1.11] - 2025-11-22
 ### Added
 - Comprehensive CSS design system with custom properties for colors, spacing, typography, and transitions
