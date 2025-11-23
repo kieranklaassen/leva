@@ -83,9 +83,9 @@
           <span class="output-value"><%= runner_result.prediction %></span>
         </div>
         <% if runner_result.dataset_record.recordable.extract_regex_pattern && runner_result.parsed_predictions.any? %>
-          <div class="output-block" style="background: rgba(106, 159, 196, 0.08); border-left: 2px solid var(--info-500);">
+          <div class="output-block output-block--parsed">
             <span class="output-label">
-              <svg class="icon-sm" style="display: inline; width: 12px; height: 12px; margin-right: 4px; vertical-align: -2px; color: var(--info-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg class="icon-sm" style="display: inline; width: 12px; height: 12px; margin-right: 4px; vertical-align: -2px; color: var(--accent-500);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
               </svg>
               Parsed

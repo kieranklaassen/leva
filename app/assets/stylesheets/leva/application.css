@@ -1330,6 +1330,13 @@ strong {
   padding: var(--space-4);
   overflow-y: auto;
   transition: width var(--transition-base), padding var(--transition-base);
+  /* Hide scrollbar while maintaining scroll */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.panel-right::-webkit-scrollbar {
+  display: none;
 }
 
 .panel-right.resizing {
@@ -1834,6 +1841,40 @@ dialog::backdrop {
 
 
 /* ============================================
+   SCROLLBAR HIDING (while maintaining scroll)
+   ============================================ */
+
+/* Hide scrollbars globally in workbench panels */
+.panel,
+.panel-right,
+.sidebar-content,
+.output-block,
+.result-block,
+.main-content,
+.prompt-textarea,
+.prompt-sidebar,
+.layout-workbench,
+.content-body,
+.output-value {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.panel::-webkit-scrollbar,
+.panel-right::-webkit-scrollbar,
+.sidebar-content::-webkit-scrollbar,
+.output-block::-webkit-scrollbar,
+.result-block::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+.prompt-textarea::-webkit-scrollbar,
+.prompt-sidebar::-webkit-scrollbar,
+.layout-workbench::-webkit-scrollbar,
+.content-body::-webkit-scrollbar,
+.output-value::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* ============================================
    WORKBENCH SPECIFIC
    ============================================ */
 
@@ -1993,9 +2034,11 @@ dialog::backdrop {
    ============================================ */
 
 .run-controls {
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--gray-800);
-  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  background: rgba(26, 25, 24, 0.4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-800);
+  margin-bottom: var(--space-3);
 }
 
 .run-selects {
@@ -2024,22 +2067,26 @@ dialog::backdrop {
    ============================================ */
 
 .output-section {
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--gray-800);
-  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  background: rgba(26, 25, 24, 0.4);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-3);
+  border: 1px solid var(--gray-800);
 }
 
 .output-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--gray-800);
 }
 
 .output-title {
   font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--gray-400);
+  color: var(--gray-300);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
 }
@@ -2047,48 +2094,125 @@ dialog::backdrop {
 .output-meta {
   font-size: 10px;
   color: var(--gray-500);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .output-grid {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-3);
 }
 
 .output-block {
   background: var(--gray-800);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   gap: var(--space-3);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.output-block:hover {
+  background: var(--gray-750, #2a2928);
 }
 
 .output-block--expected {
-  background: rgba(125, 179, 103, 0.08);
-  border-left: 2px solid var(--success-500);
+  background: rgba(125, 179, 103, 0.06);
+  border-left: 3px solid var(--success-500);
+  padding: var(--space-2) var(--space-3);
+}
+
+.output-block--expected:hover {
+  background: rgba(125, 179, 103, 0.1);
+}
+
+.output-block--expected .output-value {
+  font-weight: 500;
+  color: var(--gray-50);
 }
 
 .output-block--got {
-  border-left: 2px solid var(--gray-700);
+  background: var(--gray-850, #222120);
+  border: 1px solid var(--gray-700);
+  border-left: 3px solid var(--gray-600);
+}
+
+.output-block--parsed {
+  background: rgba(212, 168, 74, 0.06);
+  border-left: 3px solid var(--accent-500);
+  padding: var(--space-2) var(--space-3);
+}
+
+.output-block--parsed:hover {
+  background: rgba(212, 168, 74, 0.1);
+}
+
+.output-block--parsed .output-value {
+  font-weight: 500;
+  color: var(--accent-300);
 }
 
 .output-label {
   font-size: 10px;
   font-weight: 600;
-  color: var(--gray-500);
+  color: var(--gray-400);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
   flex-shrink: 0;
-  width: 56px;
+  min-width: 64px;
+  padding-top: 2px;
 }
 
 .output-value {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   color: var(--gray-100);
-  line-height: 1.5;
+  line-height: 1.6;
   word-break: break-word;
+  white-space: pre-wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Long output values get constrained height with scroll */
+.output-block--got .output-value {
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--gray-200);
+}
+
+.output-block--got .output-value::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fade effect for long content */
+.output-block--got {
+  position: relative;
+}
+
+.output-block--got::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(transparent, var(--gray-850, #222120));
+  pointer-events: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.output-block--got:has(.output-value:not(:hover)):after {
+  opacity: 0.8;
 }
 
 .output-empty {
@@ -2103,20 +2227,25 @@ dialog::backdrop {
    ============================================ */
 
 .eval-section {
-  /* No bottom border - last section */
+  padding: var(--space-4);
+  background: rgba(26, 25, 24, 0.4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-800);
 }
 
 .eval-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--gray-800);
 }
 
 .eval-title {
   font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--gray-400);
+  color: var(--gray-300);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide);
 }
@@ -2130,8 +2259,8 @@ dialog::backdrop {
 .eval-card {
   flex: 1 1 calc(50% - var(--space-1));
   min-width: 0;
-  background: var(--gray-800);
-  border: 1px solid transparent;
+  background: var(--gray-850, #222120);
+  border: 1px solid var(--gray-700);
   border-radius: var(--radius-md);
   padding: var(--space-3);
   cursor: pointer;
@@ -2143,6 +2272,8 @@ dialog::backdrop {
 
 .eval-card:hover {
   background: var(--gray-750, #2a2928);
+  border-color: var(--gray-600);
+  transform: translateY(-1px);
 }
 
 .eval-card-inner {
