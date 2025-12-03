@@ -210,6 +210,79 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/kieran
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
+## Automatic Prompt Optimization with DSPy.rb
+
+Leva integrates with [DSPy.rb](https://github.com/vicentereig/dspy.rb) to automatically generate optimized prompts from your datasets using MIPROv2 Bayesian optimization.
+
+### Setup
+
+Add DSPy dependencies to your Gemfile:
+
+```ruby
+gem 'dspy', '~> 0.5'
+gem 'dspy-openai'  # or dspy-anthropic, dspy-gemini
+```
+
+Configure DSPy in an initializer:
+
+```ruby
+# config/initializers/dspy.rb
+DSPy.configure do |c|
+  c.lm = DSPy::LM.new('openai/gpt-4o-mini', api_key: ENV['OPENAI_API_KEY'])
+end
+```
+
+### Optimizing Prompts
+
+Given a dataset with at least 10 records that have `ground_truth` values, Leva can automatically discover optimal prompt instructions and few-shot examples:
+
+```ruby
+# From the UI: Navigate to Dataset → Optimize Prompt
+# Or programmatically:
+
+optimizer = Leva::PromptOptimizer.new(
+  dataset: dataset,
+  mode: :medium  # :light (5min), :medium (15min), :heavy (30min)
+)
+
+result = optimizer.optimize
+# => { system_prompt: "...", user_prompt: "...", metadata: {...} }
+
+# Create optimized prompt
+prompt = Leva::Prompt.create!(
+  name: "Optimized: #{dataset.name}",
+  system_prompt: result[:system_prompt],
+  user_prompt: result[:user_prompt],
+  metadata: result[:metadata]
+)
+```
+
+### How It Works
+
+1. **Dataset → DSPy Examples**: Converts your `DatasetRecord` objects to DSPy training examples
+2. **Signature Generation**: Infers input/output types from `to_llm_context` and `ground_truth`
+3. **MIPROv2 Optimization**: Searches for optimal instruction + few-shot example combinations
+4. **Storage**: Saves optimized prompts with metadata including score and few-shot examples
+
+### Using Optimized Prompts
+
+Optimized prompts work with the `DspyRunner`:
+
+```ruby
+class MyDspyRunner < Leva::DspyRunner
+  # Automatically uses optimized instruction and few-shot examples
+  # from prompt metadata
+end
+
+experiment = Leva::Experiment.create!(
+  name: "Optimized Sentiment Analysis",
+  dataset: dataset,
+  prompt: optimized_prompt,
+  runner_class: "MyDspyRunner"
+)
+```
+
 ## Roadmap
 
 - [x] Parallelize evaluation
+- [ ] DSPy.rb prompt optimization integration

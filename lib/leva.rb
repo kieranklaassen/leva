@@ -1,5 +1,7 @@
 require "leva/version"
 require "leva/engine"
+require "leva/errors"
+require "leva/dspy_config"
 require "liquid"
 
 module Leva
@@ -157,3 +159,6 @@ module Leva
     end
   end
 end
+
+# Load DspyRunner after BaseRun is defined
+require "leva/dspy_runner"

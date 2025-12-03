@@ -13,6 +13,12 @@
       <% end %>
     </div>
     <div class="btn-group">
+      <%= link_to optimize_dataset_path(@dataset), class: 'btn btn-ghost' do %>
+        <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+        </svg>
+        Optimize Prompt
+      <% end %>
       <%= link_to edit_dataset_path(@dataset), class: 'btn btn-ghost' do %>
         <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
           <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />

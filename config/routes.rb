@@ -5,6 +5,10 @@ Leva::Engine.routes.draw do
 
   resources :datasets do
     resources :dataset_records, path: "records", only: [ :index, :show ]
+    member do
+      get :optimize
+      post :run_optimization
+    end
   end
   resources :experiments, except: [ :destroy ] do
     member do

@@ -1,0 +1,209 @@
+<% content_for :title, "Optimize Prompt - #{@dataset.name}" %>
+<div class="container page">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb mb-2">
+        <%= link_to "Datasets", datasets_path, class: "breadcrumb-link" %>
+        <span class="breadcrumb-sep">/</span>
+        <%= link_to @dataset.name, dataset_path(@dataset), class: "breadcrumb-link" %>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Optimize Prompt</span>
+      </div>
+      <h1 class="page-title">Optimize Prompt</h1>
+      <p class="text-muted text-sm mt-2" style="max-width: 600px;">
+        Use DSPy.rb to automatically discover optimal prompt instructions and few-shot examples for your dataset.
+      </p>
+    </div>
+  </div>
+
+  <section class="mb-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Dataset Information</h3>
+      </div>
+      <div class="card-body">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-muted text-xs uppercase tracking-wide">Dataset</label>
+            <p class="text-lg font-medium"><%= @dataset.name %></p>
+          </div>
+          <div>
+            <label class="text-muted text-xs uppercase tracking-wide">Records</label>
+            <p class="text-lg font-medium">
+              <%= @record_count %>
+              <% if @can_optimize %>
+                <span class="badge badge-success ml-2">Ready</span>
+              <% else %>
+                <span class="badge badge-warning ml-2">Need <%= @records_needed %> more</span>
+              <% end %>
+            </p>
+          </div>
+        </div>
+        <p class="text-xs text-muted mt-4">
+          Minimum <%= Leva::PromptOptimizer::MINIMUM_EXAMPLES %> records required for optimization.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <% if @can_optimize %>
+    <section>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Optimization Settings</h3>
+        </div>
+        <div class="card-body">
+          <%= form_with url: run_optimization_dataset_path(@dataset), method: :post, local: true do |f| %>
+            <div class="form-group mb-4">
+              <%= f.label :prompt_name, "Prompt Name", class: "form-label" %>
+              <%= f.text_field :prompt_name,
+                  value: "Optimized: #{@dataset.name}",
+                  class: "form-input",
+                  placeholder: "Enter a name for the optimized prompt" %>
+              <p class="form-hint">The name for the new prompt that will be created.</p>
+            </div>
+
+            <div class="form-group mb-6">
+              <%= f.label :mode, "Optimization Mode", class: "form-label" %>
+              <div class="radio-group">
+                <% @modes.each do |mode, config| %>
+                  <label class="radio-card">
+                    <%= f.radio_button :mode, mode, checked: mode == :light, class: "radio-input" %>
+                    <div class="radio-content">
+                      <span class="radio-title"><%= mode.to_s.capitalize %></span>
+                      <span class="radio-description"><%= config[:description] %></span>
+                    </div>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="alert alert-info mb-6">
+              <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+              </svg>
+              <div>
+                <p class="font-medium">How it works</p>
+                <p class="text-sm mt-1">
+                  The optimizer will analyze your dataset records to find the best prompt instructions
+                  and select optimal few-shot examples. The process runs in the background.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-3">
+              <%= f.submit "Start Optimization", class: "btn btn-primary" %>
+              <%= link_to "Cancel", dataset_path(@dataset), class: "btn btn-ghost" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </section>
+  <% else %>
+    <section>
+      <div class="card">
+        <div class="card-body">
+          <div class="empty-state">
+            <svg class="empty-state-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            <h3 class="empty-state-title">Not Enough Data</h3>
+            <p class="empty-state-description">
+              Add at least <%= @records_needed %> more records to enable prompt optimization.
+              The optimizer requires a minimum of <%= Leva::PromptOptimizer::MINIMUM_EXAMPLES %> records
+              to find meaningful patterns.
+            </p>
+            <div class="mt-4">
+              <%= link_to "Back to Dataset", dataset_path(@dataset), class: "btn btn-primary" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  <% end %>
+</div>
+
+<style>
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .radio-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+  }
+
+  .radio-card:hover {
+    border-color: var(--primary);
+    background-color: var(--bg-secondary);
+  }
+
+  .radio-card:has(.radio-input:checked) {
+    border-color: var(--primary);
+    background-color: var(--bg-secondary);
+  }
+
+  .radio-input {
+    margin-top: 0.25rem;
+  }
+
+  .radio-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .radio-title {
+    font-weight: 500;
+  }
+
+  .radio-description {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 9999px;
+  }
+
+  .badge-success {
+    background-color: rgba(34, 197, 94, 0.15);
+    color: rgb(34, 197, 94);
+  }
+
+  .badge-warning {
+    background-color: rgba(234, 179, 8, 0.15);
+    color: rgb(234, 179, 8);
+  }
+
+  .alert {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .alert-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: var(--text-primary);
+  }
+
+  .alert-info svg {
+    color: rgb(59, 130, 246);
+    flex-shrink: 0;
+  }
+</style>

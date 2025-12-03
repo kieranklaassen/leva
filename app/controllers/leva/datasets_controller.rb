@@ -2,7 +2,7 @@
 
 module Leva
   class DatasetsController < ApplicationController
-    before_action :set_dataset, only: [ :show, :edit, :update, :destroy ]
+    before_action :set_dataset, only: [ :show, :edit, :update, :destroy, :optimize, :run_optimization ]
 
     # GET /datasets
     # @return [void]
@@ -60,6 +60,33 @@ module Leva
         @dataset.destroy
         redirect_to datasets_url, notice: "Dataset was successfully destroyed."
       end
+    end
+
+    # GET /datasets/1/optimize
+    # Shows the prompt optimization form
+    # @return [void]
+    def optimize
+      @record_count = @dataset.dataset_records.count
+      @optimizer = PromptOptimizer.new(dataset: @dataset)
+      @can_optimize = @optimizer.can_optimize?
+      @records_needed = @optimizer.records_needed
+      @modes = PromptOptimizer::MODES
+    end
+
+    # POST /datasets/1/run_optimization
+    # Starts the prompt optimization job
+    # @return [void]
+    def run_optimization
+      prompt_name = params[:prompt_name].presence || "Optimized: #{@dataset.name}"
+      mode = params[:mode]&.to_sym || :light
+
+      PromptOptimizationJob.perform_later(
+        dataset_id: @dataset.id,
+        prompt_name: prompt_name,
+        mode: mode
+      )
+
+      redirect_to @dataset, notice: "Prompt optimization started. A new prompt will be created when complete."
     end
 
     private

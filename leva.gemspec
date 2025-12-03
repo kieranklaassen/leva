@@ -20,4 +20,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rails", ">= 7.2.0"
   spec.add_dependency "liquid", "~> 5.5.0"
+
+  # Optional: DSPy.rb for automatic prompt optimization
+  # Add to your Gemfile if you want to use prompt optimization:
+  #   gem "dspy", "~> 0.5"
+  #   gem "dspy-openai"  # or dspy-anthropic, dspy-gemini
 end
