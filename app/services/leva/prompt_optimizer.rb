@@ -126,7 +126,7 @@ module Leva
         metadata: {
           optimization: {
             score: 0.0, # Will be populated by actual optimization
-            mode: @mode,
+            mode: @mode.to_s,
             few_shot_examples: few_shot_examples,
             optimized_at: Time.current.iso8601,
             dataset_size: @dataset.dataset_records.count,

@@ -15,6 +15,8 @@ module Leva
   class Prompt < ApplicationRecord
     has_many :experiments
 
+    serialize :metadata, coder: JSON
+
     validates :name, presence: true
     validates :system_prompt, presence: true
     validates :user_prompt, presence: true

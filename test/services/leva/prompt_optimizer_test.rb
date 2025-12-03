@@ -104,7 +104,7 @@ module Leva
         optimizer = PromptOptimizer.new(dataset: @dataset, mode: mode)
         result = optimizer.optimize
 
-        assert_equal mode, result[:metadata][:optimization][:mode]
+        assert_equal mode.to_s, result[:metadata][:optimization][:mode]
       end
     end
 
