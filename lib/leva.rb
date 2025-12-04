@@ -1,15 +1,8 @@
 require "leva/version"
 require "leva/engine"
-require "leva/errors"
 require "liquid"
 
 module Leva
-  # Leva uses ruby_llm for all DSPy operations.
-  # RubyLLM auto-detects API keys from environment variables:
-  # - ANTHROPIC_API_KEY for Claude models
-  # - OPENAI_API_KEY for GPT models
-  # - GOOGLE_API_KEY for Gemini models
-
   # Runs an evaluation experiment with the given run and evals.
   #
   # @param experiment [Leva::Experiment] The experiment to run.
@@ -164,6 +157,3 @@ module Leva
     end
   end
 end
-
-# Load DspyRunner after BaseRun is defined
-require "leva/dspy_runner"
