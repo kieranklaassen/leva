@@ -21,8 +21,8 @@ module Leva
     # Available optimizers with their strategy class names
     OPTIMIZERS = {
       bootstrap: { name: "Bootstrap", class_name: "Leva::Optimizers::Bootstrap", gem: nil },
-      gepa: { name: "GEPA", class_name: "Leva::Optimizers::GEPA", gem: "dspy-gepa" },
-      miprov2: { name: "MIPROv2", class_name: "Leva::Optimizers::MIPROv2", gem: "dspy-miprov2" }
+      gepa: { name: "GEPA", class_name: "Leva::Optimizers::GepaOptimizer", gem: "dspy-gepa" },
+      miprov2: { name: "MIPROv2", class_name: "Leva::Optimizers::Miprov2Optimizer", gem: "dspy-miprov2" }
     }.freeze
 
     # Default optimizer
@@ -35,17 +35,25 @@ module Leva
       heavy: { description: "Thorough optimization (~30 min)", trials: 30 }
     }.freeze
 
-    # Available models for optimization
-    MODELS = {
-      "anthropic/claude-sonnet-4-20250514" => { name: "Claude Sonnet 4", provider: "Anthropic" },
-      "anthropic/claude-haiku-4-20250514" => { name: "Claude Haiku 4", provider: "Anthropic" },
-      "openai/gpt-4o" => { name: "GPT-4o", provider: "OpenAI" },
-      "openai/gpt-4o-mini" => { name: "GPT-4o Mini", provider: "OpenAI" },
-      "gemini/gemini-2.0-flash" => { name: "Gemini 2.0 Flash", provider: "Google" }
-    }.freeze
+    # Default model if none specified (fast and cheap)
+    DEFAULT_MODEL = "gemini-2.5-flash"
 
-    # Default model if none specified
-    DEFAULT_MODEL = "anthropic/claude-sonnet-4-20250514"
+    # Returns available models from RubyLLM.
+    #
+    # @return [Array<RubyLLM::Model>] All available chat models
+    def self.available_models
+      RubyLLM.models.chat_models
+    end
+
+    # Finds a model by ID.
+    #
+    # @param model_id [String] The model ID to find
+    # @return [RubyLLM::Model, nil] The model or nil if not found
+    def self.find_model(model_id)
+      RubyLLM.models.find(model_id)
+    rescue RubyLLM::ModelNotFoundError
+      nil
+    end
 
     # @return [Leva::Dataset] The dataset being optimized
     attr_reader :dataset
@@ -125,9 +133,9 @@ module Leva
 
       case optimizer_type
       when :gepa
-        defined?(DSPy::Teleprompt::GEPA)
+        !!defined?(DSPy::Teleprompt::GEPA)
       when :miprov2
-        defined?(DSPy::Teleprompt::MIPROv2)
+        !!defined?(DSPy::Teleprompt::MIPROv2)
       else
         false
       end
@@ -223,18 +231,6 @@ module Leva
       unless defined?(DSPy) && defined?(DSPy::Predict)
         raise DspyConfigurationError, "DSPy is not installed. Add 'dspy' gem to your Gemfile."
       end
-
-      api_key = Leva.api_key_for_model(@model)
-      unless api_key.present?
-        provider = @model.to_s.split("/").first
-        raise DspyConfigurationError, <<~MSG.strip
-          API key not configured for #{provider}. Configure it:
-
-            Leva.#{provider}_api_key = "your-api-key"
-
-          Or set the environment variable: #{provider.upcase}_API_KEY
-        MSG
-      end
     end
 
     # Validates that the selected optimizer is available.
@@ -256,11 +252,19 @@ module Leva
     end
 
     # Returns the default evaluation metric (case-insensitive exact match).
+    # Handles both Hash examples and DSPy::Example objects.
     #
     # @return [Proc] The default metric function
     def default_metric
       lambda do |example, prediction|
-        expected = example.dig(:expected, :output).to_s.strip.downcase
+        # Handle both Hash and DSPy::Example
+        expected_output = if example.is_a?(Hash)
+                            example.dig(:expected, :output)
+        else
+                            # DSPy::Example has expected_values method to get Hash
+                            example.expected_values[:output]
+        end
+        expected = expected_output.to_s.strip.downcase
         actual = prediction.to_s.strip.downcase
         expected == actual ? 1.0 : 0.0
       end

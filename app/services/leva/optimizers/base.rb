@@ -101,19 +101,25 @@ module Leva
       # Converts examples to DSPy::Example format.
       #
       # @param examples [Array<Hash>] Examples with :input and :expected keys
+      # @param signature [Class] The DSPy signature class
       # @return [Array<DSPy::Example>]
-      def to_dspy_examples(examples)
+      def to_dspy_examples(examples, signature)
         examples.map do |ex|
-          DSPy::Example.new(**ex[:input].merge(output: ex.dig(:expected, :output)))
+          DSPy::Example.new(
+            signature_class: signature,
+            input: ex[:input],
+            expected: ex[:expected]
+          )
         end
       end
 
       # Creates an LM instance for this optimizer.
+      # Prepends ruby_llm/ prefix for DSPy adapter.
+      # RubyLLM handles API keys from its configuration.
       #
       # @return [DSPy::LM]
       def create_lm
-        api_key = Leva.api_key_for_model(model)
-        DSPy::LM.new(model, api_key: api_key)
+        DSPy::LM.new("ruby_llm/#{model}")
       end
 
       # Reports progress to the callback if provided.
@@ -149,13 +155,24 @@ module Leva
       end
 
       # Evaluates predictor on validation examples.
+      # Handles both Hash examples and DSPy::Example objects.
       def evaluate(predictor, val_examples)
         return 0.0 if val_examples.empty?
 
         correct = val_examples.count do |example|
-          prediction = predictor.call(**example[:input])
+          # Handle both Hash and DSPy::Example
+          if example.is_a?(Hash)
+            input = example[:input]
+            expected_output = example.dig(:expected, :output)
+          else
+            # DSPy::Example has input_values/expected_values methods
+            input = example.input_values
+            expected_output = example.expected_values[:output]
+          end
+
+          prediction = predictor.call(**input)
           actual = prediction.output.to_s.strip.downcase
-          expected = example.dig(:expected, :output).to_s.strip.downcase
+          expected = expected_output.to_s.strip.downcase
           actual == expected
         end
 

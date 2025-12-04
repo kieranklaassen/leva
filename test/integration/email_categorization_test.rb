@@ -9,11 +9,10 @@ require "test_helper"
 module Leva
   class EmailCategorizationTest < ActiveSupport::TestCase
     setup do
-      @api_key = ENV["ANTHROPIC_API_KEY"]
-      skip "ANTHROPIC_API_KEY not set" unless @api_key
+      skip "ANTHROPIC_API_KEY not set" unless ENV["ANTHROPIC_API_KEY"]
 
       DSPy.configure do |config|
-        config.lm = DSPy::LM.new("anthropic/claude-3-5-haiku-latest", api_key: @api_key)
+        config.lm = DSPy::LM.new("ruby_llm/claude-3-5-haiku-latest")
       end
 
       @dataset = Dataset.create!(name: "Email Categorization Test")

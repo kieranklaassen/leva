@@ -9,7 +9,7 @@ module Leva
     #
     # @example
     #   optimizer = Leva::Optimizers::Bootstrap.new(
-    #     model: "anthropic/claude-sonnet-4-20250514",
+    #     model: "gemini-2.5-flash",
     #     metric: my_metric,
     #     mode: :medium
     #   )

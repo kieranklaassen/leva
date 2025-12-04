@@ -13,7 +13,7 @@ module Leva
       @can_optimize = @prompt_optimizer.can_optimize?
       @records_needed = @prompt_optimizer.records_needed
       @modes = PromptOptimizer::MODES
-      @models = PromptOptimizer::MODELS
+      @models = PromptOptimizer.available_models
       @optimizers = PromptOptimizer::OPTIMIZERS
     end
 

@@ -5,11 +5,9 @@ require "test_helper"
 module Leva
   class PromptOptimizationJobTest < ActiveJob::TestCase
     setup do
-      skip "ANTHROPIC_API_KEY not set" unless ENV["ANTHROPIC_API_KEY"]
-
-      # Configure DSPy with Anthropic
+      # Configure DSPy with ruby_llm adapter
       DSPy.configure do |config|
-        config.lm = DSPy::LM.new("anthropic/claude-3-5-haiku-latest", api_key: ENV["ANTHROPIC_API_KEY"])
+        config.lm = DSPy::LM.new("ruby_llm/gemini-2.5-flash")
       end
 
       @dataset = Dataset.create!(name: "Test Dataset", description: "A test dataset")
@@ -28,6 +26,7 @@ module Leva
       optimization_run = @dataset.optimization_runs.create!(
         prompt_name: "Test Prompt",
         mode: :light,
+        model: "gemini-2.5-flash",
         status: :pending
       )
 
@@ -50,6 +49,7 @@ module Leva
       optimization_run = @dataset.optimization_runs.create!(
         prompt_name: "Metadata Test",
         mode: :medium,
+        model: "gemini-2.5-flash",
         status: :pending
       )
 
@@ -69,6 +69,7 @@ module Leva
       optimization_run = @dataset.optimization_runs.create!(
         prompt_name: "Custom Name",
         mode: :light,
+        model: "gemini-2.5-flash",
         status: :pending
       )
 
@@ -83,6 +84,7 @@ module Leva
         optimization_run = @dataset.optimization_runs.create!(
           prompt_name: "Mode #{mode} Test",
           mode: mode,
+          model: "gemini-2.5-flash",
           status: :pending
         )
 
@@ -112,6 +114,7 @@ module Leva
       optimization_run = small_dataset.optimization_runs.create!(
         prompt_name: "Test",
         mode: :light,
+        model: "gemini-2.5-flash",
         status: :pending
       )
 
@@ -128,6 +131,7 @@ module Leva
       optimization_run = @dataset.optimization_runs.create!(
         prompt_name: "Async Test",
         mode: :light,
+        model: "gemini-2.5-flash",
         status: :pending
       )
 
@@ -144,6 +148,7 @@ module Leva
       optimization_run = @dataset.optimization_runs.create!(
         prompt_name: "Progress Test",
         mode: :light,
+        model: "gemini-2.5-flash",
         status: :pending
       )
 

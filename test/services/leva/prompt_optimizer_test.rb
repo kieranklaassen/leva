@@ -5,11 +5,9 @@ require "test_helper"
 module Leva
   class PromptOptimizerTest < ActiveSupport::TestCase
     setup do
-      skip "ANTHROPIC_API_KEY not set" unless ENV["ANTHROPIC_API_KEY"]
-
-      # Configure DSPy with Anthropic
+      # Configure DSPy with ruby_llm adapter
       DSPy.configure do |config|
-        config.lm = DSPy::LM.new("anthropic/claude-3-5-haiku-latest", api_key: ENV["ANTHROPIC_API_KEY"])
+        config.lm = DSPy::LM.new("ruby_llm/gemini-2.5-flash")
       end
 
       @dataset = Leva::Dataset.create!(name: "Test Dataset")
@@ -138,6 +136,36 @@ module Leva
 
       result = optimizer.optimize
       assert result.key?(:system_prompt)
+    end
+
+    # GEPA optimizer end-to-end tests
+    test "optimize with GEPA optimizer returns result" do
+      optimizer = PromptOptimizer.new(
+        dataset: @dataset,
+        optimizer: :gepa,
+        mode: :light
+      )
+      result = optimizer.optimize
+
+      assert result.key?(:system_prompt)
+      assert result.key?(:user_prompt)
+      assert result.key?(:metadata)
+      assert_equal "gepa", result[:metadata][:optimization][:optimizer]
+    end
+
+    # MIPROv2 optimizer end-to-end tests
+    test "optimize with MIPROv2 optimizer returns result" do
+      optimizer = PromptOptimizer.new(
+        dataset: @dataset,
+        optimizer: :miprov2,
+        mode: :light
+      )
+      result = optimizer.optimize
+
+      assert result.key?(:system_prompt)
+      assert result.key?(:user_prompt)
+      assert result.key?(:metadata)
+      assert_equal "miprov2", result[:metadata][:optimization][:optimizer]
     end
   end
 end

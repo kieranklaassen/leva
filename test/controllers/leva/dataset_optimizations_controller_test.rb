@@ -107,11 +107,11 @@ module Leva
       post leva.dataset_optimization_path(@dataset), params: {
         prompt_name: "Test",
         mode: "light",
-        model: "openai/gpt-4o"
+        model: "gpt-5-mini"
       }
 
       optimization_run = OptimizationRun.last
-      assert_equal "openai/gpt-4o", optimization_run.model
+      assert_equal "gpt-5-mini", optimization_run.model
     end
 
     test "should use default model if not provided" do
