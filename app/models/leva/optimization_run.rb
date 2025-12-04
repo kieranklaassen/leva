@@ -25,8 +25,10 @@ module Leva
       failed: "failed"
     }, default: :pending
 
-    validates :prompt_name, presence: true
+    validates :prompt_name, presence: true, length: { maximum: 255 }
     validates :mode, presence: true, inclusion: { in: %w[light medium heavy] }
+    validates :model, inclusion: { in: PromptOptimizer::MODELS.keys }, allow_nil: true
+    validates :optimizer, inclusion: { in: PromptOptimizer::OPTIMIZERS.keys.map(&:to_s) }
     validates :progress, numericality: { in: 0..100 }
 
     # Defined optimization steps for display

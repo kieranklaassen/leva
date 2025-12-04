@@ -32,26 +32,32 @@ module Leva
 
       result = optimizer.optimize
 
-      prompt = Prompt.create!(
-        name: @run.prompt_name,
-        system_prompt: result[:system_prompt],
-        user_prompt: result[:user_prompt],
-        metadata: result[:metadata]
-      )
+      ActiveRecord::Base.transaction do
+        prompt = Prompt.create!(
+          name: @run.prompt_name,
+          system_prompt: result[:system_prompt],
+          user_prompt: result[:user_prompt],
+          metadata: result[:metadata]
+        )
 
-      @run.complete!(prompt)
-      prompt
+        @run.complete!(prompt)
+        prompt
+      end
     rescue ActiveRecord::RecordNotFound => e
       Rails.logger.error "[Leva::PromptOptimizationJob] OptimizationRun not found: #{e.message}"
       raise
-    rescue Leva::InsufficientDataError, Leva::DspyConfigurationError, Leva::OptimizationError => e
+    rescue Leva::DspyConfigurationError => e
+      Rails.logger.error "[Leva::PromptOptimizationJob] Configuration error: #{e.message}"
+      @run&.fail!("Configuration error - please check server logs for details")
+      raise
+    rescue Leva::InsufficientDataError, Leva::OptimizationError => e
       @run&.fail!(e)
       Rails.logger.error "[Leva::PromptOptimizationJob] Optimization failed: #{e.message}"
       raise
     rescue StandardError => e
-      @run&.fail!(e)
       Rails.logger.error "[Leva::PromptOptimizationJob] Unexpected error: #{e.message}"
       Rails.logger.error e.backtrace.first(10).join("\n")
+      @run&.fail!(e.message.truncate(500))
       raise
     end
 

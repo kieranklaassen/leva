@@ -2,7 +2,7 @@
 
 module Leva
   class DatasetsController < ApplicationController
-    before_action :set_dataset, only: [ :show, :edit, :update, :destroy, :optimize, :run_optimization ]
+    before_action :set_dataset, only: [ :show, :edit, :update, :destroy ]
 
     # GET /datasets
     # @return [void]
@@ -60,41 +60,6 @@ module Leva
         @dataset.destroy
         redirect_to datasets_url, notice: "Dataset was successfully destroyed."
       end
-    end
-
-    # GET /datasets/1/optimize
-    # Shows the prompt optimization form
-    # @return [void]
-    def optimize
-      @record_count = @dataset.dataset_records.count
-      @prompt_optimizer = PromptOptimizer.new(dataset: @dataset)
-      @can_optimize = @prompt_optimizer.can_optimize?
-      @records_needed = @prompt_optimizer.records_needed
-      @modes = PromptOptimizer::MODES
-      @models = PromptOptimizer::MODELS
-      @optimizers = PromptOptimizer::OPTIMIZERS
-    end
-
-    # POST /datasets/1/run_optimization
-    # Starts the prompt optimization job with progress tracking
-    # @return [void]
-    def run_optimization
-      prompt_name = params[:prompt_name].presence || "Optimized: #{@dataset.name}"
-      mode = params[:mode] || "light"
-      model = params[:model].presence || PromptOptimizer::DEFAULT_MODEL
-      optimizer = params[:optimizer].presence || PromptOptimizer::DEFAULT_OPTIMIZER.to_s
-
-      @optimization_run = @dataset.optimization_runs.create!(
-        prompt_name: prompt_name,
-        mode: mode,
-        model: model,
-        optimizer: optimizer,
-        status: :pending
-      )
-
-      PromptOptimizationJob.perform_later(optimization_run_id: @optimization_run.id)
-
-      redirect_to optimization_run_path(@optimization_run)
     end
 
     private

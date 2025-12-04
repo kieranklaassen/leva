@@ -14,6 +14,8 @@ class CreateLevaOptimizationRuns < ActiveRecord::Migration[7.2]
       t.string :mode, default: "light", null: false
       t.text :error_message
       t.json :metadata
+      t.string :model
+      t.string :optimizer, default: "bootstrap", null: false
 
       t.timestamps
     end

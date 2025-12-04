@@ -53,7 +53,7 @@
           <h3 class="card-title">Optimization Settings</h3>
         </div>
         <div class="card-body">
-          <%= form_with url: run_optimization_dataset_path(@dataset), method: :post, local: true do |f| %>
+          <%= form_with url: dataset_optimization_path(@dataset), method: :post, local: true do |f| %>
             <div class="form-group mb-4">
               <%= f.label :prompt_name, "Prompt Name", class: "form-label" %>
               <%= f.text_field :prompt_name,

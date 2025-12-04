@@ -84,6 +84,7 @@ module Leva
       @model = model.presence || DEFAULT_MODEL
       @optimizer = (optimizer.presence || DEFAULT_OPTIMIZER).to_sym
       @progress_callback = progress_callback
+      @last_progress = nil
     end
 
     # Runs the optimization process.
@@ -148,6 +149,7 @@ module Leva
     private
 
     # Reports progress to the callback if provided.
+    # Throttles updates to only report when progress changes by 5% or more.
     #
     # @param step [String] Current step name
     # @param progress [Integer] Progress percentage (0-100)
@@ -157,6 +159,10 @@ module Leva
     def report_progress(step:, progress:, examples_processed: nil, total: nil)
       return unless @progress_callback
 
+      # Skip if progress hasn't changed by at least 5%
+      return if @last_progress && (progress - @last_progress).abs < 5
+
+      @last_progress = progress
       @progress_callback.call(
         step: step,
         progress: progress,
@@ -202,19 +208,15 @@ module Leva
           Or set the environment variable: #{provider.upcase}_API_KEY
         MSG
       end
-
-      # Configure DSPy with the selected model
-      configure_dspy_for_model!
     end
 
-    # Configures DSPy to use the selected model.
+    # Creates a local LM instance for the selected model.
+    # This avoids global state pollution and makes the optimizer thread-safe.
     #
-    # @return [void]
-    def configure_dspy_for_model!
+    # @return [DSPy::LM] A new LM instance
+    def create_lm_instance
       api_key = Leva.api_key_for_model(@model)
-      DSPy.configure do |config|
-        config.lm = DSPy::LM.new(@model, api_key: api_key)
-      end
+      DSPy::LM.new(@model, api_key: api_key)
     end
 
     # Runs GEPA-based optimization.
@@ -228,13 +230,15 @@ module Leva
 
       report_progress(step: "gepa_optimizing", progress: 30, examples_processed: 0, total: train_examples.size)
 
-      # Create the base predictor
+      # Create the base predictor with local LM instance
+      lm = create_lm_instance
       predictor = DSPy::Predict.new(signature)
+      predictor.config.lm = lm
 
-      # Configure GEPA optimizer
+      # Configure GEPA optimizer with the same LM instance
       gepa = DSPy::Teleprompt::GEPA.new(
         metric: @metric,
-        reflection_lm: DSPy::LM.new(@model, api_key: Leva.api_key_for_model(@model)),
+        reflection_lm: lm,
         auto: @mode.to_s
       )
 
@@ -273,8 +277,9 @@ module Leva
 
       report_progress(step: "miprov2_optimizing", progress: 30, examples_processed: 0, total: train_examples.size)
 
-      # Create the base predictor
+      # Create the base predictor with local LM instance
       predictor = DSPy::Predict.new(signature)
+      predictor.config.lm = create_lm_instance
 
       # Configure MIPROv2 optimizer
       mipro = DSPy::Teleprompt::MIPROv2.new(
@@ -317,8 +322,9 @@ module Leva
 
       report_progress(step: "bootstrapping", progress: 30, examples_processed: 0, total: train_examples.size)
 
-      # Create predictor with the signature
+      # Create predictor with the signature and local LM instance
       predictor = DSPy::Predict.new(signature)
+      predictor.config.lm = create_lm_instance
 
       # Bootstrap: run predictions to find best few-shot examples
       best_examples = bootstrap_few_shot_examples(predictor, train_examples)

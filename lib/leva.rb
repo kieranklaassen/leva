@@ -1,7 +1,6 @@
 require "leva/version"
 require "leva/engine"
 require "leva/errors"
-require "leva/dspy_config"
 require "liquid"
 
 module Leva

@@ -8,7 +8,7 @@
       if (!container) return;
 
       const url = container.dataset.optimizationProgress;
-      const pollInterval = 2000; // 2 seconds
+      const pollInterval = 10000; // 10 seconds
 
       function updateUI(data) {
         // Update progress bar
@@ -228,7 +228,7 @@
           <h2 class="error-title">Optimization Failed</h2>
           <p class="error-message" data-error-message><%= @optimization_run.error_message %></p>
           <div class="error-actions">
-            <%= link_to "Try Again", optimize_dataset_path(@optimization_run.dataset), class: "btn btn-primary" %>
+            <%= link_to "Try Again", new_dataset_optimization_path(@optimization_run.dataset), class: "btn btn-primary" %>
             <%= link_to "Back to Dataset", dataset_path(@optimization_run.dataset), class: "btn btn-ghost" %>
           </div>
         </div>
