@@ -5,6 +5,36 @@ require "leva/dspy_config"
 require "liquid"
 
 module Leva
+  class << self
+    # API key configuration - follows Andrew Kane pattern
+    attr_writer :anthropic_api_key, :openai_api_key, :google_api_key
+
+    def anthropic_api_key
+      @anthropic_api_key ||= ENV["ANTHROPIC_API_KEY"]
+    end
+
+    def openai_api_key
+      @openai_api_key ||= ENV["OPENAI_API_KEY"]
+    end
+
+    def google_api_key
+      @google_api_key ||= ENV["GOOGLE_API_KEY"]
+    end
+
+    # Returns the API key for a given model string
+    #
+    # @param model [String] The model identifier (e.g., "anthropic/claude-sonnet-4-20250514")
+    # @return [String, nil] The API key for the model's provider
+    def api_key_for_model(model)
+      provider = model.to_s.split("/").first
+      case provider
+      when "anthropic" then anthropic_api_key
+      when "openai" then openai_api_key
+      when "gemini", "google" then google_api_key
+      end
+    end
+  end
+
   # Runs an evaluation experiment with the given run and evals.
   #
   # @param experiment [Leva::Experiment] The experiment to run.

@@ -10,14 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_07_07_192235) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_04_000046) do
+  create_table "email_contents", force: :cascade do |t|
+    t.string "subject"
+    t.text "body"
+    t.string "category"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "leva_dataset_records", force: :cascade do |t|
     t.integer "dataset_id", null: false
     t.string "recordable_type", null: false
     t.integer "recordable_id", null: false
-    t.text "actual_result"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "actual_result"
     t.index [ "dataset_id" ], name: "index_leva_dataset_records_on_dataset_id"
     t.index [ "recordable_type", "recordable_id" ], name: "index_leva_dataset_records_on_recordable"
   end
@@ -32,11 +40,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_07_192235) do
   create_table "leva_evaluation_results", force: :cascade do |t|
     t.integer "experiment_id"
     t.integer "dataset_record_id", null: false
-    t.integer "runner_result_id", null: false
-    t.string "evaluator_class", null: false
     t.float "score"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "runner_result_id", null: false
+    t.string "evaluator_class", null: false
     t.index [ "dataset_record_id" ], name: "index_leva_evaluation_results_on_dataset_record_id"
     t.index [ "experiment_id" ], name: "index_leva_evaluation_results_on_experiment_id"
     t.index [ "runner_result_id" ], name: "index_leva_evaluation_results_on_runner_result_id"
@@ -49,12 +57,33 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_07_192235) do
     t.integer "prompt_id"
     t.integer "status"
     t.text "metadata"
-    t.string "runner_class"
-    t.text "evaluator_classes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "runner_class"
+    t.text "evaluator_classes"
     t.index [ "dataset_id" ], name: "index_leva_experiments_on_dataset_id"
     t.index [ "prompt_id" ], name: "index_leva_experiments_on_prompt_id"
+  end
+
+  create_table "leva_optimization_runs", force: :cascade do |t|
+    t.integer "dataset_id", null: false
+    t.integer "prompt_id"
+    t.string "status", default: "pending", null: false
+    t.string "current_step"
+    t.integer "progress", default: 0, null: false
+    t.integer "examples_processed", default: 0
+    t.integer "total_examples"
+    t.string "prompt_name", null: false
+    t.string "mode", default: "light", null: false
+    t.text "error_message"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "model"
+    t.string "optimizer", default: "bootstrap", null: false
+    t.index [ "dataset_id" ], name: "index_leva_optimization_runs_on_dataset_id"
+    t.index [ "prompt_id" ], name: "index_leva_optimization_runs_on_prompt_id"
+    t.index [ "status" ], name: "index_leva_optimization_runs_on_status"
   end
 
   create_table "leva_prompts", force: :cascade do |t|
@@ -70,12 +99,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_07_192235) do
   create_table "leva_runner_results", force: :cascade do |t|
     t.integer "experiment_id"
     t.integer "dataset_record_id", null: false
-    t.integer "prompt_id", null: false
-    t.integer "prompt_version"
     t.text "prediction"
-    t.string "runner_class"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "prompt_version"
+    t.integer "prompt_id", null: false
+    t.string "runner_class"
     t.index [ "dataset_record_id" ], name: "index_leva_runner_results_on_dataset_record_id"
     t.index [ "experiment_id" ], name: "index_leva_runner_results_on_experiment_id"
     t.index [ "prompt_id" ], name: "index_leva_runner_results_on_prompt_id"
@@ -94,6 +123,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_07_192235) do
   add_foreign_key "leva_evaluation_results", "leva_runner_results", column: "runner_result_id"
   add_foreign_key "leva_experiments", "leva_datasets", column: "dataset_id"
   add_foreign_key "leva_experiments", "leva_prompts", column: "prompt_id"
+  add_foreign_key "leva_optimization_runs", "leva_datasets", column: "dataset_id"
+  add_foreign_key "leva_optimization_runs", "leva_prompts", column: "prompt_id"
   add_foreign_key "leva_runner_results", "leva_dataset_records", column: "dataset_record_id"
   add_foreign_key "leva_runner_results", "leva_experiments", column: "experiment_id"
   add_foreign_key "leva_runner_results", "leva_prompts", column: "prompt_id"

@@ -67,26 +67,34 @@ module Leva
     # @return [void]
     def optimize
       @record_count = @dataset.dataset_records.count
-      @optimizer = PromptOptimizer.new(dataset: @dataset)
-      @can_optimize = @optimizer.can_optimize?
-      @records_needed = @optimizer.records_needed
+      @prompt_optimizer = PromptOptimizer.new(dataset: @dataset)
+      @can_optimize = @prompt_optimizer.can_optimize?
+      @records_needed = @prompt_optimizer.records_needed
       @modes = PromptOptimizer::MODES
+      @models = PromptOptimizer::MODELS
+      @optimizers = PromptOptimizer::OPTIMIZERS
     end
 
     # POST /datasets/1/run_optimization
-    # Starts the prompt optimization job
+    # Starts the prompt optimization job with progress tracking
     # @return [void]
     def run_optimization
       prompt_name = params[:prompt_name].presence || "Optimized: #{@dataset.name}"
-      mode = params[:mode]&.to_sym || :light
+      mode = params[:mode] || "light"
+      model = params[:model].presence || PromptOptimizer::DEFAULT_MODEL
+      optimizer = params[:optimizer].presence || PromptOptimizer::DEFAULT_OPTIMIZER.to_s
 
-      PromptOptimizationJob.perform_later(
-        dataset_id: @dataset.id,
+      @optimization_run = @dataset.optimization_runs.create!(
         prompt_name: prompt_name,
-        mode: mode
+        mode: mode,
+        model: model,
+        optimizer: optimizer,
+        status: :pending
       )
 
-      redirect_to @dataset, notice: "Prompt optimization started. A new prompt will be created when complete."
+      PromptOptimizationJob.perform_later(optimization_run_id: @optimization_run.id)
+
+      redirect_to optimization_run_path(@optimization_run)
     end
 
     private

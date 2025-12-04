@@ -3,6 +3,8 @@ Leva::Engine.routes.draw do
 
   get "design_system", to: "design_system#index"
 
+  resources :optimization_runs, only: [ :show ]
+
   resources :datasets do
     resources :dataset_records, path: "records", only: [ :index, :show ]
     member do

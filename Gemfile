@@ -16,3 +16,7 @@ gem "rubocop-rails-omakase", require: false
 # gem "debug", ">= 1.0.0"
 
 gem "annotaterb", require: false
+
+# DSPy.rb for prompt optimization (development/testing)
+gem "dspy", "~> 0.5"
+gem "dspy-anthropic"

@@ -90,39 +90,56 @@ module Leva
       end
     end
 
-    test "should redirect after starting optimization" do
-      post leva.run_optimization_dataset_path(@dataset), params: {
-        prompt_name: "My Optimized Prompt",
-        mode: "light"
-      }
+    test "should create optimization run and redirect to it" do
+      assert_difference "OptimizationRun.count", 1 do
+        post leva.run_optimization_dataset_path(@dataset), params: {
+          prompt_name: "My Optimized Prompt",
+          mode: "light"
+        }
+      end
 
-      assert_redirected_to leva.dataset_path(@dataset)
-      assert_match(/Prompt optimization started/, flash[:notice])
+      optimization_run = OptimizationRun.last
+      assert_redirected_to leva.optimization_run_path(optimization_run)
+      assert_equal "My Optimized Prompt", optimization_run.prompt_name
+      assert_equal "light", optimization_run.mode
     end
 
     test "should use default prompt name if not provided" do
-      assert_enqueued_with(
-        job: PromptOptimizationJob,
-        args: [ {
-          dataset_id: @dataset.id,
-          prompt_name: "Optimized: #{@dataset.name}",
-          mode: :light
-        } ]
-      ) do
-        post leva.run_optimization_dataset_path(@dataset), params: { mode: "light" }
-      end
+      post leva.run_optimization_dataset_path(@dataset), params: { mode: "light" }
+
+      optimization_run = OptimizationRun.last
+      assert_equal "Optimized: #{@dataset.name}", optimization_run.prompt_name
     end
 
-    test "should pass mode parameter to job" do
-      assert_enqueued_with(
-        job: PromptOptimizationJob,
-        args: [ { dataset_id: @dataset.id, prompt_name: "Test", mode: :medium } ]
-      ) do
-        post leva.run_optimization_dataset_path(@dataset), params: {
-          prompt_name: "Test",
-          mode: "medium"
-        }
-      end
+    test "should pass mode parameter to optimization run" do
+      post leva.run_optimization_dataset_path(@dataset), params: {
+        prompt_name: "Test",
+        mode: "medium"
+      }
+
+      optimization_run = OptimizationRun.last
+      assert_equal "medium", optimization_run.mode
+    end
+
+    test "should pass model parameter to optimization run" do
+      post leva.run_optimization_dataset_path(@dataset), params: {
+        prompt_name: "Test",
+        mode: "light",
+        model: "openai/gpt-4o"
+      }
+
+      optimization_run = OptimizationRun.last
+      assert_equal "openai/gpt-4o", optimization_run.model
+    end
+
+    test "should use default model if not provided" do
+      post leva.run_optimization_dataset_path(@dataset), params: {
+        prompt_name: "Test",
+        mode: "light"
+      }
+
+      optimization_run = OptimizationRun.last
+      assert_equal PromptOptimizer::DEFAULT_MODEL, optimization_run.model
     end
   end
 end

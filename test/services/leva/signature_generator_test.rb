@@ -35,26 +35,17 @@ module Leva
       assert_includes field_names, :text
     end
 
-    test "generated signature has input_schema" do
+    test "generated signature is DSPy::Signature subclass" do
       signature = @generator.generate
 
-      assert_respond_to signature, :input_schema
-      assert_kind_of Hash, signature.input_schema
-    end
-
-    test "generated signature has output_schema" do
-      signature = @generator.generate
-
-      assert_respond_to signature, :output_schema
-      assert_kind_of Hash, signature.output_schema
-      assert signature.output_schema.key?(:output)
+      assert signature < DSPy::Signature, "Should be a DSPy::Signature subclass"
     end
 
     test "generated signature has description" do
       signature = @generator.generate
 
       assert_respond_to signature, :description
-      assert_match(/Test Dataset/, signature.description)
+      assert_match(/Classify the input/, signature.description)
     end
 
     test "custom description is used" do

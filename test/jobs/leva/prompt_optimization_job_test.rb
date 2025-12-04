@@ -5,6 +5,13 @@ require "test_helper"
 module Leva
   class PromptOptimizationJobTest < ActiveJob::TestCase
     setup do
+      skip "ANTHROPIC_API_KEY not set" unless ENV["ANTHROPIC_API_KEY"]
+
+      # Configure DSPy with Anthropic
+      DSPy.configure do |config|
+        config.lm = DSPy::LM.new("anthropic/claude-3-5-haiku-latest", api_key: ENV["ANTHROPIC_API_KEY"])
+      end
+
       @dataset = Dataset.create!(name: "Test Dataset", description: "A test dataset")
 
       # Create enough records for optimization
@@ -18,12 +25,14 @@ module Leva
     end
 
     test "job creates a prompt with optimization results" do
+      optimization_run = @dataset.optimization_runs.create!(
+        prompt_name: "Test Prompt",
+        mode: :light,
+        status: :pending
+      )
+
       assert_difference "Prompt.count", 1 do
-        PromptOptimizationJob.perform_now(
-          dataset_id: @dataset.id,
-          prompt_name: "Test Prompt",
-          mode: :light
-        )
+        PromptOptimizationJob.perform_now(optimization_run_id: optimization_run.id)
       end
 
       prompt = Prompt.last
@@ -31,14 +40,20 @@ module Leva
       assert prompt.system_prompt.present?
       assert prompt.user_prompt.present?
       assert prompt.metadata.present?
+
+      optimization_run.reload
+      assert_equal "completed", optimization_run.status
+      assert_equal prompt.id, optimization_run.prompt_id
     end
 
     test "job stores optimization metadata" do
-      PromptOptimizationJob.perform_now(
-        dataset_id: @dataset.id,
+      optimization_run = @dataset.optimization_runs.create!(
         prompt_name: "Metadata Test",
-        mode: :medium
+        mode: :medium,
+        status: :pending
       )
+
+      PromptOptimizationJob.perform_now(optimization_run_id: optimization_run.id)
 
       prompt = Prompt.last
       metadata = prompt.metadata
@@ -50,12 +65,14 @@ module Leva
       assert metadata["optimization"]["optimized_at"].present?
     end
 
-    test "job uses default prompt name format" do
-      PromptOptimizationJob.perform_now(
-        dataset_id: @dataset.id,
+    test "job uses custom prompt name" do
+      optimization_run = @dataset.optimization_runs.create!(
         prompt_name: "Custom Name",
-        mode: :light
+        mode: :light,
+        status: :pending
       )
+
+      PromptOptimizationJob.perform_now(optimization_run_id: optimization_run.id)
 
       prompt = Prompt.last
       assert_equal "Custom Name", prompt.name
@@ -63,28 +80,26 @@ module Leva
 
     test "job respects mode parameter" do
       %i[light medium heavy].each do |mode|
-        PromptOptimizationJob.perform_now(
-          dataset_id: @dataset.id,
+        optimization_run = @dataset.optimization_runs.create!(
           prompt_name: "Mode #{mode} Test",
-          mode: mode
+          mode: mode,
+          status: :pending
         )
+
+        PromptOptimizationJob.perform_now(optimization_run_id: optimization_run.id)
 
         prompt = Prompt.order(created_at: :desc).first
         assert_equal mode.to_s, prompt.metadata["optimization"]["mode"]
       end
     end
 
-    test "job raises error for nonexistent dataset" do
+    test "job raises error for nonexistent optimization run" do
       assert_raises ActiveRecord::RecordNotFound do
-        PromptOptimizationJob.perform_now(
-          dataset_id: 999999,
-          prompt_name: "Test",
-          mode: :light
-        )
+        PromptOptimizationJob.perform_now(optimization_run_id: 999999)
       end
     end
 
-    test "job raises InsufficientDataError for small dataset" do
+    test "job fails optimization run for small dataset" do
       small_dataset = Dataset.create!(name: "Small Dataset")
       3.times do |i|
         text_content = TextContent.create!(
@@ -94,27 +109,49 @@ module Leva
         small_dataset.add_record(text_content)
       end
 
+      optimization_run = small_dataset.optimization_runs.create!(
+        prompt_name: "Test",
+        mode: :light,
+        status: :pending
+      )
+
       assert_raises Leva::InsufficientDataError do
-        PromptOptimizationJob.perform_now(
-          dataset_id: small_dataset.id,
-          prompt_name: "Test",
-          mode: :light
-        )
+        PromptOptimizationJob.perform_now(optimization_run_id: optimization_run.id)
       end
+
+      optimization_run.reload
+      assert_equal "failed", optimization_run.status
+      assert optimization_run.error_message.present?
     end
 
     test "job can be enqueued" do
+      optimization_run = @dataset.optimization_runs.create!(
+        prompt_name: "Async Test",
+        mode: :light,
+        status: :pending
+      )
+
       assert_enqueued_with(job: PromptOptimizationJob) do
-        PromptOptimizationJob.perform_later(
-          dataset_id: @dataset.id,
-          prompt_name: "Async Test",
-          mode: :light
-        )
+        PromptOptimizationJob.perform_later(optimization_run_id: optimization_run.id)
       end
     end
 
     test "job enqueues to default queue" do
       assert_equal "default", PromptOptimizationJob.new.queue_name
+    end
+
+    test "job updates progress during optimization" do
+      optimization_run = @dataset.optimization_runs.create!(
+        prompt_name: "Progress Test",
+        mode: :light,
+        status: :pending
+      )
+
+      PromptOptimizationJob.perform_now(optimization_run_id: optimization_run.id)
+
+      optimization_run.reload
+      assert_equal 100, optimization_run.progress
+      assert_equal "completed", optimization_run.status
     end
   end
 end

@@ -83,7 +83,17 @@ module Leva
     #
     # @return [String] A descriptive string for the signature
     def generate_description
-      "Task generated from Leva dataset: #{@dataset.name}"
+      # Analyze ground truth values to determine task type
+      ground_truths = @dataset.dataset_records.limit(20).map { |r| r.recordable.ground_truth }.compact
+      unique_outputs = ground_truths.uniq
+
+      if unique_outputs.size <= 10
+        # Classification task - be explicit about output format
+        "Classify the input. Respond with ONLY one of these exact values, nothing else: #{unique_outputs.join(', ')}"
+      else
+        # Generation task
+        "Generate output for the given input from dataset: #{@dataset.name}"
+      end
     end
 
     # Builds the DSPy::Signature class dynamically.
@@ -91,32 +101,27 @@ module Leva
     # @param input_fields [Hash<Symbol, Class>] Input field definitions
     # @param output_type [Symbol] The output type
     # @param description [String] Description for the signature
-    # @return [Class] The generated signature class
+    # @return [Class] The generated DSPy::Signature subclass
+    # @raise [Leva::DspyConfigurationError] If DSPy is not available
     def build_signature_class(input_fields, output_type, description)
-      # We need to capture these in local variables for the class block
+      unless defined?(DSPy::Signature)
+        raise DspyConfigurationError, "DSPy is required for signature generation"
+      end
+
       captured_input_fields = input_fields
       captured_description = description
 
-      Class.new do
-        # We'll define methods dynamically since DSPy::Signature may not be loaded
-        @input_fields = captured_input_fields
-        @output_type = :string
-        @description = captured_description
+      Class.new(DSPy::Signature) do
+        description captured_description
 
-        class << self
-          attr_reader :input_fields, :output_type, :description
-
-          def input_schema
-            @input_fields.transform_values { |_| String }
-          end
-
-          def output_schema
-            { output: String }
+        input do
+          captured_input_fields.each do |name, _type|
+            const name, String
           end
         end
 
-        def self.to_s
-          "LevaGeneratedSignature"
+        output do
+          const :output, String
         end
       end
     end

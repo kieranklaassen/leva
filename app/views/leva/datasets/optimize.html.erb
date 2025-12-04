@@ -63,6 +63,38 @@
               <p class="form-hint">The name for the new prompt that will be created.</p>
             </div>
 
+            <div class="form-group mb-4">
+              <%= f.label :model, "Model", class: "form-label" %>
+              <%= f.select :model,
+                  @models.map { |id, info| ["#{info[:name]} (#{info[:provider]})", id] },
+                  { selected: Leva::PromptOptimizer::DEFAULT_MODEL },
+                  class: "form-select" %>
+              <p class="form-hint">The AI model to use for optimization. Make sure you have the API key configured.</p>
+            </div>
+
+            <div class="form-group mb-6">
+              <%= f.label :optimizer, "Optimizer", class: "form-label" %>
+              <div class="radio-group">
+                <% @optimizers.each do |key, config| %>
+                  <label class="radio-card <%= 'disabled' unless Leva::PromptOptimizer.optimizer_available?(key) %>">
+                    <%= f.radio_button :optimizer, key,
+                        checked: key == :bootstrap,
+                        disabled: !Leva::PromptOptimizer.optimizer_available?(key),
+                        class: "radio-input" %>
+                    <div class="radio-content">
+                      <span class="radio-title">
+                        <%= config[:name] %>
+                        <% unless Leva::PromptOptimizer.optimizer_available?(key) %>
+                          <span class="badge badge-muted ml-2">Requires <%= config[:gem] %></span>
+                        <% end %>
+                      </span>
+                      <span class="radio-description"><%= config[:description] %></span>
+                    </div>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+
             <div class="form-group mb-6">
               <%= f.label :mode, "Optimization Mode", class: "form-label" %>
               <div class="radio-group">
@@ -187,6 +219,22 @@
   .badge-warning {
     background-color: rgba(234, 179, 8, 0.15);
     color: rgb(234, 179, 8);
+  }
+
+  .badge-muted {
+    background-color: var(--bg-secondary);
+    color: var(--text-muted);
+    font-size: 0.65rem;
+  }
+
+  .radio-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .radio-card.disabled:hover {
+    border-color: var(--border-color);
+    background-color: transparent;
   }
 
   .alert {

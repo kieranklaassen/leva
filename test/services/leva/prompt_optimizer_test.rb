@@ -5,6 +5,13 @@ require "test_helper"
 module Leva
   class PromptOptimizerTest < ActiveSupport::TestCase
     setup do
+      skip "ANTHROPIC_API_KEY not set" unless ENV["ANTHROPIC_API_KEY"]
+
+      # Configure DSPy with Anthropic
+      DSPy.configure do |config|
+        config.lm = DSPy::LM.new("anthropic/claude-3-5-haiku-latest", api_key: ENV["ANTHROPIC_API_KEY"])
+      end
+
       @dataset = Leva::Dataset.create!(name: "Test Dataset")
 
       # Create enough records for optimization
