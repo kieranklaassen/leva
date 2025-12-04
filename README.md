@@ -212,23 +212,34 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Automatic Prompt Optimization with DSPy.rb
 
-Leva integrates with [DSPy.rb](https://github.com/vicentereig/dspy.rb) to automatically generate optimized prompts from your datasets using MIPROv2 Bayesian optimization.
+Leva integrates with [DSPy.rb](https://github.com/vicentereig/dspy.rb) to automatically generate optimized prompts from your datasets using Bootstrap few-shot optimization, GEPA genetic optimization, or MIPROv2 Bayesian optimization.
 
 ### Setup
 
-Add DSPy dependencies to your Gemfile:
+Add DSPy and RubyLLM dependencies to your Gemfile:
 
 ```ruby
 gem 'dspy', '~> 0.5'
-gem 'dspy-openai'  # or dspy-anthropic, dspy-gemini
+gem 'ruby_llm'
+
+# Optional: Advanced optimizers
+gem 'dspy-gepa'    # For GEPA genetic optimization
+gem 'dspy-miprov2' # For MIPROv2 Bayesian optimization
 ```
 
-Configure DSPy in an initializer:
+Configure RubyLLM and DSPy in initializers:
 
 ```ruby
+# config/initializers/ruby_llm.rb
+RubyLLM.configure do |config|
+  config.openai_api_key = ENV['OPENAI_API_KEY']
+  config.anthropic_api_key = ENV['ANTHROPIC_API_KEY']
+  config.gemini_api_key = ENV['GEMINI_API_KEY']
+end
+
 # config/initializers/dspy.rb
 DSPy.configure do |c|
-  c.lm = DSPy::LM.new('openai/gpt-4o-mini', api_key: ENV['OPENAI_API_KEY'])
+  c.lm = DSPy::LM.new('ruby_llm/gemini-2.5-flash')  # Uses RubyLLM adapter
 end
 ```
 
@@ -242,7 +253,9 @@ Given a dataset with at least 10 records that have `ground_truth` values, Leva c
 
 optimizer = Leva::PromptOptimizer.new(
   dataset: dataset,
-  mode: :medium  # :light (5min), :medium (15min), :heavy (30min)
+  mode: :medium,           # :light, :medium, :heavy
+  model: 'gemini-2.5-flash', # Any RubyLLM-supported model
+  optimizer: :bootstrap    # :bootstrap (default), :gepa, :miprov2
 )
 
 result = optimizer.optimize
@@ -257,11 +270,19 @@ prompt = Leva::Prompt.create!(
 )
 ```
 
+### Available Optimizers
+
+| Optimizer | Description | Requirements |
+|-----------|-------------|--------------|
+| `:bootstrap` | Few-shot example selection (default, fast) | Built-in |
+| `:gepa` | Genetic-Pareto prompt evolution | `gem 'dspy-gepa'` |
+| `:miprov2` | Bayesian optimization with Gaussian Processes | `gem 'dspy-miprov2'` |
+
 ### How It Works
 
 1. **Dataset → DSPy Examples**: Converts your `DatasetRecord` objects to DSPy training examples
 2. **Signature Generation**: Infers input/output types from `to_llm_context` and `ground_truth`
-3. **MIPROv2 Optimization**: Searches for optimal instruction + few-shot example combinations
+3. **Optimization**: Searches for optimal instruction + few-shot example combinations
 4. **Storage**: Saves optimized prompts with metadata including score and few-shot examples
 
 ### Using Optimized Prompts
@@ -285,4 +306,4 @@ experiment = Leva::Experiment.create!(
 ## Roadmap
 
 - [x] Parallelize evaluation
-- [ ] DSPy.rb prompt optimization integration
+- [x] DSPy.rb prompt optimization integration
