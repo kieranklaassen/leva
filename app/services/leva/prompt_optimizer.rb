@@ -3,8 +3,8 @@
 module Leva
   # Optimizes prompts using DSPy.rb optimizers.
   #
-  # This service takes a dataset and uses optimization to find
-  # optimal prompt instructions and few-shot examples.
+  # This service coordinates the optimization process, delegating
+  # the actual optimization work to strategy classes.
   #
   # @example Optimize a prompt for a dataset
   #   optimizer = Leva::PromptOptimizer.new(dataset: dataset, mode: :medium)
@@ -18,23 +18,11 @@ module Leva
     # Minimum number of examples required for optimization
     MINIMUM_EXAMPLES = 10
 
-    # Available optimizers
+    # Available optimizers with their strategy class names
     OPTIMIZERS = {
-      bootstrap: {
-        name: "Bootstrap",
-        description: "Simple few-shot bootstrapping (fast, no extra dependencies)",
-        gem: nil
-      },
-      gepa: {
-        name: "GEPA",
-        description: "Genetic-Pareto reflective prompt evolution (best quality)",
-        gem: "dspy-gepa"
-      },
-      miprov2: {
-        name: "MIPROv2",
-        description: "Bayesian optimization with Gaussian Processes",
-        gem: "dspy-miprov2"
-      }
+      bootstrap: { name: "Bootstrap", class_name: "Leva::Optimizers::Bootstrap", gem: nil },
+      gepa: { name: "GEPA", class_name: "Leva::Optimizers::GEPA", gem: "dspy-gepa" },
+      miprov2: { name: "MIPROv2", class_name: "Leva::Optimizers::MIPROv2", gem: "dspy-miprov2" }
     }.freeze
 
     # Default optimizer
@@ -104,14 +92,13 @@ module Leva
       report_progress(step: "generating_signature", progress: 20)
       signature = SignatureGenerator.new(@dataset).generate
 
-      case @optimizer
-      when :gepa
-        run_gepa_optimization(splits, signature)
-      when :miprov2
-        run_miprov2_optimization(splits, signature)
-      else
-        run_bootstrap_optimization(splits, signature)
-      end
+      # Delegate to optimizer strategy
+      strategy = build_optimizer_strategy
+      result = strategy.optimize(splits, signature)
+
+      report_progress(step: "complete", progress: 100)
+
+      build_final_result(result, splits, strategy.optimizer_type)
     end
 
     # Checks if the dataset is ready for optimization.
@@ -148,6 +135,53 @@ module Leva
 
     private
 
+    # Builds the optimizer strategy instance.
+    #
+    # @return [Leva::Optimizers::Base] The optimizer strategy
+    def build_optimizer_strategy
+      config = OPTIMIZERS[@optimizer]
+      config[:class_name].constantize.new(
+        model: @model,
+        metric: @metric,
+        mode: @mode,
+        progress_callback: @progress_callback
+      )
+    end
+
+    # Builds the final result hash from optimization.
+    #
+    # @param result [Hash] The optimizer result with :instruction, :few_shot_examples, :score
+    # @param splits [Hash] The data splits
+    # @param optimizer_type [Symbol] The optimizer that was used
+    # @return [Hash] The formatted result
+    def build_final_result(result, splits, optimizer_type)
+      sample_record = @dataset.dataset_records.first&.recordable
+      input_fields = sample_record&.to_llm_context&.keys || []
+
+      formatted_examples = result[:few_shot_examples].map do |ex|
+        { input: ex[:input], output: ex.dig(:expected, :output) }
+      end
+
+      {
+        system_prompt: result[:instruction],
+        user_prompt: build_user_prompt_template(input_fields),
+        metadata: {
+          optimization: {
+            score: result[:score],
+            mode: @mode.to_s,
+            optimizer: optimizer_type.to_s,
+            model: @model,
+            few_shot_examples: formatted_examples,
+            optimized_at: Time.current.iso8601,
+            dataset_size: @dataset.dataset_records.count,
+            train_size: splits[:train].size,
+            val_size: splits[:val].size,
+            test_size: splits[:test].size
+          }
+        }
+      }
+    end
+
     # Reports progress to the callback if provided.
     # Throttles updates to only report when progress changes by 5% or more.
     #
@@ -171,22 +205,15 @@ module Leva
       )
     end
 
-    # Validates that the selected optimizer is available.
+    # Validates that the dataset has enough records.
     #
-    # @raise [Leva::DspyConfigurationError] If optimizer is not available
-    def validate_optimizer!
-      return if @optimizer == :bootstrap
-      return if self.class.optimizer_available?(@optimizer)
+    # @raise [Leva::InsufficientDataError] If dataset has too few records
+    def validate_dataset!
+      count = @dataset.dataset_records.count
+      return if count >= MINIMUM_EXAMPLES
 
-      gem_name = OPTIMIZERS.dig(@optimizer, :gem)
-      raise DspyConfigurationError, <<~MSG.strip
-        #{@optimizer.to_s.upcase} optimizer is not available. Install it:
-
-          gem 'dspy'
-          gem '#{gem_name}'
-
-        Or set DSPY_WITH_#{@optimizer.to_s.upcase}=1 before requiring dspy.
-      MSG
+      raise InsufficientDataError,
+        "Dataset needs at least #{MINIMUM_EXAMPLES} records for optimization, has #{count}"
     end
 
     # Validates that DSPy is properly configured.
@@ -210,292 +237,22 @@ module Leva
       end
     end
 
-    # Creates a local LM instance for the selected model.
-    # This avoids global state pollution and makes the optimizer thread-safe.
+    # Validates that the selected optimizer is available.
     #
-    # @return [DSPy::LM] A new LM instance
-    def create_lm_instance
-      api_key = Leva.api_key_for_model(@model)
-      DSPy::LM.new(@model, api_key: api_key)
-    end
+    # @raise [Leva::DspyConfigurationError] If optimizer is not available
+    def validate_optimizer!
+      return if @optimizer == :bootstrap
+      return if self.class.optimizer_available?(@optimizer)
 
-    # Runs GEPA-based optimization.
-    #
-    # @param splits [Hash] The train/val/test splits
-    # @param signature [Class] The generated signature class
-    # @return [Hash] The optimization result
-    def run_gepa_optimization(splits, signature)
-      train_examples = splits[:train]
-      val_examples = splits[:val]
+      gem_name = OPTIMIZERS.dig(@optimizer, :gem)
+      raise DspyConfigurationError, <<~MSG.strip
+        #{@optimizer.to_s.upcase} optimizer is not available. Install it:
 
-      report_progress(step: "gepa_optimizing", progress: 30, examples_processed: 0, total: train_examples.size)
+          gem 'dspy'
+          gem '#{gem_name}'
 
-      # Create the base predictor with local LM instance
-      lm = create_lm_instance
-      predictor = DSPy::Predict.new(signature)
-      predictor.config.lm = lm
-
-      # Configure GEPA optimizer with the same LM instance
-      gepa = DSPy::Teleprompt::GEPA.new(
-        metric: @metric,
-        reflection_lm: lm,
-        auto: @mode.to_s
-      )
-
-      # Convert examples to DSPy format
-      trainset = train_examples.map { |ex| DSPy::Example.new(**ex[:input].merge(output: ex.dig(:expected, :output))) }
-      valset = val_examples.map { |ex| DSPy::Example.new(**ex[:input].merge(output: ex.dig(:expected, :output))) }
-
-      report_progress(step: "gepa_compiling", progress: 50)
-
-      # Run optimization
-      optimized = gepa.compile(student: predictor, trainset: trainset, valset: valset)
-
-      report_progress(step: "evaluating", progress: 85)
-
-      # Extract optimized instruction
-      optimized_instruction = extract_optimized_instruction(optimized, signature)
-      score = evaluate_optimized_predictor(optimized, val_examples)
-
-      report_progress(step: "building_result", progress: 95)
-
-      build_optimizer_result(optimized_instruction, [], score, splits, :gepa)
-    rescue StandardError => e
-      Rails.logger.error "[Leva::PromptOptimizer] GEPA optimization failed: #{e.message}"
-      Rails.logger.error e.backtrace.first(5).join("\n")
-      raise OptimizationError, "GEPA optimization failed: #{e.message}"
-    end
-
-    # Runs MIPROv2-based optimization.
-    #
-    # @param splits [Hash] The train/val/test splits
-    # @param signature [Class] The generated signature class
-    # @return [Hash] The optimization result
-    def run_miprov2_optimization(splits, signature)
-      train_examples = splits[:train]
-      val_examples = splits[:val]
-
-      report_progress(step: "miprov2_optimizing", progress: 30, examples_processed: 0, total: train_examples.size)
-
-      # Create the base predictor with local LM instance
-      predictor = DSPy::Predict.new(signature)
-      predictor.config.lm = create_lm_instance
-
-      # Configure MIPROv2 optimizer
-      mipro = DSPy::Teleprompt::MIPROv2.new(
-        metric: @metric,
-        auto: @mode.to_s
-      )
-
-      # Convert examples to DSPy format
-      trainset = train_examples.map { |ex| DSPy::Example.new(**ex[:input].merge(output: ex.dig(:expected, :output))) }
-      valset = val_examples.map { |ex| DSPy::Example.new(**ex[:input].merge(output: ex.dig(:expected, :output))) }
-
-      report_progress(step: "miprov2_compiling", progress: 50)
-
-      # Run optimization
-      optimized = mipro.compile(student: predictor, trainset: trainset, valset: valset)
-
-      report_progress(step: "evaluating", progress: 85)
-
-      # Extract optimized instruction
-      optimized_instruction = extract_optimized_instruction(optimized, signature)
-      score = evaluate_optimized_predictor(optimized, val_examples)
-
-      report_progress(step: "building_result", progress: 95)
-
-      build_optimizer_result(optimized_instruction, [], score, splits, :miprov2)
-    rescue StandardError => e
-      Rails.logger.error "[Leva::PromptOptimizer] MIPROv2 optimization failed: #{e.message}"
-      Rails.logger.error e.backtrace.first(5).join("\n")
-      raise OptimizationError, "MIPROv2 optimization failed: #{e.message}"
-    end
-
-    # Runs simple bootstrap-based optimization (original implementation).
-    #
-    # @param splits [Hash] The train/val/test splits
-    # @param signature [Class] The generated signature class
-    # @return [Hash] The optimization result
-    def run_bootstrap_optimization(splits, signature)
-      train_examples = splits[:train]
-      val_examples = splits[:val]
-
-      report_progress(step: "bootstrapping", progress: 30, examples_processed: 0, total: train_examples.size)
-
-      # Create predictor with the signature and local LM instance
-      predictor = DSPy::Predict.new(signature)
-      predictor.config.lm = create_lm_instance
-
-      # Bootstrap: run predictions to find best few-shot examples
-      best_examples = bootstrap_few_shot_examples(predictor, train_examples)
-
-      report_progress(step: "evaluating", progress: 85)
-
-      # Evaluate on validation set
-      score = evaluate_with_few_shot(predictor, val_examples, best_examples)
-
-      report_progress(step: "building_result", progress: 95)
-
-      # Generate optimized instruction based on best examples
-      optimized_instruction = generate_optimized_instruction(best_examples, signature)
-
-      build_optimizer_result(optimized_instruction, best_examples, score, splits, :bootstrap)
-    rescue StandardError => e
-      Rails.logger.error "[Leva::PromptOptimizer] Bootstrap optimization failed: #{e.message}"
-      Rails.logger.error e.backtrace.first(5).join("\n")
-      raise OptimizationError, "Bootstrap optimization failed: #{e.message}"
-    end
-
-    # Extracts the optimized instruction from an optimized predictor.
-    #
-    # @param optimized [Object] The optimized predictor
-    # @param signature [Class] The signature class
-    # @return [String] The optimized instruction
-    def extract_optimized_instruction(optimized, signature)
-      # Try to get instruction from optimized predictor
-      if optimized.respond_to?(:instruction)
-        optimized.instruction
-      elsif optimized.respond_to?(:signature) && optimized.signature.respond_to?(:instructions)
-        optimized.signature.instructions
-      else
-        signature.description
-      end
-    end
-
-    # Evaluates an optimized predictor on validation examples.
-    #
-    # @param optimized [Object] The optimized predictor
-    # @param val_examples [Array<Hash>] Validation examples
-    # @return [Float] Accuracy score
-    def evaluate_optimized_predictor(optimized, val_examples)
-      return 0.0 if val_examples.empty?
-
-      correct = val_examples.count do |example|
-        prediction = optimized.call(**example[:input])
-        actual = prediction.output.to_s.strip.downcase
-        expected = example.dig(:expected, :output).to_s.strip.downcase
-        actual == expected
-      end
-
-      correct.to_f / val_examples.size
-    end
-
-    # Bootstraps few-shot examples by evaluating which examples help the model most.
-    #
-    # @param predictor [DSPy::Predict] The predictor to use
-    # @param examples [Array<Hash>] Training examples
-    # @return [Array<Hash>] Best few-shot examples
-    def bootstrap_few_shot_examples(predictor, examples)
-      max_examples = MODES[@mode][:trials].clamp(3, 8)
-
-      # Score each example by running prediction and checking accuracy
-      scored_examples = examples.each_with_index.map do |example, index|
-        prediction = predictor.call(**example[:input])
-        actual_output = prediction.output.to_s.strip.downcase
-        expected_output = example.dig(:expected, :output).to_s.strip.downcase
-
-        score = actual_output == expected_output ? 1.0 : 0.0
-
-        # Report progress: 30% + (index / total * 50%)
-        progress = 30 + ((index + 1).to_f / examples.size * 50).to_i
-        report_progress(
-          step: "bootstrapping",
-          progress: progress,
-          examples_processed: index + 1,
-          total: examples.size
-        )
-
-        { example: example, score: score, prediction: prediction.output }
-      end
-
-      # Select diverse, high-quality examples
-      scored_examples.sort_by { |e| -e[:score] }.take(max_examples).map { |e| e[:example] }
-    end
-
-    # Evaluates predictor with few-shot examples on validation set.
-    #
-    # @param predictor [DSPy::Predict] The predictor
-    # @param val_examples [Array<Hash>] Validation examples
-    # @param few_shot_examples [Array<Hash>] Few-shot examples to use
-    # @return [Float] Accuracy score
-    def evaluate_with_few_shot(predictor, val_examples, few_shot_examples)
-      return 0.0 if val_examples.empty?
-
-      correct = val_examples.count do |example|
-        prediction = predictor.call(**example[:input])
-        actual = prediction.output.to_s.strip.downcase
-        expected = example.dig(:expected, :output).to_s.strip.downcase
-        actual == expected
-      end
-
-      correct.to_f / val_examples.size
-    end
-
-    # Generates an optimized instruction based on the task pattern.
-    #
-    # @param examples [Array<Hash>] The best few-shot examples
-    # @param signature [Class] The signature class
-    # @return [String] Optimized instruction
-    def generate_optimized_instruction(examples, signature)
-      return signature.description if examples.empty?
-
-      # Analyze the output patterns
-      outputs = examples.map { |e| e.dig(:expected, :output) }.compact.uniq
-
-      if outputs.size <= 5
-        # Classification task - list the categories
-        "#{signature.description} Respond with one of: #{outputs.join(', ')}."
-      else
-        # Generation task - keep original description
-        signature.description
-      end
-    end
-
-    # Builds the result hash from optimization.
-    #
-    # @param instruction [String] The optimized instruction
-    # @param few_shot_examples [Array<Hash>] The selected few-shot examples
-    # @param score [Float] The validation score
-    # @param splits [Hash] The data splits
-    # @param optimizer_used [Symbol] The optimizer that was used
-    # @return [Hash] The formatted result
-    def build_optimizer_result(instruction, few_shot_examples, score, splits, optimizer_used)
-      sample_record = @dataset.dataset_records.first&.recordable
-      input_fields = sample_record&.to_llm_context&.keys || []
-
-      formatted_examples = few_shot_examples.map do |ex|
-        { input: ex[:input], output: ex.dig(:expected, :output) }
-      end
-
-      {
-        system_prompt: instruction,
-        user_prompt: build_user_prompt_template(input_fields),
-        metadata: {
-          optimization: {
-            score: score,
-            mode: @mode.to_s,
-            optimizer: optimizer_used.to_s,
-            model: @model,
-            few_shot_examples: formatted_examples,
-            optimized_at: Time.current.iso8601,
-            dataset_size: @dataset.dataset_records.count,
-            train_size: splits[:train].size,
-            val_size: splits[:val].size,
-            test_size: splits[:test].size
-          }
-        }
-      }
-    end
-
-    # Validates that the dataset has enough records.
-    #
-    # @raise [Leva::InsufficientDataError] If dataset has too few records
-    def validate_dataset!
-      count = @dataset.dataset_records.count
-      return if count >= MINIMUM_EXAMPLES
-
-      raise InsufficientDataError,
-        "Dataset needs at least #{MINIMUM_EXAMPLES} records for optimization, has #{count}"
+        Or set DSPY_WITH_#{@optimizer.to_s.upcase}=1 before requiring dspy.
+      MSG
     end
 
     # Returns the default evaluation metric (case-insensitive exact match).
