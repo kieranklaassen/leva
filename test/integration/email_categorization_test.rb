@@ -8,6 +8,8 @@ require "test_helper"
 # Run with: ANTHROPIC_API_KEY=your_key bundle exec rails test test/integration/email_categorization_test.rb
 module Leva
   class EmailCategorizationTest < ActiveSupport::TestCase
+    include VcrTestHelper
+
     setup do
       skip "ANTHROPIC_API_KEY not set" unless ENV["ANTHROPIC_API_KEY"]
 

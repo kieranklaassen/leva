@@ -4,6 +4,8 @@ require "test_helper"
 
 module Leva
   class PromptOptimizerTest < ActiveSupport::TestCase
+    include VcrTestHelper
+
     setup do
       # Configure DSPy with ruby_llm adapter
       DSPy.configure do |config|

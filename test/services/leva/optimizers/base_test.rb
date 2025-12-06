@@ -29,14 +29,14 @@ module Leva
       setup do
         @metric = ->(example, prediction) { 1.0 }
         @optimizer = TestOptimizer.new(
-          model: "ruby_llm/claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-20250514",
           metric: @metric,
           mode: :light
         )
       end
 
       test "initializes with required attributes" do
-        assert_equal "ruby_llm/claude-sonnet-4-20250514", @optimizer.model
+        assert_equal "claude-sonnet-4-20250514", @optimizer.model
         assert_equal @metric, @optimizer.metric
         assert_equal :light, @optimizer.mode
         assert_nil @optimizer.progress_callback
@@ -45,7 +45,7 @@ module Leva
       test "initializes with optional progress_callback" do
         callback = ->(args) { args }
         optimizer = TestOptimizer.new(
-          model: "ruby_llm/claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-20250514",
           metric: @metric,
           mode: :light,
           progress_callback: callback
@@ -56,7 +56,7 @@ module Leva
       test "report_progress calls callback with correct arguments" do
         progress_updates = []
         optimizer = TestOptimizer.new(
-          model: "ruby_llm/claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-20250514",
           metric: @metric,
           mode: :light,
           progress_callback: ->(args) { progress_updates << args }
@@ -72,7 +72,7 @@ module Leva
       test "report_progress includes optional examples_processed and total" do
         progress_updates = []
         optimizer = TestOptimizer.new(
-          model: "ruby_llm/claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-20250514",
           metric: @metric,
           mode: :light,
           progress_callback: ->(args) { progress_updates << args }
@@ -87,7 +87,7 @@ module Leva
       test "report_progress throttles updates less than 5% change" do
         progress_updates = []
         optimizer = TestOptimizer.new(
-          model: "ruby_llm/claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-20250514",
           metric: @metric,
           mode: :light,
           progress_callback: ->(args) { progress_updates << args }

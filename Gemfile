@@ -29,5 +29,8 @@ end
 # Required by dspy for observability
 gem "opentelemetry-sdk"
 
+# Test dependencies - VCR records real HTTP responses to replay in tests
+gem "vcr"
+
 # RubyLLM unified LLM adapter (required by dspy-ruby_llm)
 gem "ruby_llm"
