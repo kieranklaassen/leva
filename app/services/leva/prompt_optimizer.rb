@@ -20,9 +20,30 @@ module Leva
 
     # Available optimizers with their strategy class names
     OPTIMIZERS = {
-      bootstrap: { name: "Bootstrap", class_name: "Leva::Optimizers::Bootstrap", gem: nil },
-      gepa: { name: "GEPA", class_name: "Leva::Optimizers::GepaOptimizer", gem: "dspy-gepa" },
-      miprov2: { name: "MIPROv2", class_name: "Leva::Optimizers::Miprov2Optimizer", gem: "dspy-miprov2" }
+      bootstrap: {
+        name: "Bootstrap",
+        class_name: "Leva::Optimizers::Bootstrap",
+        gem: nil,
+        description: "Fast and simple. Automatically selects optimal few-shot examples from your dataset. " \
+                     "Best for quick iteration and when you have limited data (10-50 examples). " \
+                     "Does not modify instructions, only adds demonstrations."
+      },
+      gepa: {
+        name: "GEPA",
+        class_name: "Leva::Optimizers::GepaOptimizer",
+        gem: "dspy-gepa",
+        description: "State-of-the-art optimizer using reflective prompt evolution. Uses LLM reflection " \
+                     "to identify what works and propose improvements. Outperforms MIPROv2 by 10-14% " \
+                     "while being more sample efficient. Best choice for maximum quality."
+      },
+      miprov2: {
+        name: "MIPROv2",
+        class_name: "Leva::Optimizers::Miprov2Optimizer",
+        gem: "dspy-miprov2",
+        description: "Uses Bayesian optimization to search for optimal instructions and few-shot examples. " \
+                     "Good for larger datasets (200+ examples). More computationally demanding but thorough. " \
+                     "Can overfit on small datasets."
+      }
     }.freeze
 
     # Default optimizer
