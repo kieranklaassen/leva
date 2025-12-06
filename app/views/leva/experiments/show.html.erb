@@ -139,7 +139,7 @@
                     <span class="row-title"><%= runner_result.dataset_record.display_name %></span>
                   </td>
                   <td>
-                    <span class="prediction-badge"><%= truncate(runner_result.prediction.to_s.strip, length: 25) %></span>
+                    <span class="prediction-badge"><%= truncate(runner_result.parsed_predictions.first.to_s.presence || runner_result.prediction.to_s.strip, length: 25) %></span>
                   </td>
                   <td class="text-muted"><%= truncate(runner_result.ground_truth.to_s.strip.presence || '—', length: 25) %></td>
                   <% @experiment.evaluation_results.group_by(&:evaluator_class).keys.each do |evaluator_class| %>

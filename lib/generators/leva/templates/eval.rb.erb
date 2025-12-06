@@ -8,7 +8,9 @@ class <%= class_name %>Eval < Leva::BaseEval
     # Implement your evaluation logic here
     # You can access the ground truth using recordable.ground_truth
 
-    # Example implementation:
-    runner_result.parsed_predictions.first == recordable.ground_truth ? 1.0 : 0.0
+    # Example implementation (case-insensitive comparison):
+    prediction = runner_result.parsed_predictions.first.to_s.downcase
+    expected = recordable.ground_truth.to_s.downcase
+    prediction == expected ? 1.0 : 0.0
   end
 end
