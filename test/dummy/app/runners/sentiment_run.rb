@@ -10,11 +10,11 @@ class SentimentRun < Leva::BaseRun
 
     sentiment = case
     when text.match?(/\b(love|great|excellent|awesome|fantastic)\b/)
-      "Positive"
+      "positive"
     when text.match?(/\b(hate|terrible|awful|horrible|bad)\b/)
-      "Negative"
+      "negative"
     else
-      "Neutral"
+      "neutral"
     end
 
     """

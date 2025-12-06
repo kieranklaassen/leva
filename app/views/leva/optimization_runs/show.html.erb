@@ -1,0 +1,698 @@
+<% content_for :title, "Optimization Progress" %>
+
+<% content_for :head do %>
+  <script>
+    // Optimization Progress Polling Controller
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.querySelector('[data-optimization-progress]');
+      if (!container) return;
+
+      const url = container.dataset.optimizationProgress;
+      const pollInterval = 10000; // 10 seconds
+
+      function updateUI(data) {
+        // Update progress bar
+        const progressBar = document.querySelector('[data-progress-bar]');
+        if (progressBar) {
+          progressBar.style.width = data.progress + '%';
+        }
+
+        // Update progress text
+        const progressText = document.querySelector('[data-progress-text]');
+        if (progressText) {
+          progressText.textContent = data.progress + '%';
+        }
+
+        // Update step label
+        const stepLabel = document.querySelector('[data-step-label]');
+        if (stepLabel) {
+          stepLabel.textContent = data.current_step_label;
+        }
+
+        // Update examples count
+        const examplesCount = document.querySelector('[data-examples-count]');
+        if (examplesCount && data.total_examples) {
+          examplesCount.textContent = data.examples_processed + ' / ' + data.total_examples;
+        }
+
+        // Update elapsed time
+        const elapsedTime = document.querySelector('[data-elapsed-time]');
+        if (elapsedTime) {
+          elapsedTime.textContent = data.elapsed_time;
+        }
+
+        // Update status indicator
+        const statusIndicator = document.querySelector('[data-status-indicator]');
+        if (statusIndicator) {
+          statusIndicator.className = 'status-indicator status-' + data.status;
+        }
+
+        // Handle completion
+        if (data.status === 'completed') {
+          const completedSection = document.querySelector('[data-completed-section]');
+          const runningSection = document.querySelector('[data-running-section]');
+          if (completedSection) completedSection.style.display = 'block';
+          if (runningSection) runningSection.style.display = 'none';
+
+          // Update prompt link
+          const promptLink = document.querySelector('[data-prompt-link]');
+          if (promptLink && data.prompt_id) {
+            promptLink.href = promptLink.href.replace('PROMPT_ID', data.prompt_id);
+            promptLink.style.display = 'inline-flex';
+          }
+        }
+
+        // Handle failure
+        if (data.status === 'failed') {
+          const failedSection = document.querySelector('[data-failed-section]');
+          const runningSection = document.querySelector('[data-running-section]');
+          if (failedSection) {
+            failedSection.style.display = 'block';
+            const errorMessage = failedSection.querySelector('[data-error-message]');
+            if (errorMessage) errorMessage.textContent = data.error_message;
+          }
+          if (runningSection) runningSection.style.display = 'none';
+        }
+      }
+
+      function poll() {
+        fetch(url, { headers: { 'Accept': 'application/json' } })
+          .then(response => response.json())
+          .then(data => {
+            updateUI(data);
+            if (data.status === 'pending' || data.status === 'running') {
+              setTimeout(poll, pollInterval);
+            }
+          })
+          .catch(error => {
+            console.error('Error polling optimization status:', error);
+            setTimeout(poll, pollInterval * 2); // Retry with longer delay
+          });
+      }
+
+      // Start polling
+      poll();
+    });
+  </script>
+<% end %>
+
+<div class="container page" data-optimization-progress="<%= optimization_run_path(@optimization_run, format: :json) %>">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb mb-2">
+        <%= link_to "Datasets", datasets_path, class: "breadcrumb-link" %>
+        <span class="breadcrumb-sep">/</span>
+        <%= link_to @optimization_run.dataset.name, dataset_path(@optimization_run.dataset), class: "breadcrumb-link" %>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Optimization</span>
+      </div>
+      <h1 class="page-title">Optimizing Prompt</h1>
+      <p class="text-muted text-sm mt-2">
+        Creating optimized prompt: <strong><%= @optimization_run.prompt_name %></strong>
+      </p>
+    </div>
+  </div>
+
+  <%# Running State %>
+  <section data-running-section style="<%= @optimization_run.completed? || @optimization_run.failed? ? 'display: none;' : '' %>">
+    <div class="card">
+      <div class="card-body">
+        <div class="progress-container">
+          <div class="progress-header">
+            <div class="progress-status">
+              <span class="status-indicator status-<%= @optimization_run.status %>" data-status-indicator></span>
+              <span class="step-label" data-step-label><%= @optimization_run.current_step_label %></span>
+            </div>
+            <span class="progress-percentage" data-progress-text><%= @optimization_run.progress %>%</span>
+          </div>
+
+          <div class="progress-bar-container">
+            <div class="progress-bar" data-progress-bar style="width: <%= @optimization_run.progress %>%;"></div>
+          </div>
+
+          <div class="progress-details">
+            <% if @optimization_run.total_examples %>
+              <span class="detail-item">
+                <svg class="icon-xs" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                  <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                </svg>
+                <span data-examples-count><%= @optimization_run.examples_processed %> / <%= @optimization_run.total_examples %></span>
+                examples
+              </span>
+            <% end %>
+            <span class="detail-item">
+              <svg class="icon-xs" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+              </svg>
+              <span data-elapsed-time><%= @optimization_run.elapsed_time_formatted %></span>
+            </span>
+            <span class="detail-item">
+              <svg class="icon-xs" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+              </svg>
+              <%= @optimization_run.mode.capitalize %> mode
+            </span>
+            <% if @optimization_run.model.present? %>
+              <span class="detail-item">
+                <svg class="icon-xs" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                </svg>
+                <%= model_display_name(@optimization_run.model) %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="optimization-steps">
+          <% Leva::OptimizationRun::STEPS.each do |step_key, step_info| %>
+            <% step_status = optimization_step_status(@optimization_run, step_key) %>
+            <div class="step-item step-<%= step_status %>">
+              <div class="step-icon">
+                <% if step_status == 'completed' %>
+                  <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                <% elsif step_status == 'active' %>
+                  <div class="spinner"></div>
+                <% else %>
+                  <div class="step-dot"></div>
+                <% end %>
+              </div>
+              <span class="step-text"><%= step_info[:label] %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# Completed State %>
+  <section data-completed-section style="<%= @optimization_run.completed? ? '' : 'display: none;' %>">
+    <%# Success Header %>
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="completed-header">
+          <div class="completed-header-left">
+            <div class="success-icon-sm">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="completed-title">Optimization Complete</h2>
+              <p class="completed-subtitle"><%= @optimization_run.prompt_name %></p>
+            </div>
+          </div>
+          <div class="completed-actions">
+            <%= link_to workbench_index_path(prompt_id: @optimization_run.prompt_id), class: "btn btn-primary", data: { prompt_link: true }, style: @optimization_run.prompt_id ? '' : 'display: none;' do %>
+              <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+              </svg>
+              Open in Workbench
+            <% end %>
+            <%= link_to "Back to Dataset", dataset_path(@optimization_run.dataset), class: "btn btn-ghost" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <% if @optimization_run.prompt.present? %>
+      <% metadata = @optimization_run.prompt.metadata&.dig("optimization") || {} %>
+
+      <%# Stats Row %>
+      <div class="optimization-stats mb-4">
+        <div class="stat-card">
+          <div class="stat-value <%= score_class(metadata["score"]) %>">
+            <%= metadata["score"] ? "#{(metadata["score"] * 100).round}%" : "—" %>
+          </div>
+          <div class="stat-label">Optimization Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= metadata["train_size"] || "—" %></div>
+          <div class="stat-label">Training Examples</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= metadata["val_size"] || "—" %></div>
+          <div class="stat-label">Validation Examples</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= @optimization_run.elapsed_time_formatted %></div>
+          <div class="stat-label">Duration</div>
+        </div>
+      </div>
+
+      <%# Optimized Prompt Content %>
+      <div class="card">
+        <div class="card-body">
+          <div class="section-header mb-3">
+            <h3 class="section-title">
+              <svg class="icon-sm" style="color: var(--gray-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              System Prompt
+            </h3>
+          </div>
+          <div class="prompt-preview">
+            <pre class="prompt-code"><code><%= @optimization_run.prompt.system_prompt %></code></pre>
+          </div>
+
+          <% few_shot_examples = metadata["few_shot_examples"] || [] %>
+          <% if few_shot_examples.any? %>
+            <div class="section-header mb-3 mt-5">
+              <h3 class="section-title">
+                <svg class="icon-sm" style="color: var(--gray-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                Few-Shot Examples
+              </h3>
+              <span class="section-count"><%= few_shot_examples.size %> examples</span>
+            </div>
+            <div class="few-shot-list">
+              <% few_shot_examples.each_with_index do |example, idx| %>
+                <details class="collapsible">
+                  <summary class="collapsible-header">
+                    <span class="collapsible-title">Example <%= idx + 1 %></span>
+                    <svg class="collapsible-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </summary>
+                  <div class="collapsible-body">
+                    <div class="example-grid">
+                      <div class="example-block">
+                        <span class="example-label">Input</span>
+                        <pre class="example-code"><code><%= example["input"].is_a?(Hash) ? example["input"].to_json : example["input"] %></code></pre>
+                      </div>
+                      <div class="example-block example-block--output">
+                        <span class="example-label">Output</span>
+                        <pre class="example-code"><code><%= example["output"] %></code></pre>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </section>
+
+  <%# Failed State %>
+  <section data-failed-section style="<%= @optimization_run.failed? ? '' : 'display: none;' %>">
+    <div class="card">
+      <div class="card-body">
+        <div class="error-state">
+          <div class="error-icon">
+            <svg viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <h2 class="error-title">Optimization Failed</h2>
+          <p class="error-message" data-error-message><%= @optimization_run.error_message %></p>
+          <div class="error-actions">
+            <%= link_to "Try Again", new_dataset_optimization_path(@optimization_run.dataset), class: "btn btn-primary" %>
+            <%= link_to "Back to Dataset", dataset_path(@optimization_run.dataset), class: "btn btn-ghost" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .progress-container {
+    margin-bottom: 2rem;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .progress-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+  }
+
+  .status-indicator.status-pending {
+    background-color: var(--text-muted);
+  }
+
+  .status-indicator.status-running {
+    background-color: var(--primary);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .status-indicator.status-completed {
+    background-color: rgb(34, 197, 94);
+  }
+
+  .status-indicator.status-failed {
+    background-color: rgb(239, 68, 68);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .step-label {
+    font-weight: 500;
+  }
+
+  .progress-percentage {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: 'Fira Code', monospace;
+    color: var(--primary);
+  }
+
+  .progress-bar-container {
+    height: 8px;
+    background-color: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background-color: var(--primary);
+    transition: width 0.3s ease;
+  }
+
+  .progress-details {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .optimization-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 0.5rem;
+  }
+
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    color: var(--text-muted);
+  }
+
+  .step-item.step-completed {
+    color: rgb(34, 197, 94);
+  }
+
+  .step-item.step-active {
+    color: var(--primary);
+    font-weight: 500;
+  }
+
+  .step-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .step-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .step-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+    opacity: 0.5;
+  }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .success-state, .error-state {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .success-icon, .error-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .success-icon {
+    background-color: rgba(34, 197, 94, 0.15);
+    color: rgb(34, 197, 94);
+  }
+
+  .error-icon {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: rgb(239, 68, 68);
+  }
+
+  .success-icon svg, .error-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .success-title, .error-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .success-description, .error-message {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .error-message {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.875rem;
+    background-color: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: left;
+  }
+
+  .success-actions, .error-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  /* Completed State - New Design */
+  .completed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .completed-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .success-icon-sm {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: rgba(34, 197, 94, 0.15);
+    color: rgb(34, 197, 94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .success-icon-sm svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .completed-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .completed-subtitle {
+    color: var(--text-muted);
+    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+  }
+
+  .completed-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .optimization-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: 'Fira Code', monospace;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 0.25rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .section-count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-tertiary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+
+  .prompt-preview {
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .prompt-code {
+    margin: 0;
+    padding: 1rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text-primary);
+  }
+
+  .few-shot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .example-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .example-block {
+    background: var(--bg-tertiary);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+  }
+
+  .example-block--output {
+    border-left: 2px solid rgb(34, 197, 94);
+  }
+
+  .example-label {
+    display: block;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .example-code {
+    margin: 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .mb-3 { margin-bottom: 0.75rem; }
+  .mb-4 { margin-bottom: 1rem; }
+  .mt-5 { margin-top: 1.25rem; }
+
+  @media (max-width: 768px) {
+    .optimization-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .completed-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .example-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

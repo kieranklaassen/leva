@@ -84,6 +84,71 @@
     <% end %>
   </section>
 
+  <%# Optimized Prompts Section %>
+  <section class="mb-8">
+    <div class="section-header">
+      <h3 class="section-title">Optimized Prompts</h3>
+      <span class="section-count"><%= @dataset.optimization_runs.completed.count %></span>
+      <div class="ml-auto">
+        <%= link_to new_dataset_optimization_path(@dataset), class: "btn btn-primary btn-sm" do %>
+          <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+          </svg>
+          Optimize Prompt
+        <% end %>
+      </div>
+    </div>
+
+    <% if @dataset.optimization_runs.any? %>
+      <div class="table-wrapper">
+        <div class="table-scroll">
+          <table class="table table-clickable">
+            <thead>
+              <tr>
+                <th>Prompt Name</th>
+                <th style="width: 120px;">Model</th>
+                <th style="width: 80px;">Mode</th>
+                <th class="text-center" style="width: 100px;">Status</th>
+                <th class="text-right" style="width: 90px;">Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @dataset.optimization_runs.order(created_at: :desc).limit(5).each do |run| %>
+                <tr class="clickable-row" onclick="window.location='<%= run.completed? && run.prompt ? workbench_index_path(prompt_id: run.prompt_id) : optimization_run_path(run) %>'">
+                  <td>
+                    <span class="row-title"><%= run.prompt_name %></span>
+                  </td>
+                  <td class="text-sm text-muted">
+                    <%= model_display_name(run.model) %>
+                  </td>
+                  <td class="text-sm"><%= run.mode.capitalize %></td>
+                  <td class="text-center">
+                    <% case run.status %>
+                    <% when "completed" %>
+                      <span class="badge badge-success">Completed</span>
+                    <% when "running" %>
+                      <span class="badge badge-info">Running</span>
+                    <% when "failed" %>
+                      <span class="badge badge-error">Failed</span>
+                    <% else %>
+                      <span class="badge badge-muted">Pending</span>
+                    <% end %>
+                  </td>
+                  <td class="text-right text-muted text-sm"><%= run.created_at.strftime("%b %d") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% else %>
+      <div class="empty-state-inline">
+        <p class="text-muted text-sm">No optimized prompts yet.</p>
+        <p class="text-xs text-subtle mt-2">Use DSPy.rb to automatically discover optimal prompts from your dataset.</p>
+      </div>
+    <% end %>
+  </section>
+
   <%# Experiments Section %>
   <section>
     <div class="section-header">

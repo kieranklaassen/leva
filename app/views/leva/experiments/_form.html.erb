@@ -50,6 +50,16 @@
                       class: "form-select" %>
       <p class="form-hint">The runner executes your model logic for each dataset record.</p>
     </div>
+
+    <div class="form-group" id="model-selection-group">
+      <label for="experiment_metadata_model" class="form-label">Model (for LLM runners)</label>
+      <select name="experiment[metadata][model]" id="experiment_metadata_model" class="form-select">
+        <% Leva::PromptOptimizer.available_models.each do |m| %>
+          <option value="<%= m.id %>" <%= 'selected' if @experiment.metadata&.dig("model") == m.id || (@experiment.metadata.blank? && m.id == "gemini-2.5-flash") %>><%= m.name %></option>
+        <% end %>
+      </select>
+      <p class="form-hint">The AI model to use when running LLM-based runners like SentimentLlmRun.</p>
+    </div>
   </div>
 
   <hr class="form-divider">

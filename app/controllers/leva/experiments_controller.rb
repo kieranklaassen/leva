@@ -2,8 +2,6 @@
 
 module Leva
   class ExperimentsController < ApplicationController
-    include ApplicationHelper
-
     before_action :set_experiment, only: [ :show, :edit, :update ]
     before_action :check_editable, only: [ :edit, :update ]
     before_action :load_runners_and_evaluators, only: [ :new, :edit, :create, :update ]
@@ -11,7 +9,8 @@ module Leva
     # GET /experiments
     # @return [void]
     def index
-      @experiments = Experiment.all
+      @experiments = Experiment.includes(:evaluation_results).all
+      @evaluator_classes = Leva::EvaluationResult.distinct.pluck(:evaluator_class)
     end
 
     # GET /experiments/1
@@ -83,12 +82,21 @@ module Leva
     # Only allow a list of trusted parameters through.
     # @return [ActionController::Parameters]
     def experiment_params
-      params.require(:experiment).permit(:name, :description, :dataset_id, :prompt_id, :runner_class, evaluator_classes: [])
+      permitted = params.require(:experiment).permit(:name, :description, :dataset_id, :prompt_id, :runner_class, evaluator_classes: [], metadata: {})
+      # Ensure metadata is a hash, not ActionController::Parameters
+      if permitted[:metadata].present?
+        metadata_hash = permitted[:metadata].to_h
+        if metadata_hash.to_json.bytesize > 100_000
+          raise ActionController::BadRequest, "Metadata exceeds maximum size of 100KB"
+        end
+        permitted[:metadata] = metadata_hash
+      end
+      permitted
     end
 
     def load_runners_and_evaluators
-      @runners = load_runners
-      @evaluators = load_evaluators
+      @runners = Leva::ClassLoader.runners
+      @evaluators = Leva::ClassLoader.evaluators
     end
 
     def check_editable

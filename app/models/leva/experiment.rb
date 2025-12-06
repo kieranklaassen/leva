@@ -39,5 +39,6 @@ module Leva
     enum :status, { pending: 0, running: 1, completed: 2, failed: 3 }, default: :pending
 
     serialize :evaluator_classes, coder: JSON, type: Array
+    serialize :metadata, coder: JSON
   end
 end

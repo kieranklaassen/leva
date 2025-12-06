@@ -8,6 +8,9 @@
     else 'status-dot-pending'
   end
   run_count = experiment.runner_results.count
+
+  # Group evaluation results by evaluator_class to avoid N+1 queries
+  grouped_results = experiment.evaluation_results.group_by(&:evaluator_class)
 %>
 <tr class="experiment-row" onclick="window.location='<%= experiment_path(experiment) %>'">
   <td>
@@ -21,6 +24,9 @@
   <td>
     <span class="cell-dataset"><%= experiment.dataset&.name || '—' %></span>
   </td>
+  <td>
+    <span class="cell-model font-mono text-sm"><%= experiment.metadata&.dig("model") || '—' %></span>
+  </td>
   <td class="text-right text-nowrap">
     <span class="cell-timestamp"><%= time_ago_in_words(experiment.created_at) %></span>
   </td>
@@ -33,22 +39,15 @@
   <td class="text-right">
     <span class="cell-count"><%= run_count %></span>
   </td>
-  <% Leva::EvaluationResult.distinct.pluck(:evaluator_class).each do |evaluator_class| %>
+  <% @evaluator_classes.each do |evaluator_class| %>
     <td class="text-right">
-      <% results = experiment.evaluation_results.where(evaluator_class: evaluator_class) %>
+      <% results = grouped_results[evaluator_class] || [] %>
       <% if results.any? %>
         <%
           avg_score = (results.sum(&:score) / results.size.to_f)
           score_pct = (avg_score * 100).round
-          score_class = case avg_score
-            when 0...0.2 then 'score-bad'
-            when 0.2...0.4 then 'score-poor'
-            when 0.4...0.6 then 'score-fair'
-            when 0.6...0.8 then 'score-good'
-            else 'score-excellent'
-          end
         %>
-        <span class="score-pill <%= score_class %>"><%= score_pct %>%</span>
+        <span class="score-pill <%= score_class(avg_score) %>"><%= score_pct %>%</span>
       <% else %>
         <span class="score-empty">—</span>
       <% end %>

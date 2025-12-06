@@ -1,0 +1,1059 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 2\",\n  \"expected_label\":
+        \"neutral\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:34 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=829
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"neutral\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 353,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 465,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 353
+              }
+            ],
+            "thoughtsTokenCount": 92
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "2qk0aZO3NY2iqtsP1L39sAY"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:34 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 4\",\n  \"expected_label\":
+        \"negative\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:35 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=765
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"negative\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 353,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 434,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 353
+              }
+            ],
+            "thoughtsTokenCount": 61
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "26k0aZGoLYjgz7IPiayL6Ag"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:35 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 5\",\n  \"expected_label\":
+        \"neutral\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:36 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=763
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"neutral\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 353,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 446,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 353
+              }
+            ],
+            "thoughtsTokenCount": 73
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "3Kk0aY66Jd6ez7IPlMzziAc"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:36 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 14\",\n  \"expected_label\":
+        \"neutral\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:37 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=859
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"neutral\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 354,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 463,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 354
+              }
+            ],
+            "thoughtsTokenCount": 89
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "3ak0aZHwI-2Iz7IPm8DisAc"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:37 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 13\",\n  \"expected_label\":
+        \"negative\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:39 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=1555
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"neutral\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 354,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 496,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 354
+              }
+            ],
+            "thoughtsTokenCount": 122
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "36k0aZm9D92kmtkPxq_v2Aw"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:39 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 3\",\n  \"expected_label\":
+        \"positive\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:40 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=749
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"neutral\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 353,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 459,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 353
+              }
+            ],
+            "thoughtsTokenCount": 86
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "4Kk0aamwBuiez7IP-Y3T4As"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:40 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 1\",\n  \"expected_label\":
+        \"negative\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:41 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=1616
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"negative\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 353,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 478,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 353
+              }
+            ],
+            "thoughtsTokenCount": 105
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "4ak0aYHTMt2aqtsP6OKogQs"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:41 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 12\",\n  \"expected_label\":
+        \"positive\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:45 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=3300
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"neutral\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 354,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 907,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 354
+              }
+            ],
+            "thoughtsTokenCount": 533
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "5ak0afqHD8jqz7IPg7yUyAE"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:45 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 0\",\n  \"expected_label\":
+        \"positive\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:46 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=807
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"positive\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 353,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 447,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 353
+              }
+            ],
+            "thoughtsTokenCount": 74
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "5ak0adz3HuCHz7IPiZDquAc"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:46 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 6\",\n  \"expected_label\":
+        \"positive\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:47 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=1313
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"positive\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 353,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 518,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 353
+              }
+            ],
+            "thoughtsTokenCount": 145
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "56k0aZn3JPaHqtsPhOeyiQs"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:47 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 9\",\n  \"expected_label\":
+        \"positive\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:48 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=1006
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"positive\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 353,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 464,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 353
+              }
+            ],
+            "thoughtsTokenCount": 91
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "6Kk0aayQLIWGz7IP77fx0Ak"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:48 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Your input schema fields
+        are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"text\": {\n      \"type\": \"string\"\n    },\n    \"expected_label\":
+        {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\n    \"text\",\n    \"expected_label\"\n  ]\n}\n```\nYour
+        output schema fields are:\n```json\n{\n  \"$schema\": \"http://json-schema.org/draft-06/schema#\",\n  \"type\":
+        \"object\",\n  \"properties\": {\n    \"output\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\":
+        [\n    \"output\"\n  ]\n}\n```\n\nAll interactions will be structured in the
+        following way, with the appropriate values filled in.\n## Input values\n```json\n{input_values}\n```\n##
+        Output values\nRespond exclusively with the output schema fields in the json
+        block below.\n```json\n{output_values}\n```\n\nIn adhering to this structure,
+        your objective is: Classify the input. Respond with ONLY one of these exact
+        values, nothing else: positive, negative, neutral"}]},{"role":"user","parts":[{"text":"##
+        Input Values\n```json\n{\n  \"text\": \"Test text 8\",\n  \"expected_label\":
+        \"neutral\"\n}\n```\n\nRespond with the corresponding output schema fields
+        wrapped in a ```json ``` block,\nstarting with the heading `## Output values`."}]}],"generationConfig":{}}'
+    headers:
+      User-Agent:
+      - Faraday v2.14.0
+      x-goog-api-key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      content-type:
+      - application/json; charset=UTF-8
+      vary:
+      - Origin, X-Origin, Referer
+      content-encoding:
+      - gzip
+      date:
+      - Sat, 06 Dec 2025 22:10:49 GMT
+      server:
+      - scaffolding on HTTPServer2
+      x-xss-protection:
+      - '0'
+      x-frame-options:
+      - SAMEORIGIN
+      x-content-type-options:
+      - nosniff
+      server-timing:
+      - gfet4t7; dur=1007
+      alt-svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      transfer-encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "## Output values\n```json\n{\n  \"output\": \"neutral\"\n}\n```"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "index": 0
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 353,
+            "candidatesTokenCount": 20,
+            "totalTokenCount": 448,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 353
+              }
+            ],
+            "thoughtsTokenCount": 75
+          },
+          "modelVersion": "gemini-2.5-flash",
+          "responseId": "6ak0aZTNMp-VmtkPxunfsQY"
+        }
+  recorded_at: Sat, 06 Dec 2025 22:10:49 GMT
+recorded_with: VCR 6.3.1

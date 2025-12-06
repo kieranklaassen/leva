@@ -4,14 +4,44 @@ module Leva
     #
     # @return [Array<Class>] An array of evaluator classes
     def load_evaluators
-      load_classes_from_directory("app/evals", Leva::BaseEval) || []
+      Leva::ClassLoader.evaluators
     end
 
     # Loads all runner classes that inherit from Leva::BaseRun
     #
     # @return [Array<Class>] An array of runner classes
     def load_runners
-      load_classes_from_directory("app/runners", Leva::BaseRun) || []
+      Leva::ClassLoader.runners
+    end
+
+    # Returns the CSS class for a score value.
+    #
+    # @param score [Float, nil] The score value (0.0 - 1.0)
+    # @return [String] The CSS class for the score
+    def score_class(score)
+      return "" if score.nil?
+
+      case score
+      when 0...0.2 then "score-bad"
+      when 0.2...0.4 then "score-poor"
+      when 0.4...0.6 then "score-fair"
+      when 0.6...0.8 then "score-good"
+      else "score-excellent"
+      end
+    end
+
+    # Returns the display name for a model.
+    #
+    # Uses RubyLLM to find the model and get its display name,
+    # falling back to extracting the name from the model ID.
+    #
+    # @param model_id [String] The model ID
+    # @return [String] The display name for the model
+    def model_display_name(model_id)
+      return "—" if model_id.blank?
+
+      @models_cache ||= Leva::PromptOptimizer.available_models.index_by(&:id)
+      @models_cache[model_id]&.name || model_id.split("/").last
     end
 
     # Loads predefined prompts from markdown files
@@ -24,20 +54,6 @@ module Leva
         [ name, content ]
       end
       prompts
-    end
-
-    private
-
-    # Loads classes from a specified directory that inherit from a given base class
-    #
-    # @param directory [String] The directory path to load classes from
-    # @param base_class [Class] The base class that loaded classes should inherit from
-    # @return [Array<Class>] An array of loaded classes
-    def load_classes_from_directory(directory, base_class)
-      classes = Dir[Rails.root.join(directory, "*.rb")].map do |file|
-        File.basename(file, ".rb").camelize.constantize
-      end.select { |klass| klass < base_class }
-      classes.empty? ? [] : classes
     end
   end
 end

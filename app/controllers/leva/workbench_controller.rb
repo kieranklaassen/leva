@@ -19,14 +19,12 @@ module Leva
       @selected_dataset_record = params[:dataset_record_id] || DatasetRecord.first&.id
 
       # Get merged context if runner and dataset record are available
-      if @selected_runner && @dataset_record
-        runner_class = @selected_runner.constantize rescue nil
-        if runner_class && runner_class < Leva::BaseRun
-          runner = runner_class.new
-          @record_context = @dataset_record.recordable.to_llm_context
-          @runner_context = runner.to_llm_context(@dataset_record.recordable)
-          @merged_context = @record_context.merge(@runner_context)
-        end
+      if @selected_runner && @dataset_record && valid_runner?(@selected_runner)
+        runner_class = @selected_runner.constantize
+        runner = runner_class.new
+        @record_context = @dataset_record.recordable.to_llm_context
+        @runner_context = runner.to_llm_context(@dataset_record.recordable)
+        @merged_context = @record_context.merge(@runner_context)
       end
     end
 
@@ -67,8 +65,8 @@ module Leva
     def run
       return redirect_to workbench_index_path, alert: "Please select a record and a runner" unless @dataset_record && run_params[:runner]
 
+      return redirect_to workbench_index_path, alert: "Invalid runner selected" unless valid_runner?(run_params[:runner])
       runner_class = run_params[:runner].constantize
-      return redirect_to workbench_index_path, alert: "Invalid runner selected" unless runner_class < Leva::BaseRun
 
       runner = runner_class.new
       runner_result = runner.execute_and_store(nil, @dataset_record, @prompt)
@@ -90,8 +88,8 @@ module Leva
     def run_evaluator
       return redirect_to workbench_index_path, alert: "No runner result available" unless @runner_result
 
+      return redirect_to workbench_index_path, alert: "Invalid evaluator selected" unless allowed_evaluator_names.include?(params[:evaluator])
       evaluator_class = params[:evaluator].constantize
-      return redirect_to workbench_index_path, alert: "Invalid evaluator selected" unless evaluator_class < Leva::BaseEval
 
       evaluator = evaluator_class.new
       evaluator.evaluate_and_store(nil, @runner_result)
@@ -119,6 +117,24 @@ module Leva
 
     def set_runner_result
       @runner_result = @dataset_record.runner_results.last if @dataset_record
+    end
+
+    def allowed_runner_names
+      @allowed_runner_names ||= load_runners.map(&:name)
+    end
+
+    def allowed_evaluator_names
+      @allowed_evaluator_names ||= load_evaluators.map(&:name)
+    end
+
+    def valid_runner?(runner_name)
+      return true if allowed_runner_names.include?(runner_name)
+
+      # Also accept any class that inherits from BaseRun (for testing)
+      klass = runner_name.constantize
+      klass < Leva::BaseRun
+    rescue NameError
+      false
     end
   end
 end

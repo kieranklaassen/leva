@@ -131,14 +131,6 @@
           <% evaluation_result = @dataset_record&.evaluation_results&.for_evaluator(evaluator_class)&.last %>
           <% score = evaluation_result&.score %>
           <%
-            score_class = case score
-              when 0...0.2 then 'score-bad'
-              when 0.2...0.4 then 'score-poor'
-              when 0.4...0.6 then 'score-fair'
-              when 0.6...0.8 then 'score-good'
-              when 0.8..1.0 then 'score-excellent'
-              else ''
-            end
             bg_style = case score
               when 0...0.2 then 'background: rgba(207, 111, 98, 0.08);'
               when 0.2...0.4 then 'background: rgba(232, 161, 88, 0.08);'
@@ -153,7 +145,7 @@
               <span class="eval-name"><%= evaluator_class.name.demodulize.gsub(/Evaluator$/, '').gsub(/([a-z])([A-Z])/, '\1 \2') %></span>
               <div class="flex items-center gap-2">
                 <% if score %>
-                  <span class="eval-score <%= score_class %>"><%= sprintf('%.0f', score * 100) %></span>
+                  <span class="eval-score <%= score_class(score) %>"><%= sprintf('%.0f', score * 100) %></span>
                   <span class="text-xs text-muted" style="font-size: 10px;">%</span>
                 <% else %>
                   <span class="eval-score eval-score--empty">
