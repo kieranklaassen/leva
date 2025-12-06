@@ -15,3 +15,4 @@ test/dummy/db/migrate/*.leva.rb
 plans/
 todos/
 PLAN_*.md
+*.gem
