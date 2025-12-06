@@ -7,12 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.2.2] - 2025-12-06
+## [0.3.0] - 2025-12-06
 ### Changed
-- Maintenance release with dependency updates
+- Maintenance release with dependency updates and code cleanup
 
 ### Fixed
 - Cleaned up incomplete code from previous development work
+- Fixed CI pipeline issues
 
 ## [0.2.1] - 2025-11-23
 ### Changed
