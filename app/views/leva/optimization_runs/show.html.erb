@@ -189,19 +189,22 @@
 
   <%# Completed State %>
   <section data-completed-section style="<%= @optimization_run.completed? ? '' : 'display: none;' %>">
-    <div class="card">
+    <%# Success Header %>
+    <div class="card mb-4">
       <div class="card-body">
-        <div class="success-state">
-          <div class="success-icon">
-            <svg viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-            </svg>
+        <div class="completed-header">
+          <div class="completed-header-left">
+            <div class="success-icon-sm">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="completed-title">Optimization Complete</h2>
+              <p class="completed-subtitle"><%= @optimization_run.prompt_name %></p>
+            </div>
           </div>
-          <h2 class="success-title">Optimization Complete!</h2>
-          <p class="success-description">
-            Your optimized prompt "<%= @optimization_run.prompt_name %>" has been created successfully.
-          </p>
-          <div class="success-actions">
+          <div class="completed-actions">
             <%= link_to workbench_index_path(prompt_id: @optimization_run.prompt_id), class: "btn btn-primary", data: { prompt_link: true }, style: @optimization_run.prompt_id ? '' : 'display: none;' do %>
               <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
@@ -213,6 +216,86 @@
         </div>
       </div>
     </div>
+
+    <% if @optimization_run.prompt.present? %>
+      <% metadata = @optimization_run.prompt.metadata&.dig("optimization") || {} %>
+
+      <%# Stats Row %>
+      <div class="optimization-stats mb-4">
+        <div class="stat-card">
+          <div class="stat-value <%= score_class(metadata["score"]) %>">
+            <%= metadata["score"] ? "#{(metadata["score"] * 100).round}%" : "—" %>
+          </div>
+          <div class="stat-label">Optimization Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= metadata["train_size"] || "—" %></div>
+          <div class="stat-label">Training Examples</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= metadata["val_size"] || "—" %></div>
+          <div class="stat-label">Validation Examples</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value"><%= @optimization_run.elapsed_time_formatted %></div>
+          <div class="stat-label">Duration</div>
+        </div>
+      </div>
+
+      <%# Optimized Prompt Content %>
+      <div class="card">
+        <div class="card-body">
+          <div class="section-header mb-3">
+            <h3 class="section-title">
+              <svg class="icon-sm" style="color: var(--gray-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+              System Prompt
+            </h3>
+          </div>
+          <div class="prompt-preview">
+            <pre class="prompt-code"><code><%= @optimization_run.prompt.system_prompt %></code></pre>
+          </div>
+
+          <% few_shot_examples = metadata["few_shot_examples"] || [] %>
+          <% if few_shot_examples.any? %>
+            <div class="section-header mb-3 mt-5">
+              <h3 class="section-title">
+                <svg class="icon-sm" style="color: var(--gray-400);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+                Few-Shot Examples
+              </h3>
+              <span class="section-count"><%= few_shot_examples.size %> examples</span>
+            </div>
+            <div class="few-shot-list">
+              <% few_shot_examples.each_with_index do |example, idx| %>
+                <details class="collapsible">
+                  <summary class="collapsible-header">
+                    <span class="collapsible-title">Example <%= idx + 1 %></span>
+                    <svg class="collapsible-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                  </summary>
+                  <div class="collapsible-body">
+                    <div class="example-grid">
+                      <div class="example-block">
+                        <span class="example-label">Input</span>
+                        <pre class="example-code"><code><%= example["input"].is_a?(Hash) ? example["input"].to_json : example["input"] %></code></pre>
+                      </div>
+                      <div class="example-block example-block--output">
+                        <span class="example-label">Output</span>
+                        <pre class="example-code"><code><%= example["output"] %></code></pre>
+                      </div>
+                    </div>
+                  </div>
+                </details>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </section>
 
   <%# Failed State %>
@@ -436,5 +519,180 @@
     display: flex;
     gap: 0.75rem;
     justify-content: center;
+  }
+
+  /* Completed State - New Design */
+  .completed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .completed-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .success-icon-sm {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: rgba(34, 197, 94, 0.15);
+    color: rgb(34, 197, 94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .success-icon-sm svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .completed-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .completed-subtitle {
+    color: var(--text-muted);
+    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+  }
+
+  .completed-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .optimization-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: 'Fira Code', monospace;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 0.25rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .section-count {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    background: var(--bg-tertiary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+
+  .prompt-preview {
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .prompt-code {
+    margin: 0;
+    padding: 1rem;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text-primary);
+  }
+
+  .few-shot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .example-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .example-block {
+    background: var(--bg-tertiary);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+  }
+
+  .example-block--output {
+    border-left: 2px solid rgb(34, 197, 94);
+  }
+
+  .example-label {
+    display: block;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .example-code {
+    margin: 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .mb-3 { margin-bottom: 0.75rem; }
+  .mb-4 { margin-bottom: 1rem; }
+  .mt-5 { margin-top: 1.25rem; }
+
+  @media (max-width: 768px) {
+    .optimization-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .completed-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .example-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

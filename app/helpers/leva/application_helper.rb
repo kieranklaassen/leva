@@ -35,6 +35,22 @@ module Leva
       load_classes_from_directory("app/runners", Leva::BaseRun) || []
     end
 
+    # Returns the CSS class for a score value.
+    #
+    # @param score [Float, nil] The score value (0.0 - 1.0)
+    # @return [String] The CSS class for the score
+    def score_class(score)
+      return "" if score.nil?
+
+      case score
+      when 0.9..1.0 then "score-excellent"
+      when 0.7...0.9 then "score-good"
+      when 0.5...0.7 then "score-fair"
+      when 0.3...0.5 then "score-poor"
+      else "score-bad"
+      end
+    end
+
     # Returns the display name for a model.
     #
     # Uses RubyLLM to find the model and get its display name,
