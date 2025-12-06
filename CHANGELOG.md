@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-12-06
+### Added
+- **DSPy Prompt Optimization**: Automatic prompt optimization using DSPy.rb framework
+  - Bootstrap optimizer for fast few-shot example selection
+  - GEPA optimizer for state-of-the-art reflective prompt evolution
+  - MIPROv2 optimizer for Bayesian optimization search
+- Model selection dropdown with RubyLLM integration showing provider, context window, and pricing
+- Optimization modes: light (~5 min), medium (~15 min), heavy (~30 min)
+- Real-time progress tracking via Turbo Streams during optimization
+- Optimizer badges and descriptions to help users choose the right approach
+- VCR test infrastructure for HTTP request recording in tests
+
+### Changed
+- Improved experiment metadata display with optimization details
+- Enhanced evaluation comparison with case-insensitive matching
+
+### Fixed
+- N+1 query issues in experiment list and workbench views
+- Security improvements: allowlist validation before constantize calls
+- Model ID format compatibility with RubyLLM registry
+
 ## [0.2.1] - 2025-11-23
 ### Changed
 - Improved workbench UI with better spacing and visual hierarchy in output section
