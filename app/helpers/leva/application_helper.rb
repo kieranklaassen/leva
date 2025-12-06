@@ -35,6 +35,20 @@ module Leva
       load_classes_from_directory("app/runners", Leva::BaseRun) || []
     end
 
+    # Returns the display name for a model.
+    #
+    # Uses RubyLLM to find the model and get its display name,
+    # falling back to extracting the name from the model ID.
+    #
+    # @param model_id [String] The model ID
+    # @return [String] The display name for the model
+    def model_display_name(model_id)
+      return "—" if model_id.blank?
+
+      model = Leva::PromptOptimizer.find_model(model_id)
+      model&.name || model_id.split("/").last
+    end
+
     # Loads predefined prompts from markdown files
     #
     # @return [Array<Array<String, String>>] An array of prompt name and content pairs

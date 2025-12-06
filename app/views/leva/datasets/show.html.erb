@@ -119,11 +119,7 @@
                     <span class="row-title"><%= run.prompt_name %></span>
                   </td>
                   <td class="text-sm text-muted">
-                    <% if run.model.present? %>
-                      <%= Leva::PromptOptimizer::MODELS.dig(run.model, :name) || run.model.split("/").last %>
-                    <% else %>
-                      —
-                    <% end %>
+                    <%= model_display_name(run.model) %>
                   </td>
                   <td class="text-sm"><%= run.mode.capitalize %></td>
                   <td class="text-center">
