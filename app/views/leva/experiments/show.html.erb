@@ -94,13 +94,6 @@
           <%
             avg_score = (results.sum(&:score) / results.size.to_f).round(2)
             score_pct = (avg_score * 100).round
-            score_class = case avg_score
-              when 0...0.2 then 'score-bad'
-              when 0.2...0.4 then 'score-poor'
-              when 0.4...0.6 then 'score-fair'
-              when 0.6...0.8 then 'score-good'
-              else 'score-excellent'
-            end
             short_name = evaluator_class.demodulize
               .gsub(/Evaluator$/, '')
               .gsub(/Eval$/, '')
@@ -108,10 +101,10 @@
             short_name = short_name.presence || evaluator_class.demodulize.gsub(/Eval(uator)?$/, '')
           %>
           <div class="eval-summary-card" title="<%= results.size %> evaluations">
-            <span class="eval-summary-score <%= score_class %>"><%= score_pct %><span class="eval-summary-pct">%</span></span>
+            <span class="eval-summary-score <%= score_class(avg_score) %>"><%= score_pct %><span class="eval-summary-pct">%</span></span>
             <span class="eval-summary-name"><%= short_name %></span>
             <div class="eval-summary-bar">
-              <div class="eval-summary-bar-fill <%= score_class %>" style="width: <%= score_pct %>%"></div>
+              <div class="eval-summary-bar-fill <%= score_class(avg_score) %>" style="width: <%= score_pct %>%"></div>
             </div>
             <span class="eval-summary-count"><%= results.size %> runs</span>
           </div>
@@ -162,16 +155,7 @@
                       <% eval_result = runner_result.evaluation_results.find_by(evaluator_class: evaluator_class) %>
                       <% if eval_result %>
                         <% score = eval_result.score %>
-                        <%
-                          score_class = case score
-                            when 0...0.2 then 'score-bad'
-                            when 0.2...0.4 then 'score-poor'
-                            when 0.4...0.6 then 'score-fair'
-                            when 0.6...0.8 then 'score-good'
-                            else 'score-excellent'
-                          end
-                        %>
-                        <span class="score-inline <%= score_class %>"><%= sprintf('%.2f', score) %></span>
+                        <span class="score-inline <%= score_class(score) %>"><%= sprintf('%.2f', score) %></span>
                       <% else %>
                         <span class="text-subtle">—</span>
                       <% end %>

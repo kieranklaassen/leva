@@ -31,12 +31,16 @@ class SentimentLlmRun < Leva::DspyRunner
     # Get the model (from experiment metadata or default)
     model_id = experiment_model || DEFAULT_MODEL
 
-    # Call RubyLLM
-    chat = RubyLLM.chat(model: model_id)
-    messages.each { |msg| chat.add_message(role: msg[:role], content: msg[:content]) }
+    # Call RubyLLM with error handling
+    begin
+      chat = RubyLLM.chat(model: model_id)
+      messages.each { |msg| chat.add_message(role: msg[:role], content: msg[:content]) }
 
-    response = chat.complete
-    response.content
+      response = chat.complete
+      response.content
+    rescue StandardError => e
+      raise Leva::RunnerError, "LLM call failed for model #{model_id}: #{e.message}"
+    end
   end
 
   private

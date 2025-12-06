@@ -46,11 +46,17 @@ module Leva
 
     # Strong parameters for optimization run creation.
     # @return [Hash]
+    # @raise [ActionController::BadRequest] If model is invalid
     def optimization_params
+      model = params[:model].presence || PromptOptimizer::DEFAULT_MODEL
+      unless PromptOptimizer.find_model(model)
+        raise ActionController::BadRequest, "Invalid model: #{model}"
+      end
+
       {
         prompt_name: params[:prompt_name].presence || "Optimized: #{@dataset.name}",
         mode: params[:mode].presence || "light",
-        model: params[:model].presence || PromptOptimizer::DEFAULT_MODEL,
+        model: model,
         optimizer: params[:optimizer].presence || PromptOptimizer::DEFAULT_OPTIMIZER.to_s
       }
     end

@@ -18,11 +18,11 @@ module Leva
     # Minimum number of examples required for optimization
     MINIMUM_EXAMPLES = 10
 
-    # Available optimizers with their strategy class names
+    # Available optimizers with their strategy classes
     OPTIMIZERS = {
       bootstrap: {
         name: "Bootstrap",
-        class_name: "Leva::Optimizers::Bootstrap",
+        strategy_class: Leva::Optimizers::Bootstrap,
         gem: nil,
         description: "Fast and simple. Automatically selects optimal few-shot examples from your dataset. " \
                      "Best for quick iteration and when you have limited data (10-50 examples). " \
@@ -30,7 +30,7 @@ module Leva
       },
       gepa: {
         name: "GEPA",
-        class_name: "Leva::Optimizers::GepaOptimizer",
+        strategy_class: Leva::Optimizers::GepaOptimizer,
         gem: "dspy-gepa",
         description: "State-of-the-art optimizer using reflective prompt evolution. Uses LLM reflection " \
                      "to identify what works and propose improvements. Outperforms MIPROv2 by 10-14% " \
@@ -38,7 +38,7 @@ module Leva
       },
       miprov2: {
         name: "MIPROv2",
-        class_name: "Leva::Optimizers::Miprov2Optimizer",
+        strategy_class: Leva::Optimizers::Miprov2Optimizer,
         gem: "dspy-miprov2",
         description: "Uses Bayesian optimization to search for optimal instructions and few-shot examples. " \
                      "Good for larger datasets (200+ examples). More computationally demanding but thorough. " \
@@ -60,10 +60,13 @@ module Leva
     DEFAULT_MODEL = "gemini-2.5-flash"
 
     # Returns available models from RubyLLM.
+    # Results are cached for 5 minutes to avoid repeated expensive calls.
     #
     # @return [Array<RubyLLM::Model>] All available chat models
     def self.available_models
-      RubyLLM.models.chat_models
+      Rails.cache.fetch("leva/available_models", expires_in: 5.minutes) do
+        RubyLLM.models.chat_models
+      end
     end
 
     # Finds a model by ID.
@@ -169,7 +172,7 @@ module Leva
     # @return [Leva::Optimizers::Base] The optimizer strategy
     def build_optimizer_strategy
       config = OPTIMIZERS[@optimizer]
-      config[:class_name].constantize.new(
+      config[:strategy_class].new(
         model: @model,
         metric: @metric,
         mode: @mode,

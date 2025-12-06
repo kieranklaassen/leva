@@ -12,4 +12,7 @@ module Leva
 
   # Raised when optimization fails
   class OptimizationError < Error; end
+
+  # Raised when a runner encounters an error during execution
+  class RunnerError < Error; end
 end

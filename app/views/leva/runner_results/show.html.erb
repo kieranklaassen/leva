@@ -95,13 +95,6 @@
           <%
             score = eval_result.score
             score_pct = (score * 100).round
-            score_class = case score
-              when 0...0.2 then 'score-bad'
-              when 0.2...0.4 then 'score-poor'
-              when 0.4...0.6 then 'score-fair'
-              when 0.6...0.8 then 'score-good'
-              else 'score-excellent'
-            end
             score_label = case score
               when 0...0.2 then 'Bad'
               when 0.2...0.4 then 'Poor'
@@ -116,12 +109,12 @@
             short_name = short_name.presence || eval_result.evaluator_class.demodulize.gsub(/Eval(uator)?$/, '')
           %>
           <div class="eval-summary-card" title="<%= eval_result.evaluator_class %>">
-            <span class="eval-summary-score <%= score_class %>"><%= score_pct %><span class="eval-summary-pct">%</span></span>
+            <span class="eval-summary-score <%= score_class(score) %>"><%= score_pct %><span class="eval-summary-pct">%</span></span>
             <span class="eval-summary-name"><%= short_name %></span>
             <div class="eval-summary-bar">
-              <div class="eval-summary-bar-fill <%= score_class %>" style="width: <%= score_pct %>%"></div>
+              <div class="eval-summary-bar-fill <%= score_class(score) %>" style="width: <%= score_pct %>%"></div>
             </div>
-            <span class="eval-summary-label <%= score_class %>"><%= score_label %></span>
+            <span class="eval-summary-label <%= score_class(score) %>"><%= score_label %></span>
           </div>
         <% end %>
       </div>
