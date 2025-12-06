@@ -21,6 +21,9 @@
   <td>
     <span class="cell-dataset"><%= experiment.dataset&.name || '—' %></span>
   </td>
+  <td>
+    <span class="cell-model font-mono text-sm"><%= experiment.metadata&.dig("model") || '—' %></span>
+  </td>
   <td class="text-right text-nowrap">
     <span class="cell-timestamp"><%= time_ago_in_words(experiment.created_at) %></span>
   </td>

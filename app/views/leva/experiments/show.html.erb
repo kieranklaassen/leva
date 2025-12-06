@@ -61,6 +61,12 @@
         <span class="exp-meta-label">Runner</span>
         <span class="exp-meta-value font-mono text-sm"><%= @experiment.runner_class&.demodulize || '—' %></span>
       </div>
+      <% if @experiment.metadata&.dig("model").present? %>
+        <div class="exp-meta-item">
+          <span class="exp-meta-label">Model</span>
+          <span class="exp-meta-value font-mono text-sm"><%= @experiment.metadata["model"] %></span>
+        </div>
+      <% end %>
       <div class="exp-meta-item">
         <span class="exp-meta-label">Created</span>
         <span class="exp-meta-value"><%= time_ago_in_words(@experiment.created_at) %> ago</span>

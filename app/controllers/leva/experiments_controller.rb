@@ -83,7 +83,12 @@ module Leva
     # Only allow a list of trusted parameters through.
     # @return [ActionController::Parameters]
     def experiment_params
-      params.require(:experiment).permit(:name, :description, :dataset_id, :prompt_id, :runner_class, evaluator_classes: [])
+      permitted = params.require(:experiment).permit(:name, :description, :dataset_id, :prompt_id, :runner_class, evaluator_classes: [], metadata: {})
+      # Ensure metadata is a hash, not ActionController::Parameters
+      if permitted[:metadata].present?
+        permitted[:metadata] = permitted[:metadata].to_h
+      end
+      permitted
     end
 
     def load_runners_and_evaluators

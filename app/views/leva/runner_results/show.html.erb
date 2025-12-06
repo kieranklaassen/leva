@@ -217,49 +217,26 @@
     </div>
   </div>
 
-  <%# Raw Output - Enhanced Collapsible Section %>
-  <% if @runner_result.respond_to?(:raw_output) && @runner_result.raw_output.present? %>
+  <%# Raw LLM Response - Enhanced Collapsible Section %>
+  <% if @runner_result.prediction.present? && @runner_result.prediction != prediction_text %>
     <%
-      raw_output = @runner_result.raw_output
+      raw_output = @runner_result.prediction
       line_count = raw_output.lines.count
       char_count = raw_output.length
     %>
     <div class="result-section">
-      <details class="raw-output-collapsible">
-        <summary class="raw-output-header">
-          <div class="raw-output-header-left">
-            <svg class="icon-sm raw-output-icon" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-            <span class="raw-output-title">Raw Output</span>
-            <span class="raw-output-stats">
-              <span class="raw-output-stat"><%= line_count %> line<%= line_count == 1 ? '' : 's' %></span>
-              <span class="raw-output-stat-sep"></span>
-              <span class="raw-output-stat"><%= number_to_human_size(char_count) %></span>
-            </span>
-          </div>
-          <div class="raw-output-header-right">
-            <span class="raw-output-expand-hint">
-              <span class="expand-text">Show</span>
-              <span class="collapse-text">Hide</span>
-            </span>
-            <svg class="raw-output-chevron" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          </div>
-        </summary>
-        <div class="raw-output-body">
-          <div class="raw-output-toolbar">
-            <span class="raw-output-lang-hint">
-              <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-              </svg>
-              Response from LLM
-            </span>
-          </div>
-          <pre class="raw-output-code"><code><%= raw_output %></code></pre>
-        </div>
-      </details>
+      <div class="result-section-header">
+        <h2 class="result-section-title">
+          <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+          Raw LLM Response<% if @experiment.metadata&.dig("model").present? %> <span class="text-muted font-mono text-sm">(<%= @experiment.metadata["model"] %>)</span><% end %>
+        </h2>
+        <span class="result-section-count"><%= line_count %> line<%= line_count == 1 ? '' : 's' %>, <%= number_to_human_size(char_count) %></span>
+      </div>
+      <div class="result-panel">
+        <pre class="result-code"><code><%= raw_output %></code></pre>
+      </div>
     </div>
   <% end %>
 
