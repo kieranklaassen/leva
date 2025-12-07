@@ -215,7 +215,7 @@ optimizer = Leva::PromptOptimizer.new(
   dataset: dataset,
   optimizer: :gepa,      # :bootstrap, :gepa, or :miprov2
   mode: :medium,         # :light, :medium, or :heavy
-  model: "gpt-4o-mini"   # Any model supported by RubyLLM
+  model: "claude-opus-4-5"   # Any model supported by RubyLLM
 )
 
 # Run optimization
