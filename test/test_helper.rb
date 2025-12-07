@@ -4,6 +4,13 @@ ENV["RAILS_ENV"] = "test"
 require_relative "../test/dummy/config/environment"
 require "vcr"
 
+# Configure RubyLLM with test keys for VCR playback
+RubyLLM.configure do |config|
+  config.gemini_api_key = ENV.fetch("GEMINI_API_KEY", "test-gemini-key")
+  config.openai_api_key = ENV.fetch("OPENAI_API_KEY", "test-openai-key")
+  config.anthropic_api_key = ENV.fetch("ANTHROPIC_API_KEY", "test-anthropic-key")
+end
+
 VCR.configure do |config|
   config.cassette_library_dir = "test/vcr_cassettes"
   config.hook_into :faraday

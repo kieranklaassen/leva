@@ -65,7 +65,7 @@ module Leva
       rescue StandardError => e
         Rails.logger.error "[Leva::Optimizers::#{self.class.name.demodulize}] Optimization failed: #{e.message}"
         Rails.logger.error e.backtrace.first(5).join("\n")
-        raise OptimizationError, "#{optimizer_name} optimization failed: #{e.message}"
+        raise Leva::OptimizationError, "#{optimizer_name} optimization failed: #{e.message}"
       end
 
       # The name used in progress reporting.

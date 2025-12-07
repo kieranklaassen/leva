@@ -1,5 +1,6 @@
 require "leva/version"
 require "leva/engine"
+require "leva/errors"
 require "liquid"
 
 module Leva
