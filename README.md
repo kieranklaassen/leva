@@ -181,6 +181,60 @@ experiment.evaluation_results.group_by(&:evaluator_class).each do |evaluator_cla
 end
 ```
 
+## Prompt Optimization (DSPy Integration)
+
+Leva includes optional prompt optimization powered by [DSPy.rb](https://github.com/kieranklaassen/dspy.rb). This feature automatically finds optimal prompts and few-shot examples for your datasets.
+
+**Requirements:**
+- Ruby 3.3.0 or higher
+- DSPy gem and optional optimizer gems
+
+### Installation
+
+Add the DSPy gems to your Gemfile:
+
+```ruby
+gem "dspy"           # Core DSPy functionality (required)
+gem "dspy-gepa"      # GEPA optimizer (optional, recommended)
+gem "dspy-miprov2"   # MIPROv2 optimizer (optional)
+```
+
+### Available Optimizers
+
+| Optimizer | Best For | Description |
+|-----------|----------|-------------|
+| **Bootstrap** | Quick iteration, small datasets | Fast selection of few-shot examples. No gem required. |
+| **GEPA** | Maximum quality | State-of-the-art reflective prompt evolution. 10-14% better than MIPROv2. |
+| **MIPROv2** | Large datasets (200+) | Bayesian optimization for instructions and examples. |
+
+### Usage
+
+```ruby
+# Create an optimizer for your dataset
+optimizer = Leva::PromptOptimizer.new(
+  dataset: dataset,
+  optimizer: :gepa,      # :bootstrap, :gepa, or :miprov2
+  mode: :medium,         # :light, :medium, or :heavy
+  model: "gpt-4o-mini"   # Any model supported by RubyLLM
+)
+
+# Run optimization
+result = optimizer.optimize
+
+# Result contains optimized prompts
+result[:system_prompt]  # Optimized instruction
+result[:user_prompt]    # Template with Liquid variables
+result[:metadata]       # Score, examples, and optimization details
+```
+
+### Optimization Modes
+
+| Mode | Duration | Use Case |
+|------|----------|----------|
+| `:light` | ~5 min | Quick experiments |
+| `:medium` | ~15 min | Balanced quality/speed |
+| `:heavy` | ~30 min | Production prompts |
+
 ## Configuration
 
 Ensure you set up any required API keys or other configurations in your Rails credentials or environment variables.
