@@ -195,9 +195,12 @@ Add the DSPy gems to your Gemfile:
 
 ```ruby
 gem "dspy"           # Core DSPy functionality (required)
+gem "dspy-rubyllm"   # RubyLLM provider adapter (required)
 gem "dspy-gepa"      # GEPA optimizer (optional, recommended)
 gem "dspy-miprov2"   # MIPROv2 optimizer (optional)
 ```
+
+You can use any DSPy provider adapter instead of `dspy-rubyllm`, such as `dspy-openai` or `dspy-anthropic`.
 
 ### Available Optimizers
 
