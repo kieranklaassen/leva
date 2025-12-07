@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2025-12-06
+### Added
+- **DSPy Prompt Optimization** - Automatic prompt optimization powered by DSPy.rb
+  - `PromptOptimizer` service for finding optimal prompts and few-shot examples
+  - Three optimizer strategies: Bootstrap (fast), GEPA (best quality), MIPROv2 (thorough)
+  - `DatasetConverter` for converting datasets to DSPy format
+  - `SignatureGenerator` for creating DSPy signatures from datasets
+  - `OptimizationRun` model for tracking optimization progress
+- Documentation in README for prompt optimization usage
+
+### Changed
+- CI now uses `.ruby-version` file for consistent Ruby version (3.3.0)
+- Ruby 3.3.0+ required for DSPy features (io-event gem dependency)
+
 ## [0.3.0] - 2025-12-06
 ### Changed
 - Maintenance release with dependency updates and code cleanup
