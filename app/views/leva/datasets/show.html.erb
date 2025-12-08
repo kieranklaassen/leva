@@ -187,6 +187,7 @@
               </tr>
             </thead>
             <tbody>
+              <% @evaluator_classes = Leva::EvaluationResult.distinct.pluck(:evaluator_class) %>
               <%= render partial: 'leva/experiments/experiment', collection: @dataset.experiments %>
             </tbody>
           </table>
