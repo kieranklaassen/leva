@@ -43,12 +43,25 @@ module Leva
 
     private
 
-    # Extracts input fields from the sample record's LLM context.
+    # Extracts input fields from the sample record's context.
+    # Uses to_dspy_context if available, otherwise falls back to to_llm_context.
     #
     # @return [Hash<Symbol, Class>] Map of field names to their inferred types
     def extract_input_fields
-      context = @sample_record.to_llm_context
+      context = context_for(@sample_record)
       context.transform_values { |value| infer_type(value) }
+    end
+
+    # Returns the context for a recordable, preferring to_dspy_context if available.
+    #
+    # @param recordable [Object] The recordable object
+    # @return [Hash] The context hash
+    def context_for(recordable)
+      if recordable.respond_to?(:to_dspy_context)
+        recordable.to_dspy_context
+      else
+        recordable.to_llm_context
+      end
     end
 
     # Infers the Ruby type for a given value.

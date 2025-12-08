@@ -16,7 +16,6 @@ module Leva
     has_many :experiments
 
     validates :name, presence: true
-    validates :system_prompt, presence: true
     validates :user_prompt, presence: true
 
     before_save :increment_version

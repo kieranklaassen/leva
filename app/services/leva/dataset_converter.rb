@@ -21,6 +21,7 @@ module Leva
     end
 
     # Converts all dataset records to DSPy example format.
+    # Uses to_dspy_context if available, otherwise falls back to to_llm_context.
     #
     # @return [Array<Hash>] Array of example hashes with :input and :expected keys
     def to_dspy_examples
@@ -28,8 +29,8 @@ module Leva
         next unless record.recordable
 
         {
-          input: record.recordable.to_llm_context,
-          expected: { output: record.recordable.ground_truth }
+          input: sanitize_context(context_for(record.recordable)),
+          expected: { output: record.recordable.ground_truth.to_s }
         }
       end.compact
     end
@@ -59,6 +60,29 @@ module Leva
     # @return [Integer] Number of records with valid recordable objects
     def valid_record_count
       to_dspy_examples.size
+    end
+
+    private
+
+    # Returns the context for a recordable, preferring to_dspy_context if available.
+    #
+    # @param recordable [Object] The recordable object
+    # @return [Hash] The context hash
+    def context_for(recordable)
+      if recordable.respond_to?(:to_dspy_context)
+        recordable.to_dspy_context
+      else
+        recordable.to_llm_context
+      end
+    end
+
+    # Sanitizes context hash by converting nil values to empty strings.
+    # DSPy signatures require String types, not nil.
+    #
+    # @param context [Hash] The LLM context hash
+    # @return [Hash] Sanitized hash with nil values converted to empty strings
+    def sanitize_context(context)
+      context.transform_values { |v| v.nil? ? "" : v.to_s }
     end
   end
 end

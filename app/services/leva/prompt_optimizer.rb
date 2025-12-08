@@ -181,6 +181,7 @@ module Leva
     end
 
     # Builds the final result hash from optimization.
+    # Follows DSPy-style format: instruction + examples + input in user prompt.
     #
     # @param result [Hash] The optimizer result with :instruction, :few_shot_examples, :score
     # @param splits [Hash] The data splits
@@ -188,15 +189,15 @@ module Leva
     # @return [Hash] The formatted result
     def build_final_result(result, splits, optimizer_type)
       sample_record = @dataset.dataset_records.first&.recordable
-      input_fields = sample_record&.to_llm_context&.keys || []
+      input_fields = context_for(sample_record)&.keys || []
 
       formatted_examples = result[:few_shot_examples].map do |ex|
         { input: ex[:input], output: ex.dig(:expected, :output) }
       end
 
       {
-        system_prompt: result[:instruction],
-        user_prompt: build_user_prompt_template(input_fields),
+        system_prompt: "",
+        user_prompt: build_dspy_user_prompt(result[:instruction], formatted_examples, input_fields),
         metadata: {
           optimization: {
             score: result[:score],
@@ -275,6 +276,20 @@ module Leva
       MSG
     end
 
+    # Returns the context for a recordable, preferring to_dspy_context if available.
+    #
+    # @param recordable [Object] The recordable object
+    # @return [Hash] The context hash
+    def context_for(recordable)
+      return nil unless recordable
+
+      if recordable.respond_to?(:to_dspy_context)
+        recordable.to_dspy_context
+      else
+        recordable.to_llm_context
+      end
+    end
+
     # Returns the default evaluation metric (case-insensitive exact match).
     # Handles both Hash examples and DSPy::Example objects.
     #
@@ -294,12 +309,41 @@ module Leva
       end
     end
 
-    # Builds the user prompt template with Liquid placeholders.
+    # Builds a DSPy-style user prompt with instruction, examples, and input placeholders.
     #
+    # @param instruction [String] The task instruction
+    # @param examples [Array<Hash>] The few-shot examples
     # @param input_fields [Array<Symbol>] The input field names
-    # @return [String] The user prompt template
-    def build_user_prompt_template(input_fields)
-      input_fields.map { |field| "{{ #{field} }}" }.join("\n\n")
+    # @return [String] The DSPy-style user prompt template
+    def build_dspy_user_prompt(instruction, examples, input_fields)
+      sections = []
+
+      # Instruction
+      sections << instruction if instruction.present?
+
+      # Few-shot examples (DSPy style)
+      if examples.any?
+        sections << ""
+        sections << "---"
+        sections << ""
+        examples.each_with_index do |example, index|
+          sections << "Example #{index + 1}:"
+          example[:input].each do |field, value|
+            sections << "#{field}: #{value}"
+          end
+          sections << "Output: #{example[:output]}"
+          sections << ""
+        end
+        sections << "---"
+      end
+
+      # Input placeholders (Liquid)
+      sections << ""
+      input_fields.each do |field|
+        sections << "#{field}: {{ #{field} }}"
+      end
+
+      sections.join("\n")
     end
   end
 end
