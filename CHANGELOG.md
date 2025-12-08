@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2025-12-08
+### Added
+- `to_dspy_context` method support for recordables - allows separate DSPy-specific context (falls back to `to_llm_context`)
+- Documentation for `to_dspy_context` in README
+
+### Changed
+- DSPy optimized prompts now use DSPy-style format: instruction + examples + labeled input fields in user prompt
+- Context values are sanitized to strings for DSPy signature compatibility
+
+### Fixed
+- Removed `system_prompt` presence validation to support DSPy-style prompts without system prompts
+
 ## [0.3.2] - 2025-12-08
 ### Fixed
 - Added missing optimization routes and UI for DSPy prompt optimization feature

@@ -81,6 +81,14 @@ class TextContent < ApplicationRecord
       created_at: created_at.strftime('%Y-%m-%d %H:%M:%S')
     }
   end
+
+  # Optional: Override for DSPy optimization (falls back to to_llm_context if not defined).
+  # Use this to provide a simplified context with only the fields needed for optimization.
+  # All values must be strings (nil values are automatically converted to empty strings).
+  # @return [Hash<Symbol, String>] Context hash for DSPy optimization
+  def to_dspy_context
+    { text: text }
+  end
 end
 
 dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset")
