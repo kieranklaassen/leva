@@ -3,11 +3,12 @@ Leva::Engine.routes.draw do
 
   get "design_system", to: "design_system#index"
 
+  resources :optimization_runs, only: [ :show ]
+
   resources :datasets do
     resources :dataset_records, path: "records", only: [ :index, :show ]
     resource :optimization, only: [ :new, :create ], controller: "dataset_optimizations"
   end
-  resources :optimization_runs, only: [ :show ]
   resources :experiments, except: [ :destroy ] do
     member do
       post :rerun

@@ -158,3 +158,6 @@ module Leva
     end
   end
 end
+
+# Load DspyRunner after BaseRun is defined
+require "leva/dspy_runner"
