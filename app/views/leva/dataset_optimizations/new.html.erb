@@ -1,0 +1,145 @@
+<% content_for :title, 'Optimize Prompt' %>
+<div class="container page">
+  <nav class="breadcrumb mb-4">
+    <%= link_to "Datasets", datasets_path, class: "breadcrumb-link" %>
+    <span class="breadcrumb-sep">/</span>
+    <%= link_to @dataset.name, dataset_path(@dataset), class: "breadcrumb-link" %>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-current">Optimize</span>
+  </nav>
+
+  <div class="page-header mb-6">
+    <div>
+      <h1>Optimize Prompt</h1>
+      <p class="text-muted text-sm mt-1">Use DSPy to automatically optimize your prompt with few-shot examples</p>
+    </div>
+  </div>
+
+  <% if @can_optimize %>
+    <%= form_with url: dataset_optimization_path(@dataset), method: :post, local: true, class: "card p-6" do |form| %>
+      <%# Basic Information %>
+      <div class="form-section">
+        <div class="form-group">
+          <%= form.label :prompt_name, "Prompt Name", class: "form-label" %>
+          <%= form.text_field :prompt_name, value: "Optimized: #{@dataset.name}", autofocus: true, class: "form-input", placeholder: "e.g., Optimized Sentiment Classifier" %>
+          <p class="form-hint">Name for the new optimized prompt that will be created.</p>
+        </div>
+      </div>
+
+      <hr class="form-divider">
+
+      <%# Optimization Settings %>
+      <div class="form-section">
+        <h4 class="form-section-title">Optimization Settings</h4>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <%= form.label :optimizer, "Optimizer", class: "form-label" %>
+            <%= form.select :optimizer,
+                            @optimizers.map { |k, v| [v[:name], k] },
+                            {},
+                            class: "form-select" %>
+            <p class="form-hint">Algorithm used to optimize the prompt.</p>
+          </div>
+
+          <div class="form-group flex-1">
+            <%= form.label :mode, "Mode", class: "form-label" %>
+            <%= form.select :mode,
+                            @modes.map { |k, v| ["#{v[:name]} (#{v[:description]})", k] },
+                            {},
+                            class: "form-select" %>
+            <p class="form-hint">Higher modes use more examples but take longer.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <%= form.label :model, "Model", class: "form-label" %>
+          <%= form.select :model,
+                          @models.map { |m| [m.name, m.id] },
+                          {},
+                          class: "form-select" %>
+          <p class="form-hint">The AI model to use during optimization.</p>
+        </div>
+      </div>
+
+      <hr class="form-divider">
+
+      <%# Dataset Info %>
+      <div class="form-section">
+        <h4 class="form-section-title">Dataset Information</h4>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Records Available</span>
+            <span class="info-value"><%= @record_count %></span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Minimum Required</span>
+            <span class="info-value">10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <%= link_to "Cancel", dataset_path(@dataset), class: "btn btn-ghost" %>
+        <%= form.submit "Start Optimization", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="card p-6">
+      <div class="setup-required">
+        <div class="setup-required-icon">
+          <svg class="icon-xl" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <h3 class="setup-required-title">More Records Needed</h3>
+        <p class="setup-required-desc">You need at least <strong>10 records</strong> to optimize a prompt. Currently you have <strong><%= @record_count %></strong>.</p>
+        <p class="setup-required-hint mt-2">Add <strong><%= @records_needed %></strong> more records to enable optimization.</p>
+      </div>
+
+      <div class="form-actions">
+        <%= link_to dataset_path(@dataset), class: "btn btn-ghost" do %>
+          <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Back to Dataset
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .info-item {
+    background: var(--bg-secondary);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .info-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.25rem;
+  }
+
+  .info-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: 'Fira Code', monospace;
+  }
+
+  .setup-required-hint {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+</style>
