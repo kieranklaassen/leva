@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2025-12-08
+### Fixed
+- Added missing optimization routes and UI for DSPy prompt optimization feature
+- Fixed `@evaluator_classes` undefined variable error when rendering experiment partials on dataset show page
+
 ## [0.3.1] - 2025-12-06
 ### Added
 - **DSPy Prompt Optimization** - Automatic prompt optimization powered by DSPy.rb
