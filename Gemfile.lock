@@ -35,7 +35,7 @@ PATH
   remote: .
   specs:
     leva (0.3.3)
-      liquid (~> 5.5.0)
+      liquid (~> 5.5)
       rails (>= 7.2.0)
 
 GEM
