@@ -34,7 +34,7 @@ GIT
 PATH
   remote: .
   specs:
-    leva (0.3.3)
+    leva (0.3.4)
       liquid (~> 5.5)
       rails (>= 7.2.0)
 

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.4] - 2025-12-17
+### Fixed
+- Relaxed Liquid gem version constraint from `~> 5.5.0` to `~> 5.5` to allow newer versions (Fixes #30)
+
 ## [0.3.3] - 2025-12-08
 ### Added
 - `to_dspy_context` method support for recordables - allows separate DSPy-specific context (falls back to `to_llm_context`)
