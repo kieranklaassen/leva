@@ -3234,3 +3234,78 @@ dialog::backdrop {
   color: var(--gray-500);
   margin: 0;
 }
+
+/* ============================================
+   SEARCHABLE SELECT (Pure Stimulus)
+   Custom searchable dropdown matching Leva design
+   ============================================ */
+
+.searchable-select-wrapper {
+  position: relative;
+}
+
+.searchable-select-dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  right: 0;
+  background: var(--gray-800);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.searchable-select-dropdown.show {
+  display: block;
+}
+
+.searchable-select-option {
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s;
+  font-size: var(--text-base);
+}
+
+.searchable-select-option:hover {
+  background: var(--gray-700);
+}
+
+.searchable-select-option:active {
+  background: var(--accent-500);
+  color: var(--gray-950);
+}
+
+.searchable-select-dropdown .no-results {
+  padding: var(--space-3);
+  color: var(--gray-500);
+  text-align: center;
+  font-size: var(--text-sm);
+}
+
+/* Scrollbar styling for dropdown */
+.searchable-select-dropdown::-webkit-scrollbar {
+  width: 8px;
+}
+
+.searchable-select-dropdown::-webkit-scrollbar-track {
+  background: var(--gray-900);
+  border-radius: var(--radius-sm);
+}
+
+.searchable-select-dropdown::-webkit-scrollbar-thumb {
+  background: var(--gray-600);
+  border-radius: var(--radius-sm);
+}
+
+.searchable-select-dropdown::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-500);
+}
+
+.searchable-select-option.hidden {
+  display: none;
+}
