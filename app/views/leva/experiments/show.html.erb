@@ -167,6 +167,10 @@
           </table>
         </div>
       </div>
+    <% elsif @experiment.failed? %>
+      <div class="empty-state-inline">
+        <p class="text-muted">Experiment failed. Check logs for details.</p>
+      </div>
     <% else %>
       <div class="empty-state-inline">
         <p class="text-muted">No results yet. Run the experiment to see results.</p>
