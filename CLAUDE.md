@@ -15,7 +15,7 @@ Always run these commands to ensure CI will pass:
 3. `bundle exec rails test` - Run all tests
 
 ## Code Style
-- Ruby 3.2.0, Rails 7.2
+- Ruby 3.4.8, Rails 7.2
 - 2-space indentation, 120 character line length
 - Follow Rails Omakase Rubocop style guide
 - Frozen string literals by default
