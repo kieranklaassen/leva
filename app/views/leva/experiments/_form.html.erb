@@ -51,13 +51,25 @@
       <p class="form-hint">The runner executes your model logic for each dataset record.</p>
     </div>
 
-    <div class="form-group" id="model-selection-group">
+    <div class="form-group"
+         id="model-selection-group"
+         data-controller="searchable-select"
+         data-searchable-select-options-value="<%= Leva::PromptOptimizer.available_models.map { |m| { id: m.id, name: m.name } }.to_json %>"
+         data-searchable-select-selected-value="<%= @experiment.metadata&.dig("model") || "gemini-2.5-flash" %>">
       <label for="experiment_metadata_model" class="form-label">Model (for LLM runners)</label>
-      <select name="experiment[metadata][model]" id="experiment_metadata_model" class="form-select">
-        <% Leva::PromptOptimizer.available_models.each do |m| %>
-          <option value="<%= m.id %>" <%= 'selected' if @experiment.metadata&.dig("model") == m.id || (@experiment.metadata.blank? && m.id == "gemini-2.5-flash") %>><%= m.name %></option>
-        <% end %>
-      </select>
+      <div class="searchable-select-wrapper">
+        <input type="text"
+               class="form-input"
+               placeholder="Search for a model..."
+               data-searchable-select-target="search"
+               data-action="input->searchable-select#filter focus->searchable-select#showDropdown"
+               autocomplete="off">
+        <div class="searchable-select-dropdown" data-searchable-select-target="dropdown"></div>
+        <input type="hidden"
+               name="experiment[metadata][model]"
+               id="experiment_metadata_model"
+               data-searchable-select-target="hiddenInput">
+      </div>
       <p class="form-hint">The AI model to use when running LLM-based runners like SentimentLlmRun.</p>
     </div>
   </div>
@@ -84,3 +96,87 @@
     <%= form.submit @experiment.persisted? ? "Update Experiment" : "Create & Run Experiment", class: "btn btn-primary" %>
   </div>
 <% end %>
+
+<script>
+  (() => {
+    const application = Stimulus.Application.start()
+
+    application.register("searchable-select", class extends Stimulus.Controller {
+      static targets = ["search", "dropdown", "hiddenInput"]
+      static values = { options: Array, selected: String }
+
+      connect() {
+        this.clickHandler = this.handleClickOutside.bind(this)
+        document.addEventListener("click", this.clickHandler)
+        this.renderOptions()
+        this.setInitialValue()
+      }
+
+      disconnect() {
+        document.removeEventListener("click", this.clickHandler)
+      }
+
+      renderOptions() {
+        this.dropdownTarget.innerHTML = ""
+        this.optionsValue.forEach((option) => {
+          const div = document.createElement("div")
+          div.className = "searchable-select-option"
+          div.dataset.value = option.id
+          div.dataset.label = option.name
+          div.dataset.action = "click->searchable-select#select"
+          div.textContent = option.name
+          this.dropdownTarget.appendChild(div)
+        })
+      }
+
+      setInitialValue() {
+        const selected = this.optionsValue.find((opt) => opt.id === this.selectedValue)
+        if (selected) {
+          this.hiddenInputTarget.value = selected.id
+          this.searchTarget.value = selected.name
+        }
+      }
+
+      filter() {
+        const query = this.searchTarget.value.toLowerCase()
+        const options = this.dropdownTarget.querySelectorAll(".searchable-select-option")
+        let visibleCount = 0
+
+        options.forEach((option) => {
+          const matches = option.textContent.toLowerCase().includes(query)
+          option.classList.toggle("hidden", !matches)
+          if (matches) visibleCount++
+        })
+
+        this.dropdownTarget.querySelector(".no-results")?.remove()
+        if (visibleCount === 0) {
+          const div = document.createElement("div")
+          div.className = "no-results"
+          div.textContent = "No models found"
+          this.dropdownTarget.appendChild(div)
+        }
+      }
+
+      select(event) {
+        const option = event.currentTarget
+        this.hiddenInputTarget.value = option.dataset.value
+        this.searchTarget.value = option.dataset.label
+        this.hideDropdown()
+      }
+
+      showDropdown() {
+        this.dropdownTarget.classList.add("show")
+      }
+
+      hideDropdown() {
+        this.dropdownTarget.classList.remove("show")
+      }
+
+      handleClickOutside(event) {
+        if (!this.element.contains(event.target)) {
+          this.hideDropdown()
+        }
+      }
+    })
+  })()
+</script>
