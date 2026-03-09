@@ -145,7 +145,12 @@ end
 You can run experiments with different runs and evals:
 
 ```ruby
-experiment = Leva::Experiment.create!(name: "Sentiment Analysis", dataset: dataset)
+experiment = Leva::Experiment.create!(
+  name: "Sentiment Analysis",
+  dataset: dataset,
+  runner_class: "SentimentRun",
+  evaluator_classes: ["SentimentAccuracyEval", "SentimentF1Eval"]
+)
 
 run = SentimentRun.new
 evals = [SentimentAccuracyEval.new, SentimentF1Eval.new]
@@ -169,7 +174,9 @@ prompt = Leva::Prompt.create!(
 experiment = Leva::Experiment.create!(
   name: "Sentiment Analysis with LLM",
   dataset: dataset,
-  prompt: prompt
+  prompt: prompt,
+  runner_class: "SentimentRun",
+  evaluator_classes: ["SentimentAccuracyEval", "SentimentF1Eval"]
 )
 
 run = SentimentRun.new
