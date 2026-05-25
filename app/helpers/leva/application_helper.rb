@@ -21,6 +21,27 @@ module Leva
       end
     end
 
+    # Returns the status of a fine-tune step.
+    #
+    # @param fine_tune_run [Leva::FineTuneRun] The fine-tune run
+    # @param step_key [String] The step key to check
+    # @return [String] 'completed', 'active', or 'pending'
+    def fine_tune_step_status(fine_tune_run, step_key)
+      steps = Leva::FineTuneRun::STEPS.keys
+      current_index = steps.index(fine_tune_run.current_step) || -1
+      step_index = steps.index(step_key)
+
+      return "pending" if step_index.nil?
+
+      if fine_tune_run.completed? || step_index < current_index
+        "completed"
+      elsif step_index == current_index
+        "active"
+      else
+        "pending"
+      end
+    end
+
     # Loads all evaluator classes that inherit from Leva::BaseEval
     #
     # @return [Array<Class>] An array of evaluator classes

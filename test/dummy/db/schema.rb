@@ -81,8 +81,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_24_000001) do
     t.text "error_message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["dataset_id"], name: "index_leva_fine_tune_runs_on_dataset_id"
-    t.index ["status"], name: "index_leva_fine_tune_runs_on_status"
+    t.index [ "dataset_id" ], name: "index_leva_fine_tune_runs_on_dataset_id"
+    t.index [ "status" ], name: "index_leva_fine_tune_runs_on_status"
   end
 
   create_table "leva_optimization_runs", force: :cascade do |t|

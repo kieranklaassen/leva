@@ -13,6 +13,7 @@ module Leva
     has_many :dataset_records, dependent: :destroy
     has_many :experiments, dependent: :destroy
     has_many :optimization_runs, dependent: :destroy
+    has_many :fine_tune_runs, dependent: :destroy
 
     validates :name, presence: true
 

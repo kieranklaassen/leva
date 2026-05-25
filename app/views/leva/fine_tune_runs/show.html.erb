@@ -1,0 +1,198 @@
+<% content_for :title, "Fine-tune Progress" %>
+
+<% content_for :head do %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.querySelector('[data-fine-tune-progress]');
+      if (!container) return;
+
+      const url = container.dataset.fineTuneProgress;
+      const pollInterval = 10000;
+
+      function updateUI(data) {
+        const set = (sel, fn) => { const el = document.querySelector(sel); if (el) fn(el); };
+
+        set('[data-progress-bar]', el => el.style.width = data.progress + '%');
+        set('[data-progress-text]', el => el.textContent = data.progress + '%');
+        set('[data-step-label]', el => el.textContent = data.current_step_label);
+        set('[data-elapsed-time]', el => el.textContent = data.elapsed_time);
+        set('[data-status-indicator]', el => el.className = 'status-indicator status-' + data.status);
+
+        if (data.status === 'completed') {
+          set('[data-running-section]', el => el.style.display = 'none');
+          set('[data-completed-section]', el => el.style.display = 'block');
+          set('[data-model-id]', el => el.textContent = data.fine_tuned_model_id || '');
+        }
+
+        if (data.status === 'failed') {
+          set('[data-running-section]', el => el.style.display = 'none');
+          set('[data-failed-section]', el => el.style.display = 'block');
+          set('[data-error-message]', el => el.textContent = data.error_message);
+        }
+      }
+
+      function poll() {
+        fetch(url, { headers: { 'Accept': 'application/json' } })
+          .then(r => r.json())
+          .then(data => {
+            updateUI(data);
+            if (data.status === 'pending' || data.status === 'running') {
+              setTimeout(poll, pollInterval);
+            }
+          })
+          .catch(() => setTimeout(poll, pollInterval * 2));
+      }
+
+      poll();
+    });
+  </script>
+<% end %>
+
+<div class="container page" data-fine-tune-progress="<%= fine_tune_run_path(@fine_tune_run, format: :json) %>">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb mb-2">
+        <%= link_to "Datasets", datasets_path, class: "breadcrumb-link" %>
+        <span class="breadcrumb-sep">/</span>
+        <%= link_to @fine_tune_run.dataset.name, dataset_path(@fine_tune_run.dataset), class: "breadcrumb-link" %>
+        <span class="breadcrumb-sep">/</span>
+        <span class="breadcrumb-current">Fine-tune</span>
+      </div>
+      <h1 class="page-title">Fine-tuning Model</h1>
+      <p class="text-muted text-sm mt-2">
+        Base model: <strong><%= @fine_tune_run.base_model %></strong> &middot; Provider: <%= @fine_tune_run.provider.titleize %>
+      </p>
+    </div>
+  </div>
+
+  <%# Running State %>
+  <section data-running-section style="<%= @fine_tune_run.completed? || @fine_tune_run.failed? ? 'display: none;' : '' %>">
+    <div class="card">
+      <div class="card-body">
+        <div class="progress-container">
+          <div class="progress-header">
+            <div class="progress-status">
+              <span class="status-indicator status-<%= @fine_tune_run.status %>" data-status-indicator></span>
+              <span class="step-label" data-step-label><%= @fine_tune_run.current_step_label %></span>
+            </div>
+            <span class="progress-percentage" data-progress-text><%= @fine_tune_run.progress %>%</span>
+          </div>
+
+          <div class="progress-bar-container">
+            <div class="progress-bar" data-progress-bar style="width: <%= @fine_tune_run.progress %>%;"></div>
+          </div>
+
+          <div class="progress-details">
+            <span class="detail-item">Elapsed: <span data-elapsed-time><%= @fine_tune_run.elapsed_time_formatted %></span></span>
+          </div>
+        </div>
+
+        <div class="fine-tune-steps">
+          <% Leva::FineTuneRun::STEPS.each do |step_key, step_info| %>
+            <% step_status = fine_tune_step_status(@fine_tune_run, step_key) %>
+            <div class="step-item step-<%= step_status %>">
+              <div class="step-icon">
+                <% if step_status == 'completed' %>
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <% elsif step_status == 'active' %>
+                  <div class="spinner"></div>
+                <% else %>
+                  <div class="step-dot"></div>
+                <% end %>
+              </div>
+              <span class="step-text"><%= step_info[:label] %></span>
+            </div>
+          <% end %>
+        </div>
+
+        <p class="text-xs text-subtle mt-3">Fine-tuning can take many minutes. This page updates automatically.</p>
+      </div>
+    </div>
+  </section>
+
+  <%# Completed State %>
+  <section data-completed-section style="<%= @fine_tune_run.completed? ? '' : 'display: none;' %>">
+    <div class="card">
+      <div class="card-body">
+        <div class="completed-header">
+          <div class="completed-header-left">
+            <div class="success-icon-sm">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            </div>
+            <div>
+              <h2 class="completed-title">Fine-tune Complete</h2>
+              <p class="completed-subtitle">
+                Now selectable as <code data-model-id><%= @fine_tune_run.fine_tuned_model_id %></code>
+              </p>
+            </div>
+          </div>
+          <div class="completed-actions">
+            <%= link_to "Run an Experiment", new_experiment_path(dataset_id: @fine_tune_run.dataset_id), class: "btn btn-primary" %>
+            <%= link_to "Back to Dataset", dataset_path(@fine_tune_run.dataset), class: "btn btn-ghost" %>
+          </div>
+        </div>
+        <p class="text-muted text-sm mt-3">
+          Select this model anywhere Leva lists models to evaluate it against your dataset.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <%# Failed State %>
+  <section data-failed-section style="<%= @fine_tune_run.failed? ? '' : 'display: none;' %>">
+    <div class="card">
+      <div class="card-body">
+        <div class="error-state">
+          <div class="error-icon">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          </div>
+          <h2 class="error-title">Fine-tune Failed</h2>
+          <p class="error-message" data-error-message><%= @fine_tune_run.error_message %></p>
+          <div class="error-actions">
+            <%= button_to "Try Again", dataset_fine_tune_runs_path(@fine_tune_run.dataset), params: { base_model: @fine_tune_run.base_model }, class: "btn btn-primary" %>
+            <%= link_to "Back to Dataset", dataset_path(@fine_tune_run.dataset), class: "btn btn-ghost" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<style>
+  .progress-container { margin-bottom: 2rem; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+  .progress-status { display: flex; align-items: center; gap: 0.5rem; }
+  .status-indicator { width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-muted); }
+  .status-indicator.status-running { background-color: var(--primary); animation: pulse 1.5s ease-in-out infinite; }
+  .status-indicator.status-completed { background-color: rgb(34, 197, 94); }
+  .status-indicator.status-failed { background-color: rgb(239, 68, 68); }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .step-label { font-weight: 500; }
+  .progress-percentage { font-size: 1.5rem; font-weight: 600; font-family: 'Fira Code', monospace; color: var(--primary); }
+  .progress-bar-container { height: 8px; background-color: var(--bg-tertiary); border-radius: 4px; overflow: hidden; }
+  .progress-bar { height: 100%; background-color: var(--primary); transition: width 0.3s ease; }
+  .progress-details { display: flex; gap: 1.5rem; margin-top: 0.75rem; color: var(--text-muted); font-size: 0.875rem; }
+  .fine-tune-steps { display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; background-color: var(--bg-secondary); border-radius: 0.5rem; }
+  .step-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem; color: var(--text-muted); }
+  .step-item.step-completed { color: rgb(34, 197, 94); }
+  .step-item.step-active { color: var(--primary); font-weight: 500; }
+  .step-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+  .step-icon svg { width: 16px; height: 16px; }
+  .step-dot { width: 6px; height: 6px; border-radius: 50%; background-color: currentColor; opacity: 0.5; }
+  .spinner { width: 16px; height: 16px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .completed-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .completed-header-left { display: flex; align-items: center; gap: 1rem; }
+  .success-icon-sm { width: 48px; height: 48px; border-radius: 50%; background-color: rgba(34, 197, 94, 0.15); color: rgb(34, 197, 94); display: flex; align-items: center; justify-content: center; }
+  .success-icon-sm svg { width: 24px; height: 24px; }
+  .completed-title { font-size: 1.25rem; font-weight: 600; margin: 0; }
+  .completed-subtitle { color: var(--text-muted); margin: 0.25rem 0 0 0; font-size: 0.875rem; }
+  .completed-actions { display: flex; gap: 0.75rem; }
+  .error-state { text-align: center; padding: 2rem; }
+  .error-icon { width: 64px; height: 64px; margin: 0 auto 1rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; background-color: rgba(239, 68, 68, 0.15); color: rgb(239, 68, 68); }
+  .error-icon svg { width: 32px; height: 32px; }
+  .error-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .error-message { color: var(--text-muted); margin-bottom: 1.5rem; font-family: 'Fira Code', monospace; font-size: 0.875rem; background-color: var(--bg-secondary); padding: 1rem; border-radius: 0.5rem; text-align: left; }
+  .error-actions { display: flex; gap: 0.75rem; justify-content: center; }
+  .mt-3 { margin-top: 0.75rem; }
+</style>

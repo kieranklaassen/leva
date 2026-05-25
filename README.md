@@ -246,6 +246,58 @@ result[:metadata]       # Score, examples, and optimization details
 | `:medium` | ~15 min | Balanced quality/speed |
 | `:heavy` | ~30 min | Production prompts |
 
+## Fine-tuning a Model (Together AI)
+
+Leva can fine-tune an open model (Qwen3 via [Together AI](https://together.ai)) on a
+dataset's `(input, ground_truth)` pairs and **register the result so it shows up
+everywhere Leva lists models** — runnable through the normal RubyLLM path by any
+runner, no custom runner required.
+
+### Setup
+
+```bash
+export TOGETHER_API_KEY=...        # required: your Together API key
+export TOGETHER_API_BASE=...       # optional: overrides https://api.together.xyz/v1
+```
+
+Leva registers an OpenAI-compatible `together` provider with RubyLLM at boot, so a
+fine-tuned model registered under that provider routes to Together while genuine
+OpenAI models are untouched.
+
+### Usage
+
+From a dataset page, click **Fine-tune Model** (enabled once the dataset has at
+least 10 records). Leva exports the train split to chat-format JSONL, starts a LoRA
+fine-tune on Together, tracks it to completion, and registers the resulting model.
+Once complete, select it in any experiment or the workbench to evaluate it.
+
+### How registration persists
+
+Registered fine-tuned models are stored in a small overlay file and re-hydrated
+into RubyLLM's registry at boot and on dropdown refresh — Leva never rewrites
+RubyLLM's bundled catalog. Configure where the overlay lives, and who may trigger a
+fine-tune (it spends money on your Together key and uploads dataset rows to a third
+party), in an initializer:
+
+```ruby
+# config/initializers/leva.rb
+Leva.configure do |config|
+  # Restrict who can start a fine-tune (default: everyone who can reach the engine)
+  config.authorize_fine_tune = ->(controller) { controller.current_user&.admin? }
+
+  # Where registered fine-tuned models persist (default: config/leva_fine_tuned_models.json)
+  config.fine_tuned_models_path = Rails.root.join("storage", "leva_fine_tuned_models.json").to_s
+end
+```
+
+> **Multi-process note:** the model dropdown is cached for 5 minutes and busted on
+> registration. For a freshly fine-tuned model to appear promptly across web and job
+> processes, use a shared cache store (e.g. Redis/Memcached), not a per-process
+> memory store.
+
+> **Data boundary:** training data (inputs and ground-truth outputs) is uploaded to
+> Together. Ensure datasets you fine-tune on contain no unapproved sensitive data.
+
 ## Configuration
 
 Ensure you set up any required API keys or other configurations in your Rails credentials or environment variables.
