@@ -22,9 +22,6 @@ module Leva
     # Provider slug fine-tuned models are registered under.
     PROVIDER = "together"
 
-    # Family assigned to registered fine-tunes.
-    FAMILY = "qwen3-finetune"
-
     # Context window assumed for a registered fine-tuned chat model.
     DEFAULT_CONTEXT_WINDOW = 32_768
 
@@ -69,6 +66,7 @@ module Leva
 
       private
 
+      # @param data [Hash] Model::Info attributes
       # @return [Boolean] true if appended to the in-memory registry, false if present
       def add_to_registry(data)
         return false if RubyLLM.models.all.any? { |m| m.id == data[:id] }
@@ -77,6 +75,7 @@ module Leva
         true
       end
 
+      # @param data [Hash] Model::Info attributes
       # @return [Boolean] true if written to the overlay, false if already present
       def add_to_overlay(data)
         entries = read_overlay
@@ -96,12 +95,16 @@ module Leva
         []
       end
 
+      # Writes the overlay atomically (temp file + rename) so a crash mid-write
+      # cannot leave a truncated/corrupt registry.
       # @param entries [Array<Hash>]
       # @return [void]
       def write_overlay(entries)
         path = overlay_path
         FileUtils.mkdir_p(File.dirname(path))
-        File.write(path, JSON.pretty_generate(entries))
+        tmp = "#{path}.#{Process.pid}.tmp"
+        File.write(tmp, JSON.pretty_generate(entries))
+        File.rename(tmp, path)
       end
 
       # @return [void]
@@ -122,7 +125,7 @@ module Leva
           id: run.fine_tuned_model_id,
           name: registered_name(run),
           provider: PROVIDER,
-          family: FAMILY,
+          family: family_for(run.base_model),
           context_window: DEFAULT_CONTEXT_WINDOW,
           modalities: { input: [ "text" ], output: [ "text" ] },
           metadata: {
@@ -136,8 +139,19 @@ module Leva
       # @param run [Leva::FineTuneRun]
       # @return [String] a human-readable display name
       def registered_name(run)
-        dataset_name = run.respond_to?(:dataset) && run.dataset ? run.dataset.name : "dataset"
-        "#{dataset_name} fine-tune ##{run.id}"
+        "#{run.dataset&.name || 'dataset'} fine-tune ##{run.id}"
+      end
+
+      # Derives a model family label from the base model so non-Qwen fine-tunes
+      # (e.g. Gemma) are not mislabeled.
+      # @param base_model [String]
+      # @return [String]
+      def family_for(base_model)
+        case base_model.to_s
+        when /gemma/i then "gemma-finetune"
+        when /qwen/i then "qwen3-finetune"
+        else "finetune"
+        end
       end
     end
   end

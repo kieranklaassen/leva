@@ -20,6 +20,11 @@ module Leva
         return redirect_to dataset_path(@dataset), alert: "Unsupported base model: #{base_model}"
       end
 
+      if @dataset.dataset_records.count < FineTuneRun::MINIMUM_RECORDS
+        return redirect_to dataset_path(@dataset),
+          alert: "Need at least #{FineTuneRun::MINIMUM_RECORDS} records to fine-tune."
+      end
+
       @fine_tune_run = @dataset.fine_tune_runs.create!(base_model: base_model, provider: "together", status: :pending)
       FineTuneJob.perform_later(fine_tune_run_id: @fine_tune_run.id)
       redirect_to fine_tune_run_path(@fine_tune_run)

@@ -35,6 +35,12 @@ module Leva
       # Safety cap on poll attempts.
       MAX_POLLS = 720
 
+      # Seconds to wait for a connection to open.
+      OPEN_TIMEOUT = 30
+
+      # Seconds to wait for a response (uploads can be large).
+      READ_TIMEOUT = 120
+
       # @param progress [#call, nil] progress callback
       # @param api_key [String, nil] overrides ENV[API_KEY_ENV]
       # @param api_base [String, nil] overrides the API base
@@ -60,11 +66,11 @@ module Leva
 
         report(step: "uploading", progress: 15)
         file_id = upload_file(jsonl)
-        fine_tune_run.try(:update, training_file_id: file_id)
+        fine_tune_run.update(training_file_id: file_id)
 
         report(step: "creating_job", progress: 30)
-        job_id = create_job(file_id, fine_tune_run.base_model, fine_tune_run.try(:hyperparameters))
-        fine_tune_run.try(:update, provider_job_id: job_id)
+        job_id = create_job(file_id, fine_tune_run.base_model, fine_tune_run.hyperparameters)
+        fine_tune_run.update(provider_job_id: job_id)
 
         model_id = poll_until_terminal(job_id)
         report(step: "completed", progress: 100)
@@ -74,6 +80,7 @@ module Leva
 
       private
 
+      # @param jsonl [String] newline-delimited training data
       # @return [String] the uploaded file id
       def upload_file(jsonl)
         Tempfile.create([ "leva_training", ".jsonl" ]) do |file|
@@ -90,6 +97,9 @@ module Leva
         end
       end
 
+      # @param file_id [String] the uploaded training file id
+      # @param base_model [String] the base model to fine-tune
+      # @param hyperparameters [Hash, nil] optional training hyperparameters
       # @return [String] the created job id
       def create_job(file_id, base_model, hyperparameters)
         body = { training_file: file_id, model: base_model, lora: true }
@@ -117,7 +127,9 @@ module Leva
           report(step: "training", progress: training_progress(body))
 
           return output_name(body) if status == SUCCESS_STATUS
-          raise Leva::FineTuneError, "Together fine-tune #{status}: #{job_error(body)}" if FAILURE_STATUSES.include?(status)
+          if FAILURE_STATUSES.include?(status)
+            raise Leva::FineTuneError, "Together fine-tune #{status}: #{job_error(body)}"
+          end
 
           sleep(@poll_interval) if @poll_interval.to_f.positive?
         end
@@ -125,14 +137,17 @@ module Leva
         raise Leva::FineTuneError, "Together fine-tune did not complete after #{MAX_POLLS} polls"
       end
 
+      # @param body [Hash] the job status response
       # @return [Integer] a bounded progress estimate while training (30..95)
       def training_progress(body)
-        pct = body["progress"] || body.dig("events", "progress")
+        events = body["events"]
+        pct = body["progress"] || (events.is_a?(Hash) ? events["progress"] : nil)
         return 60 unless pct.is_a?(Numeric)
 
         [ [ 30 + (pct * 0.65).to_i, 30 ].max, 95 ].min
       end
 
+      # @param body [Hash] the completed job response
       # @return [String] the resulting model id from a completed job
       def output_name(body)
         key = OUTPUT_NAME_KEYS.find { |candidate| body[candidate].present? }
@@ -141,24 +156,39 @@ module Leva
         body[key]
       end
 
+      # Extracts a human-readable error message from a job body, handling both a
+      # flat +error+ string and Together's nested +{ error: { message: } }+ envelope.
+      # @param body [Hash]
+      # @return [String]
       def job_error(body)
-        body["error"] || body.dig("error", "message") || "no error detail"
+        error = body["error"]
+        return error["message"] || error.to_s if error.is_a?(Hash)
+
+        error || body["message"] || "no error detail"
       end
 
+      # @param path [String] an API path relative to the base
       # @return [String] absolute URL for an API path (avoids Faraday base-join pitfalls)
       def endpoint(path)
         "#{@api_base}/#{path}"
       end
 
+      # @return [Faraday::Connection] the (memoized) HTTP connection, with timeouts set
       def connection
         @connection ||= Faraday.new do |f|
           f.request :multipart
           f.response :json, content_type: /\bjson$/
           f.headers["Authorization"] = "Bearer #{@api_key}"
+          f.options.open_timeout = OPEN_TIMEOUT
+          f.options.timeout = READ_TIMEOUT
           f.adapter Faraday.default_adapter
         end
       end
 
+      # Raises a {Leva::FineTuneError} unless the response was 2xx.
+      # @param response [Faraday::Response]
+      # @param action [String] label for the failed action
+      # @return [void]
       def ensure_success!(response, action)
         return if response.success?
 
@@ -166,6 +196,10 @@ module Leva
         raise Leva::FineTuneError, "Together #{action} failed (HTTP #{response.status})#{": #{detail}" if detail}"
       end
 
+      # @param body [Object] the parsed response body
+      # @param key [String] the required key
+      # @return [Object] the value at +key+
+      # @raise [Leva::FineTuneError] if the key is missing
       def fetch(body, key)
         value = body.is_a?(Hash) ? body[key] : nil
         raise Leva::FineTuneError, "Together response missing '#{key}'" if value.nil?

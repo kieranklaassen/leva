@@ -65,6 +65,13 @@ module Leva
       assert_raises(ArgumentError) { ModelRegistrar.register(model_data.merge(id: "")) }
     end
 
+    test "register tolerates a corrupt overlay file and rewrites it" do
+      File.write(@overlay.path, "{ not valid json")
+      assert_nothing_raised { ModelRegistrar.register(model_data) }
+      entries = JSON.parse(File.read(@overlay.path), symbolize_names: true)
+      assert_includes entries.map { |e| e[:id] }, model_data[:id]
+    end
+
     test "available_models includes a freshly registered fine-tuned model" do
       Rails.cache.delete("leva/available_models")
       ModelRegistrar.register(model_data)

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require "ostruct"
 
 module Leva
   module FineTuners
@@ -9,7 +8,7 @@ module Leva
       setup do
         @dataset = Leva::Dataset.create!(name: "Sentiment")
         10.times { |i| @dataset.add_record(TextContent.create!(text: "Text #{i}", expected_label: "positive")) }
-        @run = OpenStruct.new(dataset: @dataset, base_model: "Qwen/Qwen3-8B", hyperparameters: nil)
+        @run = Leva::FineTuneRun.create!(dataset: @dataset, base_model: Leva::FineTuneRun::DEFAULT_BASE_MODEL)
       end
 
       test "uploads, creates, polls to completion and returns the serving binding" do
@@ -29,25 +28,61 @@ module Leva
         assert_includes steps, "completed"
       end
 
-      test "raises a FineTuneError when the job fails" do
+      test "persists the training file id and provider job id on the run" do
+        build_together(&method(:happy_path_stubs)).run(@run)
+        @run.reload
+        assert_equal "file-1", @run.training_file_id
+        assert_equal "ft-1", @run.provider_job_id
+      end
+
+      test "raises a FineTuneError when the job fails, surfacing a nested error message" do
         together = build_together do |stub|
           stub.post(url("files")) { ok(id: "file-1") }
           stub.post(url("fine-tunes")) { ok(id: "ft-1", status: "pending") }
-          stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "error", error: "bad training data") }
+          stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "error", error: { message: "bad training data" }) }
         end
 
         error = assert_raises(Leva::FineTuneError) { together.run(@run) }
-        assert_match(/error/, error.message)
+        assert_match(/bad training data/, error.message)
       end
 
       test "raises before creating a job when the upload returns non-2xx" do
         together = build_together do |stub|
           stub.post(url("files")) { [ 400, json_headers, { error: "bad file" }.to_json ] }
-          # No /fine-tunes stub: if create_job were called, the test adapter would raise a
-          # different (not-stubbed) error, so a FineTuneError proves we stopped at upload.
         end
 
         assert_raises(Leva::FineTuneError) { together.run(@run) }
+      end
+
+      test "raises when the job completes without a model name" do
+        together = build_together do |stub|
+          stub.post(url("files")) { ok(id: "file-1") }
+          stub.post(url("fine-tunes")) { ok(id: "ft-1", status: "pending") }
+          stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "completed") }
+        end
+
+        error = assert_raises(Leva::FineTuneError) { together.run(@run) }
+        assert_match(/without a model name/, error.message)
+      end
+
+      test "raises after exhausting the poll budget when the job never finishes" do
+        together = build_together do |stub|
+          stub.post(url("files")) { ok(id: "file-1") }
+          stub.post(url("fine-tunes")) { ok(id: "ft-1", status: "pending") }
+          stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "running") }
+        end
+
+        error = assert_raises(Leva::FineTuneError) { together.run(@run) }
+        assert_match(/did not complete/, error.message)
+      end
+
+      test "raises when the dataset produces no training examples" do
+        empty = Leva::Dataset.create!(name: "Tiny")
+        empty.add_record(TextContent.create!(text: "only one", expected_label: "positive"))
+        run = Leva::FineTuneRun.create!(dataset: empty, base_model: Leva::FineTuneRun::DEFAULT_BASE_MODEL)
+
+        error = assert_raises(Leva::FineTuneError) { build_together { |_stub| }.run(run) }
+        assert_match(/no training examples/, error.message)
       end
 
       test "raises when the API key is missing" do

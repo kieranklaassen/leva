@@ -23,7 +23,7 @@ module Leva
       result = adapter_for(@run.provider).run(@run)
 
       @run.complete!(result: result)
-      ModelRegistrar.call(@run)
+      register_model
     rescue ActiveRecord::RecordNotFound => e
       Rails.logger.error "[Leva::FineTuneJob] FineTuneRun not found: #{e.message}"
       raise
@@ -39,6 +39,16 @@ module Leva
     end
 
     private
+
+    # Registers the fine-tuned model after a successful run. Training already
+    # succeeded and the run is completed, so a registration failure is logged
+    # rather than flipping the run to failed (which would hide a usable result).
+    # @return [void]
+    def register_model
+      ModelRegistrar.call(@run)
+    rescue StandardError => e
+      Rails.logger.error "[Leva::FineTuneJob] Training succeeded but model registration failed: #{e.message}"
+    end
 
     # @param provider [String]
     # @return [Leva::FineTuners::Base]

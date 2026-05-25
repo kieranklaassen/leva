@@ -9,7 +9,9 @@ module Leva
     setup do
       @routes = Engine.routes
       @dataset = Dataset.create!(name: "Sentiment")
-      3.times { |i| @dataset.add_record(TextContent.create!(text: "Text #{i}", expected_label: "positive")) }
+      Leva::FineTuneRun::MINIMUM_RECORDS.times do |i|
+        @dataset.add_record(TextContent.create!(text: "Text #{i}", expected_label: "positive"))
+      end
     end
 
     teardown do
@@ -41,6 +43,18 @@ module Leva
         end
       end
       assert_redirected_to leva.dataset_path(@dataset)
+    end
+
+    test "create rejects datasets below the minimum record count without enqueuing" do
+      small = Dataset.create!(name: "Tiny")
+      3.times { |i| small.add_record(TextContent.create!(text: "t#{i}", expected_label: "positive")) }
+
+      assert_no_enqueued_jobs do
+        assert_no_difference -> { Leva::FineTuneRun.count } do
+          post leva.dataset_fine_tune_runs_path(small), params: { base_model: Leva::FineTuneRun::DEFAULT_BASE_MODEL }
+        end
+      end
+      assert_redirected_to leva.dataset_path(small)
     end
 
     test "create is blocked when the authorization gate denies" do

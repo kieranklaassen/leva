@@ -55,6 +55,23 @@ module Leva
       assert RubyLLM.models.find("kieran/Qwen3-8B-ft-1")
     end
 
+    test "keeps the run completed when registration fails after training succeeds" do
+      result = {
+        model_id: "kieran/Qwen3-8B-ft-2",
+        serving_base_url: Leva::Providers::Together::DEFAULT_API_BASE
+      }
+
+      Leva::FineTuners::Together.stub(:new, FakeAdapter.new(result: result)) do
+        Leva::ModelRegistrar.stub(:call, ->(_run) { raise "overlay write failed" }) do
+          Leva::FineTuneJob.perform_now(fine_tune_run_id: @run.id)
+        end
+      end
+
+      @run.reload
+      assert @run.completed?, "training succeeded, so a registration failure must not flip the run to failed"
+      assert_equal "kieran/Qwen3-8B-ft-2", @run.fine_tuned_model_id
+    end
+
     test "marks the run failed with a message and registers nothing on adapter failure" do
       adapter = FakeAdapter.new(error: Leva::FineTuneError.new("Together fine-tune error: bad data"))
 

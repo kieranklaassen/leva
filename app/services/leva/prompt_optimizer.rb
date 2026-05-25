@@ -66,7 +66,7 @@ module Leva
     #
     # @return [Array<RubyLLM::Model>] All available chat models
     def self.available_models
-      Rails.cache.fetch("leva/available_models", expires_in: 5.minutes) do
+      Rails.cache.fetch(Leva::ModelRegistrar::AVAILABLE_MODELS_CACHE_KEY, expires_in: 5.minutes) do
         Leva::ModelRegistrar.sync!
         RubyLLM.models.chat_models
       end

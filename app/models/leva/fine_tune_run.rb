@@ -13,6 +13,9 @@ module Leva
   class FineTuneRun < ApplicationRecord
     self.table_name = "leva_fine_tune_runs"
 
+    # Minimum dataset records required to start a fine-tune.
+    MINIMUM_RECORDS = 10
+
     # Default base model fine-tuned when none is chosen (a small Qwen3).
     DEFAULT_BASE_MODEL = "Qwen/Qwen3-8B"
 
