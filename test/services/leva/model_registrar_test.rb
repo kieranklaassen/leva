@@ -71,6 +71,23 @@ module Leva
       assert_includes Leva::PromptOptimizer.available_models.map(&:id), model_data[:id]
     end
 
+    test "call builds and registers the model from a completed run" do
+      dataset = Leva::Dataset.create!(name: "Sentiment")
+      run = Leva::FineTuneRun.create!(
+        dataset: dataset,
+        base_model: Leva::FineTuneRun::DEFAULT_BASE_MODEL,
+        status: :completed,
+        fine_tuned_model_id: "kieran/Qwen3-8B-ft-call",
+        serving_base_url: Leva::Providers::Together::DEFAULT_API_BASE
+      )
+
+      assert ModelRegistrar.call(run)
+      info = RubyLLM.models.find(run.fine_tuned_model_id)
+      assert_equal "together", info.provider
+      assert_equal "chat", info.type
+      assert_equal Leva::FineTuneRun::DEFAULT_BASE_MODEL, info.metadata[:base_model]
+    end
+
     private
 
     def model_data(id = "ft:qwen3-8b:sentiment-1")
