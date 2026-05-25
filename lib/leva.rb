@@ -4,6 +4,54 @@ require "leva/errors"
 require "liquid"
 
 module Leva
+  # Holds host-configurable settings for the Leva engine.
+  #
+  # @example Configure Leva in a host initializer
+  #   Leva.configure do |config|
+  #     config.authorize_fine_tune = ->(controller) { controller.current_user&.admin? }
+  #     config.fine_tuned_models_path = Rails.root.join("storage", "leva_fine_tuned_models.json").to_s
+  #   end
+  class Configuration
+    # @return [#call] gate invoked before starting a fine-tune; receives the
+    #   controller and returns truthy to allow. Defaults to always-allow.
+    attr_writer :authorize_fine_tune
+
+    # @return [String, nil] explicit path to the overlay file that persists
+    #   Leva-registered fine-tuned models. Defaults to a path under the host app.
+    attr_writer :fine_tuned_models_path
+
+    # @return [#call] the authorization gate (default allows everything)
+    def authorize_fine_tune
+      @authorize_fine_tune ||= ->(_controller) { true }
+    end
+
+    # @return [String] the fine-tuned models overlay path
+    def fine_tuned_models_path
+      @fine_tuned_models_path || default_fine_tuned_models_path
+    end
+
+    private
+
+    # @return [String] default overlay path under the host app (writable, persistent)
+    def default_fine_tuned_models_path
+      base = defined?(Rails) && Rails.respond_to?(:root) && Rails.root ? Rails.root : Pathname.new(Dir.pwd)
+      base.join("config", "leva_fine_tuned_models.json").to_s
+    end
+  end
+
+  # @return [Leva::Configuration] the current configuration
+  def self.config
+    @config ||= Configuration.new
+  end
+
+  # Yields the configuration for host customization.
+  #
+  # @yieldparam config [Leva::Configuration]
+  # @return [void]
+  def self.configure
+    yield(config)
+  end
+
   # Runs an evaluation experiment with the given run and evals.
   #
   # @param experiment [Leva::Experiment] The experiment to run.

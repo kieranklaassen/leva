@@ -61,10 +61,13 @@ module Leva
 
     # Returns available models from RubyLLM.
     # Results are cached for 5 minutes to avoid repeated expensive calls.
+    # Re-hydrates Leva-registered fine-tuned models first so models registered in
+    # another process (e.g. a fine-tune job worker) become selectable here.
     #
     # @return [Array<RubyLLM::Model>] All available chat models
     def self.available_models
       Rails.cache.fetch("leva/available_models", expires_in: 5.minutes) do
+        Leva::ModelRegistrar.sync!
         RubyLLM.models.chat_models
       end
     end
