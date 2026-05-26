@@ -3,6 +3,7 @@
 require "faraday"
 require "faraday/multipart"
 require "tempfile"
+require "digest"
 
 module Leva
   module FineTuners
@@ -45,13 +46,16 @@ module Leva
       # @param api_key [String, nil] overrides ENV[API_KEY_ENV]
       # @param api_base [String, nil] overrides the API base
       # @param poll_interval [Numeric] seconds between polls (0 in tests)
-      # @param connection [Faraday::Connection, nil] injectable connection (tests)
-      def initialize(progress: nil, api_key: nil, api_base: nil, poll_interval: DEFAULT_POLL_INTERVAL, connection: nil)
+      # @param connection [Faraday::Connection, nil] injectable API connection (tests)
+      # @param upload_connection [Faraday::Connection, nil] injectable S3-PUT connection (tests)
+      def initialize(progress: nil, api_key: nil, api_base: nil, poll_interval: DEFAULT_POLL_INTERVAL,
+                     connection: nil, upload_connection: nil)
         super(progress: progress)
         @api_key = api_key || ENV[API_KEY_ENV]
         @api_base = api_base || ENV.fetch("TOGETHER_API_BASE", API_BASE)
         @poll_interval = poll_interval
         @connection = connection
+        @upload_connection = upload_connection
       end
 
       # @param fine_tune_run [Leva::FineTuneRun]
@@ -80,20 +84,41 @@ module Leva
 
       private
 
+      # Uploads training data via Together's presigned-URL flow:
+      #   POST /files (multipart metadata, redirects NOT followed) -> 302 with
+      #   Location (presigned S3 URL) + X-Together-File-Id -> PUT raw bytes to the
+      #   presigned URL -> POST /files/{id}/preprocess to finalize.
       # @param jsonl [String] newline-delimited training data
       # @return [String] the uploaded file id
       def upload_file(jsonl)
         Tempfile.create([ "leva_training", ".jsonl" ]) do |file|
           file.write(jsonl)
           file.flush
-          response = connection.post(endpoint("files")) do |req|
+          checksum = Digest::SHA256.file(file.path).hexdigest
+
+          meta = connection.post(endpoint("files")) do |req|
             req.body = {
-              purpose: "fine-tune",
-              file: Faraday::Multipart::FilePart.new(file.path, "application/jsonl", "training.jsonl")
+              purpose: Faraday::Multipart::ParamPart.new("fine-tune", "text/plain"),
+              file_name: Faraday::Multipart::ParamPart.new("training.jsonl", "text/plain"),
+              file_type: Faraday::Multipart::ParamPart.new("jsonl", "text/plain"),
+              checksum: Faraday::Multipart::ParamPart.new(checksum, "text/plain")
             }
           end
-          ensure_success!(response, "file upload")
-          fetch(response.body, "id")
+          unless meta.status == 302
+            raise Leva::FineTuneError, "Together file upload init failed (HTTP #{meta.status}): #{meta.body}"
+          end
+
+          upload_url = meta.headers["Location"]
+          file_id = meta.headers["X-Together-File-Id"]
+          if upload_url.to_s.empty? || file_id.to_s.empty?
+            raise Leva::FineTuneError, "Together upload response missing Location / X-Together-File-Id"
+          end
+
+          put = upload_connection.put(upload_url, File.binread(file.path))
+          ensure_success!(put, "training file S3 PUT")
+
+          ensure_success!(connection.post(endpoint("files/#{file_id}/preprocess")), "file preprocess")
+          file_id
         end
       end
 
@@ -102,7 +127,17 @@ module Leva
       # @param hyperparameters [Hash, nil] optional training hyperparameters
       # @return [String] the created job id
       def create_job(file_id, base_model, hyperparameters)
-        body = { training_file: file_id, model: base_model, lora: true }
+        # Defaults mirror the Together SDK (batch_size "max" is required — omitting
+        # it makes Together compute a zero batch size and reject the job).
+        body = {
+          training_file: file_id,
+          model: base_model,
+          lora: true,
+          n_epochs: 3,
+          n_checkpoints: 1,
+          batch_size: "max",
+          learning_rate: 0.00001
+        }
         body.merge!(hyperparameters.symbolize_keys) if hyperparameters.is_a?(Hash)
 
         response = connection.post(endpoint("fine-tunes")) do |req|
@@ -179,6 +214,16 @@ module Leva
           f.request :multipart
           f.response :json, content_type: /\bjson$/
           f.headers["Authorization"] = "Bearer #{@api_key}"
+          f.options.open_timeout = OPEN_TIMEOUT
+          f.options.timeout = READ_TIMEOUT
+          f.adapter Faraday.default_adapter
+        end
+      end
+
+      # Bare connection (no Together auth) for PUTting bytes to the presigned S3 URL.
+      # @return [Faraday::Connection]
+      def upload_connection
+        @upload_connection ||= Faraday.new do |f|
           f.options.open_timeout = OPEN_TIMEOUT
           f.options.timeout = READ_TIMEOUT
           f.adapter Faraday.default_adapter

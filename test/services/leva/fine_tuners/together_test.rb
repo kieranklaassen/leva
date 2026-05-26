@@ -11,16 +11,17 @@ module Leva
         @run = Leva::FineTuneRun.create!(dataset: @dataset, base_model: Leva::FineTuneRun::DEFAULT_BASE_MODEL)
       end
 
-      test "uploads, creates, polls to completion and returns the serving binding" do
+      test "uploads (presigned flow), creates, polls to completion and returns the serving binding" do
         steps = []
-        together = build_together(
-          progress: ->(step:, progress:) { steps << step },
-          &method(:happy_path_stubs)
-        )
+        together = build_together(progress: ->(step:, progress:) { steps << step }) do |stub|
+          add_upload_stubs(stub)
+          stub.post(url("fine-tunes")) { ok(id: "ft-1", status: "pending") }
+          stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "completed", output_name: "kieran/Qwen2.5-7B-Instruct-ft-1") }
+        end
 
         result = together.run(@run)
 
-        assert_equal "kieran/Qwen3-8B-ft-1", result[:model_id]
+        assert_equal "kieran/Qwen2.5-7B-Instruct-ft-1", result[:model_id]
         assert_equal Together::API_BASE, result[:serving_base_url]
         assert_equal "TOGETHER_API_KEY", result[:api_key_env]
         assert result[:serverless]
@@ -29,7 +30,12 @@ module Leva
       end
 
       test "persists the training file id and provider job id on the run" do
-        build_together(&method(:happy_path_stubs)).run(@run)
+        build_together do |stub|
+          add_upload_stubs(stub)
+          stub.post(url("fine-tunes")) { ok(id: "ft-1", status: "pending") }
+          stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "completed", output_name: "m") }
+        end.run(@run)
+
         @run.reload
         assert_equal "file-1", @run.training_file_id
         assert_equal "ft-1", @run.provider_job_id
@@ -37,7 +43,7 @@ module Leva
 
       test "raises a FineTuneError when the job fails, surfacing a nested error message" do
         together = build_together do |stub|
-          stub.post(url("files")) { ok(id: "file-1") }
+          add_upload_stubs(stub)
           stub.post(url("fine-tunes")) { ok(id: "ft-1", status: "pending") }
           stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "error", error: { message: "bad training data" }) }
         end
@@ -46,9 +52,9 @@ module Leva
         assert_match(/bad training data/, error.message)
       end
 
-      test "raises before creating a job when the upload returns non-2xx" do
+      test "raises before creating a job when the upload init returns non-302" do
         together = build_together do |stub|
-          stub.post(url("files")) { [ 400, json_headers, { error: "bad file" }.to_json ] }
+          stub.post(url("files")) { [ 400, json_headers, { message: "bad file" }.to_json ] }
         end
 
         assert_raises(Leva::FineTuneError) { together.run(@run) }
@@ -56,7 +62,7 @@ module Leva
 
       test "raises when the job completes without a model name" do
         together = build_together do |stub|
-          stub.post(url("files")) { ok(id: "file-1") }
+          add_upload_stubs(stub)
           stub.post(url("fine-tunes")) { ok(id: "ft-1", status: "pending") }
           stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "completed") }
         end
@@ -67,7 +73,7 @@ module Leva
 
       test "raises after exhausting the poll budget when the job never finishes" do
         together = build_together do |stub|
-          stub.post(url("files")) { ok(id: "file-1") }
+          add_upload_stubs(stub)
           stub.post(url("fine-tunes")) { ok(id: "ft-1", status: "pending") }
           stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "running") }
         end
@@ -94,18 +100,21 @@ module Leva
 
       def build_together(progress: nil, &stub_block)
         stubs = Faraday::Adapter::Test::Stubs.new(&stub_block)
-        connection = Faraday.new do |f|
+        conn = Faraday.new do |f|
           f.request :multipart
           f.response :json, content_type: /\bjson$/
           f.adapter :test, stubs
         end
-        Together.new(api_key: "sk-test", poll_interval: 0, connection: connection, progress: progress)
+        # Inject the same test connection for both API calls and the S3 PUT.
+        Together.new(api_key: "sk-test", poll_interval: 0, connection: conn, upload_connection: conn, progress: progress)
       end
 
-      def happy_path_stubs(stub)
-        stub.post(url("files")) { ok(id: "file-1") }
-        stub.post(url("fine-tunes")) { ok(id: "ft-1", status: "pending") }
-        stub.get(url("fine-tunes/ft-1")) { ok(id: "ft-1", status: "completed", output_name: "kieran/Qwen3-8B-ft-1") }
+      # Stubs Together's presigned upload flow: POST /files -> 302 (Location +
+      # X-Together-File-Id) -> PUT bytes to the presigned URL -> POST /preprocess.
+      def add_upload_stubs(stub)
+        stub.post(url("files")) { [ 302, { "Location" => "https://s3.test/upload", "X-Together-File-Id" => "file-1" }, "" ] }
+        stub.put("https://s3.test/upload") { [ 200, {}, "" ] }
+        stub.post(url("files/file-1/preprocess")) { ok(id: "file-1") }
       end
 
       def url(path)
