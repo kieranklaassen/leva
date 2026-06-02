@@ -1,26 +1,5 @@
 module Leva
   module ApplicationHelper
-    # Returns the status of an optimization step.
-    #
-    # @param optimization_run [Leva::OptimizationRun] The optimization run
-    # @param step_key [String] The step key to check
-    # @return [String] 'completed', 'active', or 'pending'
-    def optimization_step_status(optimization_run, step_key)
-      steps = Leva::OptimizationRun::STEPS.keys
-      current_index = steps.index(optimization_run.current_step) || -1
-      step_index = steps.index(step_key)
-
-      return "pending" if step_index.nil?
-
-      if optimization_run.completed? || step_index < current_index
-        "completed"
-      elsif step_index == current_index
-        "active"
-      else
-        "pending"
-      end
-    end
-
     # Loads all evaluator classes that inherit from Leva::BaseEval
     #
     # @return [Array<Class>] An array of evaluator classes
@@ -51,18 +30,13 @@ module Leva
       end
     end
 
-    # Returns the display name for a model.
+    # Returns available chat models from RubyLLM.
     #
-    # Uses RubyLLM to find the model and get its display name,
-    # falling back to extracting the name from the model ID.
-    #
-    # @param model_id [String] The model ID
-    # @return [String] The display name for the model
-    def model_display_name(model_id)
-      return "—" if model_id.blank?
-
-      @models_cache ||= Leva::PromptOptimizer.available_models.index_by(&:id)
-      @models_cache[model_id]&.name || model_id.split("/").last
+    # @return [Array<RubyLLM::Model>] All available chat models
+    def available_models
+      @available_models ||= Rails.cache.fetch("leva/available_models", expires_in: 5.minutes) do
+        RubyLLM.models.chat_models
+      end
     end
 
     # Loads predefined prompts from markdown files

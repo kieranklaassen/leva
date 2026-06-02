@@ -17,20 +17,5 @@ gem "rubocop-rails-omakase", require: false
 
 gem "annotaterb", require: false
 
-# DSPy.rb for prompt optimization (development/testing)
-# Using fork with ruby-llm adapter and miprov2 fix
-git "https://github.com/kieranklaassen/dspy.rb.git", branch: "feat/ruby-llm-adapter" do
-  gem "dspy"
-  gem "dspy-ruby_llm"
-  gem "dspy-gepa"
-  gem "dspy-miprov2"
-end
-
-# Required by dspy for observability
-gem "opentelemetry-sdk"
-
-# Test dependencies - VCR records real HTTP responses to replay in tests
-gem "vcr"
-
-# RubyLLM unified LLM adapter (required by dspy-ruby_llm)
+# RubyLLM model catalog for experiment configuration
 gem "ruby_llm"

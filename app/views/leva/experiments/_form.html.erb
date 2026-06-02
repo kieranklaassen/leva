@@ -54,7 +54,7 @@
     <div class="form-group"
          id="model-selection-group"
          data-controller="searchable-select"
-         data-searchable-select-options-value="<%= Leva::PromptOptimizer.available_models.map { |m| { id: m.id, name: m.name } }.to_json %>"
+         data-searchable-select-options-value="<%= available_models.map { |m| { id: m.id, name: m.name } }.to_json %>"
          data-searchable-select-selected-value="<%= @experiment.metadata&.dig("model") || "gemini-2.5-flash" %>">
       <label for="experiment_metadata_model" class="form-label">Model (for LLM runners)</label>
       <div class="searchable-select-wrapper">

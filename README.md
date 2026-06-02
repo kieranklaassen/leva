@@ -82,13 +82,6 @@ class TextContent < ApplicationRecord
     }
   end
 
-  # Optional: Override for DSPy optimization (falls back to to_llm_context if not defined).
-  # Use this to provide a simplified context with only the fields needed for optimization.
-  # All values must be strings (nil values are automatically converted to empty strings).
-  # @return [Hash<Symbol, String>] Context hash for DSPy optimization
-  def to_dspy_context
-    { text: text }
-  end
 end
 
 dataset = Leva::Dataset.create(name: "Sentiment Analysis Dataset")
@@ -195,63 +188,6 @@ experiment.evaluation_results.group_by(&:evaluator_class).each do |evaluator_cla
   puts "#{evaluator_class.capitalize} Average Score: #{average_score}"
 end
 ```
-
-## Prompt Optimization (DSPy Integration)
-
-Leva includes optional prompt optimization powered by [DSPy.rb](https://github.com/kieranklaassen/dspy.rb). This feature automatically finds optimal prompts and few-shot examples for your datasets.
-
-**Requirements:**
-- Ruby 3.3.0 or higher
-- DSPy gem and optional optimizer gems
-
-### Installation
-
-Add the DSPy gems to your Gemfile:
-
-```ruby
-gem "dspy"           # Core DSPy functionality (required)
-gem "dspy-ruby_llm"  # RubyLLM provider adapter (required)
-gem "dspy-gepa"      # GEPA optimizer (optional, recommended)
-gem "dspy-miprov2"   # MIPROv2 optimizer (optional)
-```
-
-You can use any DSPy provider adapter instead of `dspy-ruby_llm`, such as `dspy-openai` or `dspy-anthropic`.
-
-### Available Optimizers
-
-| Optimizer | Best For | Description |
-|-----------|----------|-------------|
-| **Bootstrap** | Quick iteration, small datasets | Fast selection of few-shot examples. No gem required. |
-| **GEPA** | Maximum quality | State-of-the-art reflective prompt evolution. 10-14% better than MIPROv2. |
-| **MIPROv2** | Large datasets (200+) | Bayesian optimization for instructions and examples. |
-
-### Usage
-
-```ruby
-# Create an optimizer for your dataset
-optimizer = Leva::PromptOptimizer.new(
-  dataset: dataset,
-  optimizer: :gepa,      # :bootstrap, :gepa, or :miprov2
-  mode: :medium,         # :light, :medium, or :heavy
-  model: "claude-opus-4-5"   # Any model supported by RubyLLM
-)
-
-# Run optimization
-result = optimizer.optimize
-
-# Result contains optimized prompts
-result[:system_prompt]  # Optimized instruction
-result[:user_prompt]    # Template with Liquid variables
-result[:metadata]       # Score, examples, and optimization details
-```
-
-### Optimization Modes
-
-| Mode | Duration | Use Case |
-|------|----------|----------|
-| `:light` | ~5 min | Quick experiments |
-| `:medium` | ~15 min | Balanced quality/speed |
-| `:heavy` | ~30 min | Production prompts |
 
 ## Configuration
 

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+- DSPy prompt optimization, its storage table, and its contributor dependency chain
+
 ## [0.3.4] - 2025-12-17
 ### Fixed
 - Relaxed Liquid gem version constraint from `~> 5.5.0` to `~> 5.5` to allow newer versions (Fixes #30)

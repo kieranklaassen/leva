@@ -29,3 +29,4 @@ Always run these commands to ensure CI will pass:
 ## Project Organization
 This is a Rails engine for evaluating language models with dataset experiments.
 - check @app/views/leva/design_system/ when doing any changes to the UI
+- `docs/solutions/` contains documented fixes and practices organized by category with YAML frontmatter (`module`, `tags`, `problem_type`), relevant when implementing or debugging documented areas.
