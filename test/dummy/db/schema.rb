@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_04_000046) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_02_214129) do
   create_table "email_contents", force: :cascade do |t|
     t.string "subject"
     t.text "body"
@@ -65,27 +65,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_04_000046) do
     t.index [ "prompt_id" ], name: "index_leva_experiments_on_prompt_id"
   end
 
-  create_table "leva_optimization_runs", force: :cascade do |t|
-    t.integer "dataset_id", null: false
-    t.integer "prompt_id"
-    t.string "status", default: "pending", null: false
-    t.string "current_step"
-    t.integer "progress", default: 0, null: false
-    t.integer "examples_processed", default: 0
-    t.integer "total_examples"
-    t.string "prompt_name", null: false
-    t.string "mode", default: "light", null: false
-    t.text "error_message"
-    t.json "metadata"
-    t.string "model"
-    t.string "optimizer", default: "bootstrap", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index [ "dataset_id" ], name: "index_leva_optimization_runs_on_dataset_id"
-    t.index [ "prompt_id" ], name: "index_leva_optimization_runs_on_prompt_id"
-    t.index [ "status" ], name: "index_leva_optimization_runs_on_status"
-  end
-
   create_table "leva_prompts", force: :cascade do |t|
     t.string "name"
     t.integer "version"
@@ -123,8 +102,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_04_000046) do
   add_foreign_key "leva_evaluation_results", "leva_runner_results", column: "runner_result_id"
   add_foreign_key "leva_experiments", "leva_datasets", column: "dataset_id"
   add_foreign_key "leva_experiments", "leva_prompts", column: "prompt_id"
-  add_foreign_key "leva_optimization_runs", "leva_datasets", column: "dataset_id"
-  add_foreign_key "leva_optimization_runs", "leva_prompts", column: "prompt_id"
   add_foreign_key "leva_runner_results", "leva_dataset_records", column: "dataset_record_id"
   add_foreign_key "leva_runner_results", "leva_experiments", column: "experiment_id"
   add_foreign_key "leva_runner_results", "leva_prompts", column: "prompt_id"
