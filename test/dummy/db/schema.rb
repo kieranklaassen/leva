@@ -10,13 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_04_000046) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_25_000001) do
   create_table "email_contents", force: :cascade do |t|
     t.string "subject"
     t.text "body"
     t.string "category"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "email_samples", force: :cascade do |t|
+    t.string "type", default: "EmailSample", null: false
+    t.string "from"
+    t.string "from_name"
+    t.string "subject"
+    t.text "body"
+    t.string "category", null: false
+    t.string "routing"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index [ "category" ], name: "index_email_samples_on_category"
+    t.index [ "routing" ], name: "index_email_samples_on_routing"
+    t.index [ "type" ], name: "index_email_samples_on_type"
   end
 
   create_table "leva_dataset_records", force: :cascade do |t|
@@ -63,6 +78,26 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_04_000046) do
     t.datetime "updated_at", null: false
     t.index [ "dataset_id" ], name: "index_leva_experiments_on_dataset_id"
     t.index [ "prompt_id" ], name: "index_leva_experiments_on_prompt_id"
+  end
+
+  create_table "leva_fine_tune_runs", force: :cascade do |t|
+    t.integer "dataset_id", null: false
+    t.string "provider", default: "together", null: false
+    t.string "base_model", null: false
+    t.string "fine_tuned_model_id"
+    t.string "provider_job_id"
+    t.string "training_file_id"
+    t.string "serving_base_url"
+    t.string "serving_endpoint_id"
+    t.string "status", default: "pending", null: false
+    t.integer "progress", default: 0, null: false
+    t.string "current_step"
+    t.json "hyperparameters"
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index [ "dataset_id" ], name: "index_leva_fine_tune_runs_on_dataset_id"
+    t.index [ "status" ], name: "index_leva_fine_tune_runs_on_status"
   end
 
   create_table "leva_optimization_runs", force: :cascade do |t|
@@ -123,6 +158,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_04_000046) do
   add_foreign_key "leva_evaluation_results", "leva_runner_results", column: "runner_result_id"
   add_foreign_key "leva_experiments", "leva_datasets", column: "dataset_id"
   add_foreign_key "leva_experiments", "leva_prompts", column: "prompt_id"
+  add_foreign_key "leva_fine_tune_runs", "leva_datasets", column: "dataset_id"
   add_foreign_key "leva_optimization_runs", "leva_datasets", column: "dataset_id"
   add_foreign_key "leva_optimization_runs", "leva_prompts", column: "prompt_id"
   add_foreign_key "leva_runner_results", "leva_dataset_records", column: "dataset_record_id"

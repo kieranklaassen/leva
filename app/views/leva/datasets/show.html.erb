@@ -148,6 +148,64 @@
     <% end %>
   </section>
 
+  <%# Model Fine-tuning Section %>
+  <section class="mb-8">
+    <div class="section-header">
+      <h3 class="section-title">Model Fine-tuning</h3>
+      <span class="section-count"><%= @dataset.fine_tune_runs.count %></span>
+      <div class="ml-auto">
+        <% if @dataset.dataset_records.count >= Leva::FineTuneRun::MINIMUM_RECORDS %>
+          <%= button_to dataset_fine_tune_runs_path(@dataset), params: { base_model: Leva::FineTuneRun::DEFAULT_BASE_MODEL }, class: "btn btn-primary btn-sm" do %>
+            <svg class="icon-sm" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
+            </svg>
+            Fine-tune Model
+          <% end %>
+        <% else %>
+          <button class="btn btn-ghost btn-sm" disabled title="Need at least <%= Leva::FineTuneRun::MINIMUM_RECORDS %> records to fine-tune">
+            Need <%= Leva::FineTuneRun::MINIMUM_RECORDS - @dataset.dataset_records.count %> more records
+          </button>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @dataset.fine_tune_runs.any? %>
+      <div class="table-wrapper">
+        <div class="table-scroll">
+          <table class="table table-clickable">
+            <thead>
+              <tr>
+                <th>Base Model</th>
+                <th>Fine-tuned Model</th>
+                <th>Status</th>
+                <th class="text-right">Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @dataset.fine_tune_runs.order(created_at: :desc).each do |run| %>
+                <tr class="clickable-row" onclick="window.location='<%= fine_tune_run_path(run) %>'">
+                  <td><span class="row-title"><%= run.base_model %></span></td>
+                  <td class="text-muted"><%= run.fine_tuned_model_id || '—' %></td>
+                  <td>
+                    <span class="badge badge-<%= run.status == 'completed' ? 'success' : (run.status == 'failed' ? 'error' : 'warning') %>">
+                      <%= run.status&.titleize || 'Pending' %>
+                    </span>
+                  </td>
+                  <td class="text-right text-muted"><%= time_ago_in_words(run.created_at) %> ago</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% else %>
+      <div class="empty-state-inline">
+        <p class="text-muted text-sm">No fine-tunes yet.</p>
+        <p class="text-xs text-subtle mt-2">Train an open model on this dataset; the result becomes a selectable model.</p>
+      </div>
+    <% end %>
+  </section>
+
   <%# Experiments Section %>
   <section>
     <div class="section-header">
