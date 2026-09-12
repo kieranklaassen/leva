@@ -155,7 +155,7 @@
                       <% eval_result = runner_result.evaluation_results.find_by(evaluator_class: evaluator_class) %>
                       <% if eval_result %>
                         <% score = eval_result.score %>
-                        <span class="score-inline <%= score_class(score) %>"><%= sprintf('%.2f', score) %></span>
+                        <span class="score-inline <%= score_class(score) %>" title="<%= eval_result.details.to_s.truncate(300) %>"><%= sprintf('%.2f', score) %></span>
                       <% else %>
                         <span class="text-subtle">—</span>
                       <% end %>

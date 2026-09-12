@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_25_000001) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_12_000002) do
   create_table "email_contents", force: :cascade do |t|
     t.string "subject"
     t.text "body"
@@ -60,6 +60,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_25_000001) do
     t.float "score"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "details"
     t.index [ "dataset_record_id" ], name: "index_leva_evaluation_results_on_dataset_record_id"
     t.index [ "experiment_id" ], name: "index_leva_evaluation_results_on_experiment_id"
     t.index [ "runner_result_id" ], name: "index_leva_evaluation_results_on_runner_result_id"
@@ -134,7 +135,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_25_000001) do
   create_table "leva_runner_results", force: :cascade do |t|
     t.integer "experiment_id"
     t.integer "dataset_record_id", null: false
-    t.integer "prompt_id", null: false
+    t.integer "prompt_id"
     t.integer "prompt_version"
     t.text "prediction"
     t.string "runner_class"

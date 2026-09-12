@@ -46,8 +46,12 @@
         <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
       </svg>
       <span class="result-meta-label">Prompt</span>
-      <%= link_to @runner_result.prompt.name, prompt_path(@runner_result.prompt), class: 'result-meta-value result-meta-link' %>
-      <span class="tag tag-gray">v<%= @runner_result.prompt_version %></span>
+      <% if @runner_result.prompt %>
+        <%= link_to @runner_result.prompt.name, prompt_path(@runner_result.prompt), class: 'result-meta-value result-meta-link' %>
+        <span class="tag tag-gray">v<%= @runner_result.prompt_version || @runner_result.prompt.version %></span>
+      <% else %>
+        <span class="result-meta-value text-muted" title="The runner owns its prompt">—</span>
+      <% end %>
     </div>
     <div class="result-meta-divider"></div>
     <div class="result-meta-item">
@@ -118,6 +122,22 @@
           </div>
         <% end %>
       </div>
+      <% detailed = @runner_result.evaluation_results.select { |eval_result| eval_result.details.present? } %>
+      <% if detailed.any? %>
+        <div class="eval-details mt-4">
+          <% detailed.each do |eval_result| %>
+            <div class="result-panel mt-3">
+              <div class="result-panel-header">
+                <span class="result-panel-label"><%= eval_result.evaluator_class.demodulize %></span>
+                <span class="result-panel-meta"><%= sprintf('%.2f', eval_result.score) %></span>
+              </div>
+              <div class="result-panel-content">
+                <pre class="result-code"><code><%= eval_result.details %></code></pre>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     </div>
   <% end %>
 

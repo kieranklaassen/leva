@@ -20,9 +20,21 @@ module Leva
     #   Leva-registered fine-tuned models. Defaults to a path under the host app.
     attr_writer :fine_tuned_models_path
 
+    # @return [String] name of the host controller every Leva controller
+    #   inherits from, so the host's authentication and authorization
+    #   before_actions, layout helpers and error handling apply to the engine.
+    #   Set it in an initializer, before the engine's controllers load.
+    #   Defaults to "ActionController::Base".
+    attr_writer :parent_controller
+
     # @return [#call] the authorization gate (default allows everything)
     def authorize_fine_tune
       @authorize_fine_tune ||= ->(_controller) { true }
+    end
+
+    # @return [String] the host controller class name Leva's controllers inherit from
+    def parent_controller
+      @parent_controller || "ActionController::Base"
     end
 
     # @return [String] the fine-tuned models overlay path
@@ -108,9 +120,10 @@ module Leva
     #
     # @param experiment [Leva::Experiment, nil] The experiment being run, if any.
     # @param dataset_record [Leva::DatasetRecord] The dataset record to run the model on.
-    # @param prompt [Leva::Prompt] The prompt to store the version of.
+    # @param prompt [Leva::Prompt, nil] The prompt to store the version of; nil for a
+    #   runner that owns its prompt (an application's production prompt, a fixed pipeline).
     # @return [Leva::RunnerResult] The stored runner result.
-    def execute_and_store(experiment, dataset_record, prompt)
+    def execute_and_store(experiment, dataset_record, prompt = nil)
       # Expose these to the subclass execution
       @experiment = experiment
       @prompt = prompt
@@ -177,11 +190,13 @@ module Leva
   class BaseEval
     # Evaluates the model's prediction against the ground truth.
     #
-    # @param prediction [Object] The model's prediction.
+    # @param runner_result [Leva::RunnerResult] The stored run (its +prediction+ is the model's output).
     # @param recordable [Object] The recordable object containing the ground truth.
-    # @return [Float] The evaluation score.
+    # @return [Numeric, Array, Hash, nil] the score, or the score with details
+    #   (+[score, details]+ or +{score:, details:}+ — details are stored and
+    #   shown in the UI), or +nil+ to abstain (nothing is stored for this run).
     # @raise [NotImplementedError] if the method is not implemented in a subclass.
-    def evaluate(prediction, recordable)
+    def evaluate(runner_result, recordable)
       raise NotImplementedError, "#{self.class} must implement #evaluate"
     end
 
@@ -189,20 +204,51 @@ module Leva
     #
     # @param experiment [Leva::Experiment, nil] The experiment being evaluated, if any.
     # @param runner_result [Leva::RunnerResult] The runner result to evaluate.
-    # @return [Leva::EvaluationResult] The stored evaluation result.
+    # @return [Leva::EvaluationResult, nil] The stored evaluation result, or nil when the evaluator abstained.
     def evaluate_and_store(experiment, runner_result)
       @experiment = experiment
       @runner_result = runner_result
 
-      score = evaluate(runner_result, runner_result.dataset_record.recordable)
+      score, details = self.class.normalize(evaluate(runner_result, runner_result.dataset_record.recordable))
+      return nil if score.nil?
 
       EvaluationResult.create!(
         experiment: experiment,
         dataset_record: runner_result.dataset_record,
         runner_result: runner_result,
         score: score,
+        details: details,
         evaluator_class: self.class.name
       )
+    end
+
+    # Normalizes what {#evaluate} returned into +[score, details]+.
+    #
+    # @param value [Numeric, Array, Hash, nil]
+    # @return [Array(Numeric, String), Array(nil, nil)] score and details; both nil for an abstention
+    # @raise [ArgumentError] when the value is none of the documented shapes
+    def self.normalize(value)
+      case value
+      when nil then [ nil, nil ]
+      when Numeric then [ value, nil ]
+      when Array then [ value[0], details_text(value[1]) ]
+      when Hash
+        hash = value.transform_keys(&:to_s)
+        [ hash["score"], details_text(hash["details"]) ]
+      else
+        raise ArgumentError, "#{name}#evaluate must return a score, [score, details], {score:, details:} or nil (got #{value.class})"
+      end
+    end
+
+    # @param details [Object, nil]
+    # @return [String, nil] details as text (a Hash or Array is stored as JSON)
+    def self.details_text(details)
+      case details
+      when nil then nil
+      when String then details
+      when Hash, Array then details.to_json
+      else details.to_s
+      end
     end
   end
 end

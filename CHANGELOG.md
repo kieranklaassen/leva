@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `Leva.config.parent_controller`: the host controller every Leva controller inherits from (default `ActionController::Base`), so a host's authentication and authorization before_actions gate the whole UI
+- `leva_evaluation_results.details`: an evaluator may return `[score, details]` or `{score:, details:}` and the details (a judge's reasoning, the failed assertion) are stored and shown on the runner result page and as the score's tooltip in the experiment table
+- An evaluator may return `nil` to abstain — nothing is stored for that run (a skipped case, a rubric that does not apply)
+
+### Changed
+- Runner results no longer require a `Leva::Prompt` (`prompt_id` is nullable; `execute_and_store(experiment, dataset_record, prompt = nil)`), so a runner that owns its prompt — an application's production prompt, a fixed pipeline — stores results, and an experiment created with the form's "None" prompt runs instead of failing
+- `BaseEval#evaluate` receives the `Leva::RunnerResult` (as it always did at runtime); the documentation now says so
 
 ## [0.3.4] - 2025-12-17
 ### Fixed

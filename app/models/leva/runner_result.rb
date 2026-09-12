@@ -10,7 +10,7 @@
 #  updated_at        :datetime         not null
 #  dataset_record_id :integer          not null
 #  experiment_id     :integer
-#  prompt_id         :integer          not null
+#  prompt_id         :integer
 #
 # Indexes
 #
@@ -28,11 +28,12 @@ module Leva
   class RunnerResult < ApplicationRecord
     belongs_to :experiment, optional: true
     belongs_to :dataset_record
-    belongs_to :prompt
+    # A runner that owns its prompt (an application's production prompt, a
+    # fixed pipeline) stores results without a Leva::Prompt.
+    belongs_to :prompt, optional: true
     has_many :evaluation_results, dependent: :destroy
 
     validates :prediction, presence: true
-    validates :prompt, presence: true
     validates :runner_class, presence: true
 
     delegate :ground_truth, to: :dataset_record
