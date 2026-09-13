@@ -56,7 +56,9 @@
       </div>
       <% if @dataset_record && (runner_result = @dataset_record.runner_results.last) %>
         <span class="output-meta">
-          <span class="badge badge-default" style="font-size: 10px; padding: 2px 6px;">v<%= runner_result.prompt.version %></span>
+          <% if runner_result.prompt %>
+            <span class="badge badge-default" style="font-size: 10px; padding: 2px 6px;">v<%= runner_result.prompt.version %></span>
+          <% end %>
           <span style="margin-left: 4px;"><%= time_ago_in_words(runner_result.created_at) %> ago</span>
         </span>
       <% end %>

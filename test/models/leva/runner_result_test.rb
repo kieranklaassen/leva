@@ -10,7 +10,7 @@
 #  updated_at        :datetime         not null
 #  dataset_record_id :integer          not null
 #  experiment_id     :integer
-#  prompt_id         :integer          not null
+#  prompt_id         :integer
 #
 # Indexes
 #

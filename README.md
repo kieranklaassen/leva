@@ -40,6 +40,25 @@ end
 
 The Leva UI will then be available at `/leva` in your application.
 
+To put your own authentication and authorization in front of the UI, name the
+host controller Leva's controllers should inherit from (its `before_action`s,
+helpers and error handling then apply to every Leva page):
+
+```ruby
+# config/initializers/leva.rb
+Leva.configure do |config|
+  config.parent_controller = "Admin::BaseController"   # default: "ActionController::Base"
+  # The model the experiment form proposes for LLM runners: an id, or a callable
+  # read on each request (default: "gemini-2.5-flash").
+  config.default_model = -> { RubyLLM.config.default_model }
+end
+```
+
+The UI ships every asset it needs — Stimulus is served from the engine's own
+`app/assets/javascripts/leva/` — so a host's `script-src` policy can stay
+`'self'` (the pages still use inline `<script>` blocks); only Fira Code is
+fetched from Google Fonts.
+
 ## Usage
 
 ### 1. Setting up Datasets
@@ -125,20 +144,32 @@ rails generate leva:eval sentiment_accuracy
 
 ```ruby
 class SentimentAccuracyEval < Leva::BaseEval
-  def evaluate(prediction, record)
+  # runner_result is the stored Leva::RunnerResult; its #prediction is the run's output.
+  def evaluate(runner_result, record)
+    prediction = runner_result.prediction.to_s.strip
     score = prediction == record.expected_label ? 1.0 : 0.0
-    [score, record.expected_label]
+    # An optional second element is stored as `details` and shown in the UI.
+    [score, "predicted #{prediction}, expected #{record.expected_label}"]
   end
 end
 
 class SentimentF1Eval < Leva::BaseEval
-  def evaluate(prediction, record)
+  def evaluate(runner_result, record)
     # Calculate F1 score
     # ...
-    [f1_score, record.f1_score]
+    { score: f1_score, details: { precision: precision, recall: recall } }   # details may be a Hash (stored as JSON)
+  end
+end
+
+class RubricEval < Leva::BaseEval
+  def evaluate(runner_result, record)
+    return nil unless record.rubric?   # nil abstains: nothing is stored for this run
+    # ...
   end
 end
 ```
+
+`evaluate` may return a score, `[score, details]`, `{score:, details:}`, or `nil` to abstain.
 
 ### 4. Running Experiments
 
@@ -157,6 +188,10 @@ evals = [SentimentAccuracyEval.new, SentimentF1Eval.new]
 
 Leva.run_evaluation(experiment: experiment, run: run, evals: evals)
 ```
+
+An experiment needs no `Leva::Prompt` when the runner owns its prompt (your
+application's production prompt, a fixed pipeline): leave `prompt` unset and
+`execute_and_store(experiment, dataset_record)` stores the result without one.
 
 ### 5. Using Prompts
 

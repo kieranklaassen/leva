@@ -3,6 +3,7 @@
 # Table name: leva_evaluation_results
 #
 #  id                :integer          not null, primary key
+#  details           :text
 #  evaluator_class   :string           not null
 #  score             :float
 #  created_at        :datetime         not null

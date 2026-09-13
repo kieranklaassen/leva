@@ -3,12 +3,15 @@ module Leva
     isolate_namespace Leva
 
     initializer "leva.assets" do |app|
-      # Add asset paths for both Sprockets and Propshaft
+      # Add asset paths for both Sprockets and Propshaft. Stimulus ships with
+      # the engine (app/assets/javascripts/leva/stimulus.umd.js) so the UI
+      # needs no CDN and a host's script CSP can stay `'self'`.
       app.config.assets.paths << root.join("app/assets/stylesheets").to_s
+      app.config.assets.paths << root.join("app/assets/javascripts").to_s
 
       # For Sprockets: explicitly precompile leva assets
       if app.config.respond_to?(:assets) && app.config.assets.respond_to?(:precompile)
-        app.config.assets.precompile += %w[leva/application.css]
+        app.config.assets.precompile += %w[leva/application.css leva/stimulus.umd.js]
       end
     end
 
