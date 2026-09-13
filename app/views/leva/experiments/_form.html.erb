@@ -55,7 +55,7 @@
          id="model-selection-group"
          data-controller="searchable-select"
          data-searchable-select-options-value="<%= Leva::PromptOptimizer.available_models.map { |m| { id: m.id, name: m.name } }.to_json %>"
-         data-searchable-select-selected-value="<%= @experiment.metadata&.dig("model") || "gemini-2.5-flash" %>">
+         data-searchable-select-selected-value="<%= @experiment.metadata&.dig("model") || Leva.config.default_model %>">
       <label for="experiment_metadata_model" class="form-label">Model (for LLM runners)</label>
       <div class="searchable-select-wrapper">
         <input type="text"
@@ -130,11 +130,12 @@
       }
 
       setInitialValue() {
+        if (!this.selectedValue) return
+        // A host's default may not be in RubyLLM's registry; show it as typed
+        // rather than an empty field that hides what the runner will use.
         const selected = this.optionsValue.find((opt) => opt.id === this.selectedValue)
-        if (selected) {
-          this.hiddenInputTarget.value = selected.id
-          this.searchTarget.value = selected.name
-        }
+        this.hiddenInputTarget.value = selected ? selected.id : this.selectedValue
+        this.searchTarget.value = selected ? selected.name : this.selectedValue
       }
 
       filter() {

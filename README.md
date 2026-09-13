@@ -48,8 +48,16 @@ helpers and error handling then apply to every Leva page):
 # config/initializers/leva.rb
 Leva.configure do |config|
   config.parent_controller = "Admin::BaseController"   # default: "ActionController::Base"
+  # The model the experiment form proposes for LLM runners: an id, or a callable
+  # read on each request (default: "gemini-2.5-flash").
+  config.default_model = -> { RubyLLM.config.default_model }
 end
 ```
+
+The UI ships every asset it needs — Stimulus is served from the engine's own
+`app/assets/javascripts/leva/` — so a host's `script-src` policy can stay
+`'self'` (the pages still use inline `<script>` blocks); only Fira Code is
+fetched from Google Fonts.
 
 ## Usage
 

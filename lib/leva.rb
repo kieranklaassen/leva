@@ -10,6 +10,7 @@ module Leva
   #   Leva.configure do |config|
   #     config.authorize_fine_tune = ->(controller) { controller.current_user&.admin? }
   #     config.fine_tuned_models_path = Rails.root.join("storage", "leva_fine_tuned_models.json").to_s
+  #     config.default_model = -> { RubyLLM.config.default_model }
   #   end
   class Configuration
     # @return [#call] gate invoked before starting a fine-tune; receives the
@@ -27,6 +28,12 @@ module Leva
     #   Defaults to "ActionController::Base".
     attr_writer :parent_controller
 
+    # @return [String, #call] the model the experiment form proposes for LLM
+    #   runners — a model id, or a callable returning one (read per request,
+    #   so a host can point it at its own runtime default). Defaults to
+    #   {Leva::PromptOptimizer::DEFAULT_MODEL}.
+    attr_writer :default_model
+
     # @return [#call] the authorization gate (default allows everything)
     def authorize_fine_tune
       @authorize_fine_tune ||= ->(_controller) { true }
@@ -40,6 +47,12 @@ module Leva
     # @return [String] the fine-tuned models overlay path
     def fine_tuned_models_path
       @fine_tuned_models_path || default_fine_tuned_models_path
+    end
+
+    # @return [String] the model id the experiment form proposes
+    def default_model
+      value = @default_model.respond_to?(:call) ? @default_model.call : @default_model
+      value.to_s.strip.empty? ? Leva::PromptOptimizer::DEFAULT_MODEL : value.to_s
     end
 
     private

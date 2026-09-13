@@ -13,7 +13,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 
     <%= stylesheet_link_tag "leva/application", media: "all" %>
-    <script src="https://cdn.jsdelivr.net/npm/stimulus@3.2.2/dist/stimulus.umd.min.js"></script>
+    <%# Stimulus 3.2.2 (the npm package's own UMD build, MIT), served from the engine's assets — no CDN. %>
+    <%= javascript_include_tag "leva/stimulus.umd" %>
     <%= yield(:head) %>
   </head>
   <body>

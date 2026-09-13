@@ -10,8 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Leva.config.parent_controller`: the host controller every Leva controller inherits from (default `ActionController::Base`), so a host's authentication and authorization before_actions gate the whole UI
 - `leva_evaluation_results.details`: an evaluator may return `[score, details]` or `{score:, details:}` and the details (a judge's reasoning, the failed assertion) are stored and shown on the runner result page and as the score's tooltip in the experiment table
 - An evaluator may return `nil` to abstain — nothing is stored for that run (a skipped case, a rubric that does not apply)
+- `Leva.config.default_model`: the model the experiment form proposes for LLM runners — an id or a callable read per request, so a host can point it at its own runtime default (default `Leva::PromptOptimizer::DEFAULT_MODEL`); a default the RubyLLM registry does not list is shown as typed instead of leaving the field blank
 
 ### Changed
+- Stimulus 3.2.2 ships with the engine (`app/assets/javascripts/leva/stimulus.umd.js`, the npm package's own UMD build, served through the asset pipeline) instead of being loaded from `cdn.jsdelivr.net`, so the UI works without egress and a host's script CSP can stay `'self'`
 - Runner results no longer require a `Leva::Prompt` (`prompt_id` is nullable; `execute_and_store(experiment, dataset_record, prompt = nil)`), so a runner that owns its prompt — an application's production prompt, a fixed pipeline — stores results, and an experiment created with the form's "None" prompt runs instead of failing
 - `BaseEval#evaluate` receives the `Leva::RunnerResult` (as it always did at runtime); the documentation now says so
 
