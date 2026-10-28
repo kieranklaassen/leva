@@ -100,7 +100,8 @@ module Leva
     private
 
     def set_prompt
-      @prompt = params[:prompt_id] ? Prompt.find(params[:prompt_id]) : Prompt.first
+      prompt_id = params[:id] || params[:prompt_id]
+      @prompt = prompt_id ? Prompt.find(prompt_id) : Prompt.first
     end
 
     def prompt_params

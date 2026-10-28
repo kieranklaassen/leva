@@ -42,6 +42,16 @@ module Leva
       assert_match(/runner_specific_field/, response.body)
     end
 
+    test "edit shows the prompt from the URL" do
+      other_prompt = Prompt.create!(name: "Other Prompt", user_prompt: "Other: {{ text }}")
+
+      get leva.edit_workbench_path(other_prompt)
+
+      assert_response :success
+      assert_match(/Other Prompt/, response.body)
+      assert_no_match(/Test Prompt/, response.body)
+    end
+
     test "run action uses runner context" do
       post leva.run_workbench_index_path, params: {
         prompt_id: @prompt.id,

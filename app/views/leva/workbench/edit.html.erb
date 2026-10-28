@@ -49,3 +49,72 @@
     <div id="form-status" class="autosave-status" data-prompt-form-target="status"></div>
   <% end %>
 </div>
+
+<script>
+  (() => {
+    const application = Stimulus.Application.start()
+
+    application.register("prompt-form", class extends Stimulus.Controller {
+      static targets = ["status"]
+
+      connect() {
+        this.timeout = null
+        this.debounceTime = 1000
+        this.lastSavedContent = this.formContent()
+      }
+
+      autoSave() {
+        clearTimeout(this.timeout)
+        this.timeout = setTimeout(() => {
+          if (this.formContent() !== this.lastSavedContent) {
+            this.submitForm()
+          }
+        }, this.debounceTime)
+      }
+
+      submitForm() {
+        const form = this.element
+        const formData = new FormData(form)
+
+        this.showStatus("Saving...", "text-warning")
+
+        fetch(form.action, {
+          method: form.method,
+          body: formData,
+          headers: {
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').content
+          },
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === "success") {
+            this.showStatus("Changes saved", "text-success")
+            this.lastSavedContent = this.formContent()
+          } else {
+            this.showStatus(`Error: ${data.errors.join(", ")}`, "text-error")
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error)
+          this.showStatus("Error saving changes", "text-error")
+        })
+      }
+
+      showStatus(message, className) {
+        clearTimeout(this.statusTimeout)
+        this.statusTarget.textContent = message
+        this.statusTarget.className = `autosave-status ${className}`
+        this.statusTimeout = setTimeout(() => {
+          this.statusTarget.textContent = ""
+          this.statusTarget.className = "autosave-status"
+        }, 3000)
+      }
+
+      formContent() {
+        return JSON.stringify(Object.fromEntries(new FormData(this.element)))
+      }
+    })
+  })()
+</script>
